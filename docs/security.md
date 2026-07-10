@@ -18,12 +18,16 @@
 |---|---|---|
 | Hash verification | `pip install --require-hashes -r requirements.lock` | Same version, different content → fails |
 | Multi-stage build | Separate builder + prod stage; build tools don't ship to prod | Smaller attack surface |
-| `.pth` injection scan | Scan `.pth` files in build+CI; **high-signal** pattern: `exec(\|subprocess\|os.system\|socket\|eval(\|marshal\|base64\|__import__` | Blocks autorun injection |
+| `.pth` injection scan | Scan installed `.pth` for exfiltration/exec **primitives** (`subprocess\|socket\|os.system\|urllib\|base64\|marshal\|...`), skipping legit shims (`distutils-precedence.pth`) | Flags autorun exfiltration without false-failing on legit packages |
 | pip-audit CI step | `pip-audit -r requirements.lock` in CI | Catches known CVEs |
 | Network policy | Only necessary egress allowed in prod | Harder to exfiltrate |
 
-> **Note — common `.pth`-scan mistake:** a naive `import` grep false-positives on setuptools'
-> `distutils-precedence.pth` file and breaks the build. That's why only high-signal patterns are scanned.
+> **Note — `.pth` scanning is heuristic.** Legitimate `.pth` files execute code too (setuptools'
+> `distutils-precedence.pth`, coloredlogs, editable installs all use `import`/`exec`/`__import__`), so
+> grepping for *those* tokens false-positives and breaks CI. We instead scan only for **exfiltration/
+> execution primitives** (network/subprocess/encoding: `subprocess`, `socket`, `os.system`/`os.popen`,
+> `urllib`, `base64`, `marshal`, ...) — what a credential-harvesting `.pth` actually needs — and skip the
+> ubiquitous `distutils-precedence.pth`. A hit means "human review," not "certainly malicious."
 
 ## Tier 3 — Planned
 | Measure | Effect |

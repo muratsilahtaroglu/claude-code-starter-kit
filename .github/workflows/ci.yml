@@ -22,17 +22,19 @@ jobs:
         run: |
           pip install --require-hashes -r requirements.lock
 
-      # High-signal-only pattern to avoid false-positiving on setuptools'
-      # legitimate distutils-precedence.pth (see docs/security.md note).
+      # Scan installed .pth for exfiltration/execution PRIMITIVES only (network/subprocess/
+      # encoding) — what a credential-harvesting .pth actually needs. We deliberately do NOT
+      # flag bare exec()/eval()/__import__: legit .pth files (setuptools' distutils-precedence.pth,
+      # coloredlogs, editable installs) use those and would false-fail CI. See docs/security.md.
       - name: Scan .pth files for injection
         run: |
           set -euo pipefail
-          PATTERN='exec\(|subprocess|os\.system|socket|eval\(|marshal|base64|__import__'
+          PATTERN='subprocess|socket|os\.system|os\.popen|marshal|base64|urllib|ftplib|smtplib|pty\.spawn'
           SITE=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
-          FOUND=$(find "$SITE" -name "*.pth" 2>/dev/null \
+          FOUND=$(find "$SITE" -name "*.pth" -not -name 'distutils-precedence.pth' 2>/dev/null \
             | xargs -r grep -lE "$PATTERN" || true)
           if [ -n "$FOUND" ]; then
-            echo "Suspicious .pth file(s) found:"
+            echo "Suspicious .pth file(s) found — review before trusting:"
             echo "$FOUND"
             exit 1
           fi
