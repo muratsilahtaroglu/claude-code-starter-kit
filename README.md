@@ -1,5 +1,22 @@
 # Claude Code Project Template (Starter Kit)
 
+*A discipline + security starter kit that keeps Claude Code (or any LLM) building your project
+consistently, traceably, and safely — from the very first session.*
+
+**Requires:** [Claude Code](https://claude.com/claude-code). The `.claude/` layer (permissions, hooks,
+skills) is Claude-Code-native; the docs and discipline (`rules.md`, ADRs, `HANDOVER.md`, security guide)
+are tool-agnostic and useful with any agent.
+
+## Quick start
+```bash
+# 1) copy the template (incl. dotfiles) into your new project's root
+cp -a _project_template/. my-project/ && cd my-project
+# 2) in Claude Code, let it tailor the template to THIS project before coding:
+#    "Read CLAUDE.md, then run the bootstrap: prune what this project doesn't need and plan."
+```
+Then follow **How to use** below. Not every project needs the whole template — the bootstrap prunes it
+to fit (with your approval).
+
 > **Purpose:** When starting a new project (you or your teammates), give Claude Code this folder as a
 > **template**. The generic "working discipline" files inside help set up the project from day one as
 > **professional, traceable, and secure**. No file contains a project name or project-specific detail —
@@ -24,6 +41,8 @@ rules.md               # working rules: documentation discipline, testing, scrat
                        #   sub-agent verification, GitHub push, supply-chain security
 HANDOVER.md            # cumulative session handover (done/tried-failed/latest/next)
 user_manual.md         # end-user guide skeleton
+LICENSE                # MIT
+CONTRIBUTING.md        # how to contribute to the template itself (vs rules.md = building with it)
 .claude/settings.json  # permissions (deny .env/secrets, ask before push) + hook registration
 .claude/hooks/         # block-dangerous.sh (rm -rf/force-push/.env/pipe-to-shell) + handover reminder
 .claude/skills/        # invokable workflows: /handoff, /phase-review, /research
