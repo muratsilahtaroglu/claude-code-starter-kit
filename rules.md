@@ -67,7 +67,9 @@
    results are summarized under `tests/` + in the handover.
 9. **Reusability:** repeated prompts/scripts/helpers are not written once and thrown away — they are
    **permanently** saved into `prompts/`, `.claude/skills/` (Claude Code invokable skills), or the
-   appropriate module + recorded in `docs/architecture.md`.
+   appropriate module + recorded in `docs/architecture.md`. Recurring operations (handover, distill,
+   research, review) are always **fixed skills** — cheap, consistent, versioned — with the case-specific
+   details filled in at run time. The SECOND time you write a similar ad-hoc prompt, promote it.
 
 ## 3. File layout (CRITICAL)
 10. Temporary/experimental/probe code goes **only** into the appropriate `scratch/` subfolder, with a
@@ -157,3 +159,19 @@
 35. **No vector DB / RAG for memory (by default).** At this scale grep-able markdown beats embeddings on
     freshness, zero deps, and git-diffability (Claude Code itself uses agentic search, no index).
     Reconsider only if the notes corpus reaches ~1,000+ files or fuzzy "can't-name-it" recall is needed.
+
+## 10. Judgment — weighing requests and uncertainty
+36. **Sanity-check, don't rubber-stamp.** Before implementing a request, check it against the project's
+    architecture, conventions, and stated goals. If it conflicts with them, looks like a likely mistake,
+    or a clearly simpler approach exists, say so **once, concretely** — the specific problem, its
+    consequence, and an alternative — then stop. Do not refuse, lecture, or manufacture objections to
+    appear rigorous: **silent compliance and reflexive pushback are both failures.** Once the user
+    confirms after hearing the concern, their decision is **final** — implement it well and don't
+    re-litigate it later in the session. Never agree just to be agreeable — accuracy over agreement.
+37. **Ground before you build.** When not confident that an API, mechanism, or approach works the way
+    you're about to use it (unfamiliar library, framework hook, architectural pattern), do NOT invent it
+    from memory — hallucinated APIs are common and confidently wrong. Check prior art cheapest-first:
+    `LESSONS.md`/ADRs + existing code patterns → official docs → a research sub-agent for anything
+    bigger. State where you verified it ("per docs X" / "per LESSONS.md"); if you can't cite a source,
+    say you're unsure and check before writing code. **Proportionality:** skip this for trivial
+    one-sentence-diff changes or things already verified this session.

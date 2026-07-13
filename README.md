@@ -30,6 +30,18 @@ See **How to use** below. **Already have a project?** Don't `rm -rf .git` — se
 > **professional, traceable, and secure**. No file contains a project name or project-specific detail —
 > fill in the placeholders.
 
+## When (not) to use Keel
+Honest scoping: **solo developer, one machine, a weekend project?** Claude Code's built-in auto-memory +
+compaction will mostly carry you — Keel's discipline would be overhead. Keel pays off when any of these
+is true:
+- **a team** — project memory must live in the repo and travel through git (built-in auto-memory is
+  machine-local and never shared);
+- **open source / CI** — enforced permissions + hooks, supply-chain checks, PR discipline;
+- **a months-long project with tens of compactions** — block-rotated memory, an always-loaded lessons
+  database, a cross-session task board.
+
+And even then, you don't take all of it: the bootstrap prunes whatever *this* project doesn't need.
+
 ## The loop (why it doesn't drift)
 ```mermaid
 flowchart LR
@@ -127,7 +139,7 @@ next work), and migrates security (rules.md §7) gradually — without breaking 
 claude-code-starter-kit/
 │
 ├── CLAUDE.md                 # project constitution — Claude reads it first (@-imports the 4 below)
-├── rules.md                  # working discipline: docs · tests · security · git · research · memory
+├── rules.md                  # working discipline: docs · tests · security · git · research · memory · judgment
 ├── HANDOVER.md               # session memory: last 5 blocks (done · tried-failed · latest · next)
 ├── LESSONS.md                # critical knowledge written the moment it appears ([rule][test][fail][gotcha])
 ├── TASKS.md                  # cross-session task board (Now (3–5) · Next · Discovered; delete-on-done)
