@@ -21,6 +21,9 @@ cd my-project && rm -rf .git && git init
 # 2) in Claude Code, let it tailor the template to THIS project before coding:
 #    "Read CLAUDE.md, then run the bootstrap: prune what this project doesn't need and plan."
 ```
+Shell commands in this README are for **macOS/Linux** — on Windows use **Git Bash** (Claude Code uses it
+there anyway); the PowerShell equivalent of `rm -rf .git` is `Remove-Item -Recurse -Force .git`.
+
 Not every project needs the whole template — the bootstrap prunes it to fit (with your approval).
 See **How to use** below. **Already have a project?** Don't `rm -rf .git` — see
 [Adopting into an existing project](#adopting-into-an-existing-project-brownfield).
@@ -134,6 +137,11 @@ The kit is *overlaid, never dumped on top*: **non-destructive is the hard rule**
 git clone https://github.com/muratsilahtaroglu/claude-code-starter-kit.git /tmp/keel
 # add ONLY the files you don't already have (existing files are kept, never overwritten):
 rsync -av --ignore-existing /tmp/keel/ /path/to/your-project/ --exclude '.git'
+```
+Windows has no `rsync` (not even in Git Bash) — use the built-in `robocopy` instead
+(copies only files missing from the target, like `--ignore-existing`):
+```bat
+robocopy C:\tmp\keel C:\path\to\your-project /E /XC /XN /XO /XD .git
 ```
 Then, in Claude Code, run **`/adopt`** (or: *"Adopt Keel into THIS project — don't overwrite my files, add
 only what's missing, back-fill `docs/architecture.md` + `HANDOVER.md` from the current code, merge conflicts
