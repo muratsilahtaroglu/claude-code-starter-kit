@@ -15,8 +15,8 @@
   pick ONE `## Now` item; verify tests pass before new work.
 - **During:** the moment a rule / must-run test / gotcha / failed approach is agreed or discovered — ask
   "shall I note this?" and append it to `LESSONS.md` immediately (don't wait for compaction).
-- **End (or before compact):** `/handover` (new HANDOVER block) · delete done TASKS items · commit with
-  approval. If any memory file exceeds its cap → `/distill`.
+- **End (or before compact):** `/keel-handover` (new HANDOVER block) · delete done TASKS items · commit with
+  approval. If any memory file exceeds its cap → `/keel-distill`.
 - **When compacting, always preserve:** the list of modified files, open `TASKS.md ## Now` items, test
   commands, and any agreement not yet written to `LESSONS.md` (write it there first).
 
@@ -48,7 +48,7 @@ parameters from `config/<env>.yaml` selected by `ENV` (see `config/README.md`).
   never loose at the repo root; the root holds only the discipline/config scaffold. New modules → `src/`.
 - Runtime LLM prompts (LLM apps only) live in versioned files under `src/` and are read from disk —
   code never embeds prompt strings. (Prompts that steer *Claude Code* go in `.claude/skills/` or `.claude/agents/`, not here.)
-- Reusable Claude Code workflows live in `.claude/skills/<name>/SKILL.md` (e.g. `/handover`, `/phase-review`).
+- Reusable Claude Code workflows live in `.claude/skills/<name>/SKILL.md` (e.g. `/keel-handover`, `/keel-phase-review`).
 - Side tasks that would clutter the thread run as subagents in `.claude/agents/` (e.g. `researcher`,
   `verifier`). Which mechanism for what (skill vs subagent vs rule vs hook) → `docs/steering.md`.
 - Throwaway/experimental code only in `scratch/<subfolder>/`, with a 1-line purpose comment at the top.

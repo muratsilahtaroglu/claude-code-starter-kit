@@ -1,6 +1,6 @@
 # research/ — external research evidence trail (opt-in, rules.md §8)
 
-Filled **only when the user opts in** (offered at bootstrap §0d, or via the `/research` skill). One
+Filled **only when the user opts in** (offered at bootstrap §0d, or via the `/keel-research` skill). One
 subfolder per source platform; each holds a distilled `findings.md` and (optionally) raw downloads.
 
 ```

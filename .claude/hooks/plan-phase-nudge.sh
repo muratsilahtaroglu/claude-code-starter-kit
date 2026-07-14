@@ -2,7 +2,7 @@
 # Stop hook — gentle, NON-blocking nudge fired the MOMENT a turn ends: a PLAN.md phase is
 # still `wip` yet every TASKS.md `## Now` item is checked off, i.e. the phase looks finished
 # but its status was never flipped (rules.md §2.7). This is the enforcement backstop that the
-# four ritual update-points lacked — statuses lived only in guidance, so a skipped /phase-review
+# four ritual update-points lacked — statuses lived only in guidance, so a skipped /keel-phase-review
 # left PLAN lagging reality. Surfacing here (systemMessage) is also seen by the user, so the
 # phase map can be watched from outside without waiting a whole session. Always exits 0.
 
@@ -26,6 +26,6 @@ now=$(sed -n '/^## Now/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null)
 nowopen=$(printf '%s\n' "$now" | grep -c '^- \[ \]')
 nowdone=$(printf '%s\n' "$now" | grep -cE '^- \[[xX]\]')
 if [ "${nowopen:-0}" -eq 0 ] && [ "${nowdone:-0}" -ge 1 ]; then
-  printf '{"systemMessage":"[keel] Phase %s is still wip but every TASKS.md ## Now item is checked off — if the gate is met, run /phase-review to flip it to done in PLAN.md (rules.md §2.7); otherwise refill ## Now from the gate."}\n' "$wip"
+  printf '{"systemMessage":"[keel] Phase %s is still wip but every TASKS.md ## Now item is checked off — if the gate is met, run /keel-phase-review to flip it to done in PLAN.md (rules.md §2.7); otherwise refill ## Now from the gate."}\n' "$wip"
 fi
 exit 0

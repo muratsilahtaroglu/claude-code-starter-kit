@@ -12,8 +12,8 @@
    - **Mode A — New / greenfield project** (empty or near-empty repo): the template files are the starting
      point. Go straight to the tailoring plan (a)–(e) below.
    - **Mode B — Adopt into an EXISTING project** (brownfield): the project already has code + history; the
-     template is *overlaid, never dumped on top*. **Non-destructive is the hard rule.** Run the `/adopt`
-     skill (`.claude/skills/adopt/`), which before (a)–(e) additionally:
+     template is *overlaid, never dumped on top*. **Non-destructive is the hard rule.** Run the `/keel-adopt`
+     skill (`.claude/skills/keel-adopt/`), which before (a)–(e) additionally:
      - **keeps their `.git`** — never re-init or wipe history (no `rm -rf .git`);
      - **inventories & classifies** every template path vs. the repo — *missing* (safe to add), *present*
        (project has its own: `README.md`, `pyproject.toml`, `.gitignore`, `CLAUDE.md`, ...), or
@@ -42,7 +42,7 @@
      `HANDOVER.md` session block (a) (or a short ADR), so later sessions understand why the tree differs
      from the stock template.
 
-   After the tailoring is applied, run **`/plan`**: propose the phase DAG (phases · gates ·
+   After the tailoring is applied, run **`/keel-plan`**: propose the phase DAG (phases · gates ·
    dependencies) and, on approval, seed `PLAN.md` + `TASKS.md ## Now` from its first wip leaf.
 1. Before writing any code, read **`CLAUDE.md` + `rules.md` + `HANDOVER.md` (top block) + `LESSONS.md` +
    `TASKS.md ## Now`** (CLAUDE.md `@`-imports all four, so they auto-load).
@@ -54,7 +54,7 @@
 4. **`HANDOVER.md` is updated BEFORE every compact/session end** — one dated **session block** (newest
    first) with (a) completed, (b) tried-and-failed (so they aren't retried), (c) latest updates,
    (d) next steps. **Hard cap: max 5 blocks / ~200 lines** (it is `@`-imported into every session — bloat
-   is a per-session token tax and an adherence tax). On overflow run **`/distill`** (§9.33): oldest
+   is a per-session token tax and an adherence tax). On overflow run **`/keel-distill`** (§9.33): oldest
    block's critical facts → `LESSONS.md`, raw block → `docs/handover-archive.md` verbatim. Default is a
    **single root** handover. On large multi-area projects the AI may create **per-area handovers**
    (`<area>/HANDOVER.md`, e.g. backend/frontend/agent) when an area needs its own — the root then indexes
@@ -66,7 +66,7 @@
 
 ## 2. Code & tests
 7. Phases are not skipped; each phase ends with a **working product + a "how to test this" summary** —
-   and is not `done` until its gate is flipped to `done` in `PLAN.md` via `/phase-review` (a Stop hook
+   and is not `done` until its gate is flipped to `done` in `PLAN.md` via `/keel-phase-review` (a Stop hook
    nudges the moment a `wip` phase's `## Now` tasks are all checked but its status was never flipped).
 8. After every code change, the relevant **unit/integration (and e2e if needed) tests** are written/run;
    results are summarized under `tests/` + in the handover.
@@ -94,7 +94,7 @@
     **verify** it (does it work, does it match the architecture/rules, did it leave stray files) and fix
     if needed. (Note: outputs from external guides/docs are applied with the same verification.) Reusable
     subagents live in `.claude/agents/`: `researcher` (cited prior-art scouting), `verifier`
-    (adversarial "try to refute it" checks) and `auditor` (rules-compliance spot-check via `/audit`).
+    (adversarial "try to refute it" checks) and `auditor` (rules-compliance spot-check via `/keel-audit`).
     Mechanism guide: `docs/steering.md`.
 
 ## 5. Security (application)
@@ -137,7 +137,7 @@
 ## 8. Research (optional, opt-in — ask first)
 27. **Ask before researching.** External research (GitHub, articles/papers, LinkedIn, Hugging Face, the
     web) runs **only when the user opts in** — offered at bootstrap (§0d) or on request. If declined, skip
-    it silently. The reusable workflow is the `/research` skill (`.claude/skills/research/`), which
+    it silently. The reusable workflow is the `/keel-research` skill (`.claude/skills/keel-research/`), which
     delegates to the `researcher` subagent (`.claude/agents/`).
 28. **Layout:** findings live under `research/<platform>/` — one subfolder per source (`github/`,
     `articles/`, `linkedin/`, `huggingface/`, `web/`, ...). Each keeps a `findings.md` (distilled, cited
@@ -160,14 +160,14 @@
     critical user↔AI knowledge **accumulated during** the project.
 32. **Task board (`TASKS.md`).** Cross-session tasks live in `TASKS.md` (built-in todos are session
     scratch only). Work ONLY from `## Now` (max 3–5); every item has a verifiable `done-when:`; a
-    finished item is marked `[x]` immediately and **deleted at `/handover`** as its one-liner lands in
+    finished item is marked `[x]` immediately and **deleted at `/keel-handover`** as its one-liner lands in
     the new HANDOVER block (a) — git is the archive; mid-session discoveries get one line in
     `## Discovered` immediately, triaged at session end.
-33. **Consolidation (`/distill`).** These caps are the single source of truth — the `distill` skill and
+33. **Consolidation (`/keel-distill`).** These caps are the single source of truth — the `keel-distill` skill and
     `.claude/hooks/session-start-reground.sh` mirror them; change one, change all three. Memory that is
     written but never reviewed degrades: when caps are
     exceeded (HANDOVER > 5 blocks/~200 lines, LESSONS/TASKS > ~100 lines) or every ~5 sessions, run
-    `/distill` — rotate old blocks (critical → LESSONS, raw → `docs/handover-archive.md` **verbatim**),
+    `/keel-distill` — rotate old blocks (critical → LESSONS, raw → `docs/handover-archive.md` **verbatim**),
     dedup/merge lessons (mark `SUPERSEDED`, never silently delete), promote 3×-applied lessons into
     rules/skills/ADRs, and lint for contradictions/stale claims.
 34. **Restorable compression.** Distillation never lossy-deletes: every distilled line carries a pointer

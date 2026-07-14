@@ -34,8 +34,9 @@ This repo is **also its own Claude Code plugin marketplace** — install the enf
 /plugin marketplace add muratsilahtaroglu/claude-code-starter-kit
 /plugin install keel@keel
 ```
-That gives you the **skills** (namespaced: `/keel:handover` · `/keel:distill` · `/keel:phase-review` ·
-`/keel:research` · `/keel:adopt` · `/keel:update` · `/keel:audit` · `/keel:plan`), the `researcher` +
+That gives you the **skills** (each `keel-`-prefixed, so under the plugin namespace: `/keel:keel-handover` ·
+`/keel:keel-distill` · `/keel:keel-phase-review` · `/keel:keel-research` · `/keel:keel-adopt` ·
+`/keel:keel-update` · `/keel:keel-audit` · `/keel:keel-plan`), the `researcher` +
 `verifier` + `auditor` **subagents**, and the
 memory/safety **hooks** — across every repo. **A clone is a snapshot; the plugin is a subscription:**
 when the template improves, one `/plugin marketplace update keel` brings the new tooling to *all* your
@@ -44,7 +45,7 @@ projects at once — no re-cloning. It does **not** install the discipline docs 
 files or permission rules). The clone above is the full kit; the plugin is the tooling half for teams
 that already have the docs or want the skills everywhere.
 
-**Updating a cloned kit** works the same reviewed way: run **`/update`** in the project — it fetches the
+**Updating a cloned kit** works the same reviewed way: run **`/keel-update`** in the project — it fetches the
 latest template, skips what your bootstrap pruned, and shows the rest as diffs: kit tooling in one
 reviewed batch, likely-tailored files (`rules.md`, config, workflows) hunk-by-hunk. Only hunks you
 approve are applied; your project memory (`HANDOVER/LESSONS/TASKS`), your code, and the project-owned
@@ -85,21 +86,21 @@ The context window is volatile RAM; the repo is durable disk. Every phase writes
 
 | File | What | Anti-bloat rule |
 |---|---|---|
-| `HANDOVER.md` | last **5 session blocks** (done · tried-failed · latest · next) | on overflow `/distill` rotates the oldest block |
+| `HANDOVER.md` | last **5 session blocks** (done · tried-failed · latest · next) | on overflow `/keel-distill` rotates the oldest block |
 | `LESSONS.md` | critical knowledge written **the moment it appears** (rules, must-run tests, gotchas, failures) — with your approval | ~100-line cap; dedup/merge; `SUPERSEDED`, never silently deleted |
 | `TASKS.md` | cross-session task board (`Now` (max 3–5) · `Next` · `Discovered`), each item with a verifiable `done-when:` | ~100-line cap; **delete on done** — git is the archive |
 | `docs/handover-archive.md` | raw rotated blocks, verbatim | never `@`-imported → zero context cost, grep on demand |
 | `PLAN.md` | strategic phase map: status table + **colored Mermaid DAG** (renders live on GitHub/VSCode — watch nodes turn red→yellow→green) + post-completion fix log | not `@`-imported; statuses flip at rituals — a Stop hook nudges the moment a `wip` phase's tasks are all done but its status wasn't flipped (+ table↔diagram↔TASKS drift check) |
 
 No vector DB, no external memory service — grep-able markdown beats embeddings at this scale
-(Claude Code itself ships with agentic search and no index). `/distill` is the consolidation ritual:
+(Claude Code itself ships with agentic search and no index). `/keel-distill` is the consolidation ritual:
 rotate, dedup, promote 3×-applied lessons into rules/skills, lint for contradictions.
 
 ### Surviving compaction (the pincer)
 
 <p align="center">
   <img src="docs/assets/keel-memory.gif" width="760"
-       alt="Keel memory lifecycle: a mid-session rule is written to LESSONS.md the moment it appears, survives compaction via the PreCompact snapshot + SessionStart re-ground pincer, and /distill rotates the oldest HANDOVER block when the cap is hit">
+       alt="Keel memory lifecycle: a mid-session rule is written to LESSONS.md the moment it appears, survives compaction via the PreCompact snapshot + SessionStart re-ground pincer, and /keel-distill rotates the oldest HANDOVER block when the cap is hit">
 </p>
 
 When the context window fills up, Claude Code **compacts**: the conversation is squeezed into a lossy
@@ -109,7 +110,7 @@ from disk** after every compaction. Keel exploits that with a two-sided pincer a
 - **Before — `PreCompact` hook** (side effects only; it *cannot* inject instructions): snapshots
   `HANDOVER/LESSONS/TASKS` to `.claude/snapshots/` and warns if the handover looks stale.
 - **After — `SessionStart` hook** (its output *is* injected into context): tells Claude to re-read the
-  top HANDOVER block, `LESSONS.md`, and `TASKS.md ## Now`, and warns when a memory file needs `/distill`.
+  top HANDOVER block, `LESSONS.md`, and `TASKS.md ## Now`, and warns when a memory file needs `/keel-distill`.
 - **Standing directive in `CLAUDE.md`**: what every compaction summary must preserve (modified files,
   open tasks, test commands, unwritten agreements → write them to `LESSONS.md` first).
 
@@ -155,16 +156,16 @@ everything already in the target, like `--ignore-existing`):
 git clone https://github.com/muratsilahtaroglu/claude-code-starter-kit.git C:\tmp\keel
 robocopy C:\tmp\keel C:\path\to\your-project /E /XC /XN /XO /XD .git
 ```
-Then, in Claude Code, run **`/adopt`** (or: *"Adopt Keel into THIS project — don't overwrite my files, add
+Then, in Claude Code, run **`/keel-adopt`** (or: *"Adopt Keel into THIS project — don't overwrite my files, add
 only what's missing, back-fill `docs/architecture.md` + `HANDOVER.md` from the current code, merge conflicts
-by showing me a diff first, and propose the plan before changing anything."*). `/adopt` inventories every
+by showing me a diff first, and propose the plan before changing anything."*). `/keel-adopt` inventories every
 path as **add · merge · defer**, reverse-engineers the docs from your real code, **seeds the memory layer**
 (first `HANDOVER.md` block = what exists today; `LESSONS.md` = known gotchas; `TASKS.md ## Now` = the actual
 next work), and migrates security (rules.md §7) gradually — without breaking a working build.
 
 <p align="center">
   <img src="docs/assets/keel-adopt.gif" width="760"
-       alt="Keel adopt flow: clone the kit elsewhere, rsync only missing files, then /adopt inventories add/merge/defer, keeps your git history, back-fills the docs and seeds the memory files — with your approval">
+       alt="Keel adopt flow: clone the kit elsewhere, rsync only missing files, then /keel-adopt inventories add/merge/defer, keeps your git history, back-fills the docs and seeds the memory files — with your approval">
 </p>
 
 ## Where your code lives (discipline vs. code)
@@ -184,7 +185,7 @@ The kit ships **no `src/`** — it is NOT part of the shipped tree below; the bo
 layout for *your* project type (service / CLI / ML / mix) and you approve it, then **all application code
 goes under `src/`** and nothing loose lands at the root (rules.md §3.10). LLM-app runtime prompts (if any)
 are versioned files under `src/`, read from disk. **New project:** the shell comes first, you add code
-inside `src/`. **Existing project:** your code already exists and the shell wraps around it via `/adopt` —
+inside `src/`. **Existing project:** your code already exists and the shell wraps around it via `/keel-adopt` —
 nothing in your `src/` moves. Keel is a **shell that wraps your project, not a skeleton you pour code into.**
 
 ## Contents (all generic / project-agnostic)
@@ -205,7 +206,7 @@ claude-code-starter-kit/
 │   ├── settings.json         #     permissions: deny reading secrets · ask before push · hook registration
 │   ├── hooks/                #     block-dangerous · handover reminder · phase-done nudge · pre-compact snapshot ·
 │   │                         #     session-start re-ground (+ cap · staleness · audit-due · plan-drift warnings)
-│   ├── skills/               #     invokable workflows: /handover · /phase-review · /research · /adopt · /distill · /update · /audit · /plan
+│   ├── skills/               #     invokable workflows: /keel-handover · /keel-phase-review · /keel-research · /keel-adopt · /keel-distill · /keel-update · /keel-audit · /keel-plan
 │   ├── agents/               #     reusable subagents: researcher · verifier · auditor (isolated context)
 │   ├── hooks/hooks.json      #     plugin-mode hook registration (standalone mode uses settings.json)
 │   └── rules/                #     optional path-scoped rules (load only when matching files are touched)
@@ -253,7 +254,7 @@ claude-code-starter-kit/
   every session into `HANDOVER.md`. The project stays stable even after 10+ compactions.
 - **Memory with a lifecycle, not a landfill:** always-loaded files are size-capped; old detail rotates
   to a never-loaded archive; critical facts are written the moment they appear (`LESSONS.md`) and
-  consolidated by `/distill`. Files + grep beat vector DBs at this scale — no external memory service.
+  consolidated by `/keel-distill`. Files + grep beat vector DBs at this scale — no external memory service.
 - **Order:** throwaway code stays in `scratch/`, the main tree stays clean.
 - **Security from day one:** dependency pinning + hashing + non-root + secret hygiene from the start.
 - **Enforced, not just advised:** the discipline is wired into Claude Code's native layer (see the

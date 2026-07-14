@@ -9,5 +9,5 @@ changed="$(git -C "$DIR" status --porcelain 2>/dev/null)"
 [ -n "$(git -C "$DIR" status --porcelain -- HANDOVER.md 2>/dev/null)" ] && exit 0  # already updated → quiet
 
 # Advisory only. `systemMessage` is shown to the user; exit 0 lets the turn end normally.
-printf '{"systemMessage":"Reminder (rules.md §1.4): the working tree changed but HANDOVER.md was not updated this session — consider /handover before ending."}\n'
+printf '{"systemMessage":"Reminder (rules.md §1.4): the working tree changed but HANDOVER.md was not updated this session — consider /keel-handover before ending."}\n'
 exit 0

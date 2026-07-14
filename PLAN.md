@@ -2,20 +2,20 @@
 
 > The **strategic** view: phases, gates, and the dependency graph — where the whole journey stands.
 > The **tactical** board is `TASKS.md` (`## Now` feeds from the wip phase's gate); never duplicate its
-> checkboxes here. Updated at **ritual points only**: `/plan` creates/revises the map, `/handover` flips
-> statuses + refreshes *Current focus*, `/phase-review` turns a finished phase's gate green. The
+> checkboxes here. Updated at **ritual points only**: `/keel-plan` creates/revises the map, `/keel-handover` flips
+> statuses + refreshes *Current focus*, `/keel-phase-review` turns a finished phase's gate green. The
 > SessionStart hook cross-checks table ↔ diagram ↔ TASKS and warns on drift. **Not `@`-imported**
 > (zero always-on context cost) — read it when orienting. **Cap ~150 lines / ~30 nodes** (split
 > per-phase diagrams beyond that).
 
 _Current focus: <p1_2 — one line on what is actively being pushed>_
 
-<!-- REPLACE this example at bootstrap (run /plan) -->
+<!-- REPLACE this example at bootstrap (run /keel-plan) -->
 
 ## Phase table (SOURCE OF TRUTH — the diagram below is regenerated from this)
 
 Statuses: `todo` → `wip` → `done` (a fix on a done phase goes to the Fix log — never flip done back).
-`after` = dependency (comma-separated ids). A phase is `done` only when its gate passed `/phase-review`.
+`after` = dependency (comma-separated ids). A phase is `done` only when its gate passed `/keel-phase-review`.
 Nodes are **product** phases (what ships); one-time meta/tooling work — a mid-project tool adoption, a
 CVE sweep, a pure refactor — goes to an ADR / the Fix log, not a node (an `after` on a meta stub forks
 the graph on something that never ships). This file holds ONLY the latest plan — phases dropped by a

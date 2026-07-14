@@ -3,7 +3,7 @@
 > Updated BEFORE every compact/session end. The repo is durable disk; the context window is volatile
 > RAM — anything not written here is assumed lost. This file is `@`-imported into EVERY session, so it
 > has a **hard cap: max 5 session blocks / ~200 lines.** When a 6th block would be added (or the cap is
-> hit), run **`/distill`** first: the oldest block's critical facts go to `LESSONS.md` (tagged, distilled)
+> hit), run **`/keel-distill`** first: the oldest block's critical facts go to `LESSONS.md` (tagged, distilled)
 > and the raw block moves verbatim to `docs/handover-archive.md` (never imported — costs no context,
 > grep-able forever). Compaction is a curation step, not an information-loss event.
 
@@ -13,12 +13,12 @@ _Last updated: <YYYY-MM-DD> — <short status>._
 
 ## Session blocks (newest first — a fresh session reads the TOP block first)
 <!-- Insert each new session block HERE, directly below this comment (newest first; older blocks get
-     pushed down). Max 5 blocks — then run /distill. On the FIRST real session, REPLACE the placeholder
+     pushed down). Max 5 blocks — then run /keel-distill. On the FIRST real session, REPLACE the placeholder
      block below (don't stack a real block on top of it, or the phantom placeholder lingers forever). -->
 
 ### <YYYY-MM-DD> — <one-line status>   <!-- ← REPLACE this whole placeholder block on the first session -->
 - **(a) Completed:** <what was done, briefly>. (Details/decisions → ADR / docs; done TASKS.md items land here as one-liners.)
-- **(b) Tried, didn't work (don't retry):** <approach> — FAILED, reason: <...>. (Highest-value lines — never lost: `/distill` moves them to `LESSONS.md [fail]`, not to the trash.)
+- **(b) Tried, didn't work (don't retry):** <approach> — FAILED, reason: <...>. (Highest-value lines — never lost: `/keel-distill` moves them to `LESSONS.md [fail]`, not to the trash.)
 - **(c) Latest updates:** <most recent changes>
 - **(d) Next steps:** <what to do next session, in priority order>
 

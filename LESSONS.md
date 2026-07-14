@@ -11,8 +11,8 @@
 > what compaction destroys.
 >
 > **Format:** atomic one-line entries, dated + tagged, newest first within a tag group. Never silently
-> delete: mark superseded entries as `SUPERSEDED by <entry/date>` (or remove them during `/distill` once
-> promoted to rules.md/a skill). **Cap: ~100 lines** — `/distill` dedups, merges, and promotes.
+> delete: mark superseded entries as `SUPERSEDED by <entry/date>` (or remove them during `/keel-distill` once
+> promoted to rules.md/a skill). **Cap: ~100 lines** — `/keel-distill` dedups, merges, and promotes.
 
 ## [rule] — mid-project agreements on how to work
 - <YYYY-MM-DD> — <e.g. "never regenerate the lock file on Fridays before the release cut">

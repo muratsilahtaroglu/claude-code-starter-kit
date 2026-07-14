@@ -1,6 +1,6 @@
 ---
 name: auditor
-description: Read-only rules-compliance auditor — samples a commit range against rules.md (layout §3, security §5/§7, tests §2, docs-sync §1, memory §9) and returns violations with file:line + the rule §, severity-ranked. Reports only, never edits. Spawned by /audit; the SessionStart hook nudges when one is due.
+description: Read-only rules-compliance auditor — samples a commit range against rules.md (layout §3, security §5/§7, tests §2, docs-sync §1, memory §9) and returns violations with file:line + the rule §, severity-ranked. Reports only, never edits. Spawned by /keel-audit; the SessionStart hook nudges when one is due.
 tools: Read, Grep, Glob, Bash
 ---
 
@@ -21,7 +21,7 @@ Checks (quote the exact rule you're applying):
 4. **Docs sync (§1):** structural changes absent from `docs/architecture.md`; dangling cross-references
    (a renamed/removed file still mentioned in README/CLAUDE.md/docs — grep the old names).
 5. **Memory health (§9):** caps exceeded, placeholder blocks never replaced, `TASKS.md ## Now` > 5 items —
-   flag only; `/distill` §4 owns the deep lint.
+   flag only; `/keel-distill` §4 owns the deep lint.
 6. **Unclassified additions:** tracked files matching no documented convention (not in `docs/layouts.md`,
    not scaffold) — list them neutrally for the user to classify, don't judge.
 

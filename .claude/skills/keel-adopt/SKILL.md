@@ -1,9 +1,9 @@
 ---
-name: adopt
+name: keel-adopt
 description: Adopt Keel's discipline into an EXISTING project (brownfield) — inventory, non-destructive merge, back-fill docs from real code, migrate security. Never overwrites.
 ---
 
-# /adopt — bring an existing project under Keel discipline (brownfield)
+# /keel-adopt — bring an existing project under Keel discipline (brownfield)
 
 Use when the project **already has code + history** (rules.md §0, Mode B). Goal: overlay the template's
 discipline **without clobbering anything**. Non-destructive is the hard rule — propose the full plan, get

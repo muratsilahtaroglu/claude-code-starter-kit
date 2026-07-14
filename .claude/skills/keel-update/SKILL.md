@@ -1,15 +1,15 @@
 ---
-name: update
+name: keel-update
 description: Pull the latest Keel template improvements into THIS project — kit tooling in one reviewed batch, likely-tailored files hunk-by-hunk; only approved hunks are applied. Never touches project memory (HANDOVER/LESSONS/TASKS) or project-owned files (src/, CLAUDE.md, ADRs).
 ---
 
-# /update — sync this project with the latest Keel template
+# /keel-update — sync this project with the latest Keel template
 
 Use when the kit was **cloned** a while ago and the template has since improved (hardened hooks, doc
 fixes, workflow updates). Pull model: run it IN the project, review diffs, approve. Non-destructive is
-the hard rule (same spirit as `/adopt`): nothing is applied without a shown diff + an explicit yes.
+the hard rule (same spirit as `/keel-adopt`): nothing is applied without a shown diff + an explicit yes.
 
-**Plugin half first:** if the `keel` plugin is installed (skills show up as `/keel:*`), the *live*
+**Plugin half first:** if the `keel` plugin is installed (skills show up as `/keel:keel-*`), the *live*
 tooling (skills · agents · hooks) updates centrally — run `/plugin marketplace update keel` for that
 half. The buckets below still apply in full: a plugin never writes repo files, so the committed
 `.claude/**` copies (what standalone / no-plugin sessions run), `.claude-plugin/**`, and the template
@@ -17,7 +17,7 @@ docs are synced here.
 
 ## 1. Fetch the latest template (never inside the project)
 ```bash
-rm -rf /tmp/keel-latest   # idempotent — clear the stale clone a previous /update run left behind
+rm -rf /tmp/keel-latest   # idempotent — clear the stale clone a previous /keel-update run left behind
 git clone --depth 1 https://github.com/muratsilahtaroglu/claude-code-starter-kit /tmp/keel-latest
 git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
 ```
@@ -54,6 +54,6 @@ diffs per §2 buckets. Apply only what was approved; never resolve a conflict si
 - Hooks stay executable: `chmod +x .claude/hooks/*.sh`. If `.claude-plugin/` changed:
   `claude plugin validate <project-root>`.
 - Quick smoke: the project's tests still pass (rules.md §2.8).
-- `HANDOVER.md` block (a) one-liner: `keel /update applied @ <template-sha>: <files>`; structural
+- `HANDOVER.md` block (a) one-liner: `keel /keel-update applied @ <template-sha>: <files>`; structural
   changes also land in `docs/architecture.md` (rules.md §1.6). Commit with approval (rules.md §1.3);
   push only with approval (§6).

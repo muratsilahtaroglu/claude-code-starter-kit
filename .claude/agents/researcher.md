@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Isolated external-research agent — scans the web and the local repo for prior art, returns a distilled, CITED findings summary (not raw pages). Use when a question needs docs/papers/GitHub/community input that would clutter the main thread. Backs rules.md §8 and the /research skill.
+description: Isolated external-research agent — scans the web and the local repo for prior art, returns a distilled, CITED findings summary (not raw pages). Use when a question needs docs/papers/GitHub/community input that would clutter the main thread. Backs rules.md §8 and the /keel-research skill.
 tools: WebSearch, WebFetch, Read, Grep, Glob, Bash
 ---
 

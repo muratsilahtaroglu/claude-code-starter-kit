@@ -1,9 +1,9 @@
 ---
-name: distill
+name: keel-distill
 description: Consolidate project memory — rotate old HANDOVER blocks to the archive, promote critical facts to LESSONS.md, dedup/merge, and lint for contradictions. Run when caps are exceeded.
 ---
 
-# /distill — the memory consolidation ritual ("sleep" for the project)
+# /keel-distill — the memory consolidation ritual ("sleep" for the project)
 
 Run when `HANDOVER.md` exceeds **5 session blocks / ~200 lines**, when `LESSONS.md` or `TASKS.md`
 exceeds **~100 lines** (the SessionStart hook warns on all of these), or every ~5 sessions as hygiene —

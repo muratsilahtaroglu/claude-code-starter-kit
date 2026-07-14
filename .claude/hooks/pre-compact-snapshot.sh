@@ -29,7 +29,7 @@ fi
 if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   changed=$(git -C "$DIR" status --porcelain 2>/dev/null)
   if [ -n "$changed" ] && [ -z "$(git -C "$DIR" status --porcelain -- HANDOVER.md 2>/dev/null)" ]; then
-    printf '{"systemMessage":"[keel] Compacting with a dirty tree but HANDOVER.md not updated — consider /handover first (snapshot saved to .claude/snapshots/)."}\n'
+    printf '{"systemMessage":"[keel] Compacting with a dirty tree but HANDOVER.md not updated — consider /keel-handover first (snapshot saved to .claude/snapshots/)."}\n'
   fi
 fi
 exit 0

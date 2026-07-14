@@ -1,12 +1,12 @@
 ---
-name: audit
+name: keel-audit
 description: Periodic rules-compliance spot-check — spawns the read-only auditor subagent over the commits since the last audit, reports violations with file:line + rule §, fixes only what the user approves. Skips itself on an empty (phase-0) project.
 ---
 
-# /audit — check the recent work against rules.md
+# /keel-audit — check the recent work against rules.md
 
-When: the SessionStart hook nudges (default: >25 commits since the last audit), at `/phase-review`, or
-on demand. Complements — never replaces — `/distill` (memory lint) and `verifier` (single claims): this
+When: the SessionStart hook nudges (default: >25 commits since the last audit), at `/keel-phase-review`, or
+on demand. Complements — never replaces — `/keel-distill` (memory lint) and `verifier` (single claims): this
 is the "is the project still following its own constitution?" sweep. Post-compact drift gets a free
 30-second inline self-check from the re-ground hook; this skill is the deep pass.
 

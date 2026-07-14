@@ -1,9 +1,9 @@
 ---
-name: research
+name: keel-research
 description: Opt-in external research — scan GitHub/articles/LinkedIn/HuggingFace/web and save cited findings per platform under research/.
 ---
 
-# /research — structured, opt-in external research
+# /keel-research — structured, opt-in external research
 
 **HARD GATE: never run without the user's explicit opt-in in THIS session (rules.md §8.27).** If the
 user hasn't opted in, stop and ask first. Produce a **verified, cited evidence trail** — never blind copy.
