@@ -24,5 +24,10 @@ view; `TASKS.md` stays the tactical board — never duplicate checkboxes across 
    _Current focus_ each session; `/phase-review` is the only gate to `done`. `done` never flips back —
    a bug found later is a **Fix log row** (`date | fix | phase-id`), which keeps the map honest after
    the project completes.
+5. **Re-planning (experiments change the plan).** `PLAN.md` always shows ONLY the latest plan: phases
+   dropped in a re-plan are **removed entirely** from the table and diagram — no tombstone rows or
+   statuses. The failed approach is already recorded in `LESSONS.md [fail]` / HANDOVER block (b), and
+   git history keeps every earlier shape of the plan. `done` phases stay; existing ids are never
+   renumbered (Fix log / HANDOVER references must keep resolving).
 5. **Drift.** The SessionStart hook warns when the table and diagram disagree or when a wip phase has an
    empty `TASKS.md ## Now` — fix by regenerating from the table (this skill), not by editing the diagram.

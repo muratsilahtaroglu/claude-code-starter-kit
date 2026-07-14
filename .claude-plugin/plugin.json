@@ -1,6 +1,6 @@
 {
   "name": "keel",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Keel's Claude Code enforcement layer — skills (/handover /distill /phase-review /research /adopt /update /audit /plan), the researcher + verifier + auditor subagents, and the memory/safety hooks. The discipline docs (rules.md, HANDOVER/LESSONS/TASKS/PLAN, permissions) come from cloning the template repo.",
   "author": { "name": "Murat Silahtaroğlu" },
   "homepage": "https://github.com/muratsilahtaroglu/claude-code-starter-kit",
