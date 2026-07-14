@@ -11,8 +11,11 @@ view; `TASKS.md` stays the tactical board — never duplicate checkboxes across 
 
 1. **Propose.** From the user's goal derive phases + sub-phases, each with: id (`p1`, `p1_2` — lowercase
    `[a-z0-9_]`), a **gate** (verifiable done-when, same spirit as TASKS.md), and `after` dependencies
-   (siblings with no mutual `after` may run in parallel). Show the table draft — **apply only after
-   approval** (§10.36).
+   (siblings with no mutual `after` may run in parallel). Map **product** phases only — what the project
+   builds and ships. One-time meta/tooling work (a mid-project tool adoption, a dependency/CVE sweep, a
+   pure refactor) is **not** a phase node: record it in an ADR and/or the Fix log. A meta stub given an
+   `after` becomes a permanent dead-end fork in the graph — exactly the noise the map should avoid. Show
+   the table draft — **apply only after approval** (§10.36).
 2. **Write `PLAN.md`.** Patch the phase table (SOURCE OF TRUTH) and _Current focus_; **regenerate the
    whole diagram block from the table** between the `KEEL_PLAN_DIAGRAM` markers — never hand-edit inside,
    never rewrite the rest of the file (patch, don't clobber). Diagram rules are printed above the block

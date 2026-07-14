@@ -16,8 +16,10 @@ _Current focus: <p1_2 — one line on what is actively being pushed>_
 
 Statuses: `todo` → `wip` → `done` (a fix on a done phase goes to the Fix log — never flip done back).
 `after` = dependency (comma-separated ids). A phase is `done` only when its gate passed `/phase-review`.
-This file holds ONLY the latest plan — phases dropped by a re-plan are removed, not marked (failures
-live in `LESSONS.md`; git history keeps every earlier plan).
+Nodes are **product** phases (what ships); one-time meta/tooling work — a mid-project tool adoption, a
+CVE sweep, a pure refactor — goes to an ADR / the Fix log, not a node (an `after` on a meta stub forks
+the graph on something that never ships). This file holds ONLY the latest plan — phases dropped by a
+re-plan are removed, not marked (failures live in `LESSONS.md`; git history keeps every earlier plan).
 
 | id | phase | status | after | gate (done-when) | since |
 |---|---|---|---|---|---|
