@@ -13,10 +13,10 @@ source="$(printf '%s' "$payload" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]*
 
 case "$source" in
   compact|resume|clear)
-    echo "[keel] Context was reset ($source) — re-read HANDOVER.md (TOP block = current state), LESSONS.md, and TASKS.md '## Now' to recover state before continuing; resume from a '## Now' item."
+    echo "[keel] Context was reset ($source) — re-read HANDOVER.md (TOP block = current state), LESSONS.md, TASKS.md '## Now', and PLAN.md (current focus) to recover state before continuing; resume from a '## Now' item."
     echo "[keel] Post-reset self-check (30s, inline — no sub-agent): does the in-flight work still respect rules.md §3 layout / §5 security / §2 tests? Catch drift at the reset point; /audit is the deep pass when due." ;;
   *)
-    echo "[keel] Keel project — skim HANDOVER.md (top block) · LESSONS.md · TASKS.md '## Now' to get oriented (rules.md §1)." ;;
+    echo "[keel] Keel project — skim HANDOVER.md (top block) · LESSONS.md · TASKS.md '## Now' · PLAN.md (current focus) to get oriented (rules.md §1)." ;;
 esac
 
 # Cap checks (rules.md §9.33): warn when a memory file needs /distill. Thresholds mirror rules.md §1.4
@@ -83,6 +83,25 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   n=${n:-0}
   if [ "$n" -gt 25 ]; then
     echo "[keel] ${n} commits since the last rules audit — run /audit at the next natural boundary (it skips itself on a phase-0 project)."
+  fi
+fi
+
+# PLAN drift check (warn-only): PLAN.md's phase table is the source of truth; the mermaid block between
+# the KEEL_PLAN_DIAGRAM markers is REGENERATED from it, and TASKS '## Now' carries the wip work.
+# Deterministic detection only — regenerating is /plan | /handover's job. Skips the untouched template.
+if [ -f "$DIR/PLAN.md" ] && ! grep -q 'REPLACE this example at bootstrap' "$DIR/PLAN.md"; then
+  tbl=$(awk -F'|' '$2 ~ /^ *[a-z][a-z0-9_]* *$/ && $4 ~ /^ *(todo|wip|done) *$/ {gsub(/ /,"",$2); gsub(/ /,"",$4); print $2":"$4}' "$DIR/PLAN.md" 2>/dev/null | sort)
+  dgm=$(sed -n '/KEEL_PLAN_DIAGRAM_BEGIN/,/KEEL_PLAN_DIAGRAM_END/p' "$DIR/PLAN.md" 2>/dev/null \
+        | grep -oE '^ *[a-z][a-z0-9_]*\["[^"]*"\]:::(todo|wip|done)' \
+        | sed -E 's/^ *([a-z][a-z0-9_]*)\["[^"]*"\]:::/\1:/' | sort)
+  if [ -n "$tbl" ] && [ "$tbl" != "$dgm" ]; then
+    echo "[keel] PLAN.md drift: the phase table and the diagram block disagree — regenerate the diagram from the table (/plan step 2)."
+  fi
+  if printf '%s\n' "$tbl" | grep -q ':wip$' && [ -f "$DIR/TASKS.md" ]; then
+    nowopen=$(sed -n '/^## Now/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -c '^- \[ \]')
+    if [ "${nowopen:-0}" -eq 0 ]; then
+      echo "[keel] PLAN.md has a wip phase but TASKS.md '## Now' is empty — refill Now from the wip gate (or flip the phase)."
+    fi
   fi
 fi
 exit 0

@@ -41,6 +41,9 @@
    - **(e) Record the tailoring** — note what was removed/added/renamed and why in the first
      `HANDOVER.md` session block (a) (or a short ADR), so later sessions understand why the tree differs
      from the stock template.
+
+   After the tailoring is applied, run **`/plan`**: propose the phase DAG (phases · gates ·
+   dependencies) and, on approval, seed `PLAN.md` + `TASKS.md ## Now` from its first wip leaf.
 1. Before writing any code, read **`CLAUDE.md` + `rules.md` + `HANDOVER.md` (top block) + `LESSONS.md` +
    `TASKS.md ## Now`** (CLAUDE.md `@`-imports all four, so they auto-load).
 2. Review `docs/architecture.md` and the relevant ADR (if any) for the current phase.

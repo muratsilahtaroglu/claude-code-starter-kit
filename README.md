@@ -35,8 +35,8 @@ This repo is **also its own Claude Code plugin marketplace** — install the enf
 /plugin install keel@keel
 ```
 That gives you the **skills** (namespaced: `/keel:handover` · `/keel:distill` · `/keel:phase-review` ·
-`/keel:research` · `/keel:adopt` · `/keel:update` · `/keel:audit`), the `researcher` + `verifier` +
-`auditor` **subagents**, and the
+`/keel:research` · `/keel:adopt` · `/keel:update` · `/keel:audit` · `/keel:plan`), the `researcher` +
+`verifier` + `auditor` **subagents**, and the
 memory/safety **hooks** — across every repo. **A clone is a snapshot; the plugin is a subscription:**
 when the template improves, one `/plugin marketplace update keel` brings the new tooling to *all* your
 projects at once — no re-cloning. It does **not** install the discipline docs (`rules.md`,
@@ -89,6 +89,7 @@ The context window is volatile RAM; the repo is durable disk. Every phase writes
 | `LESSONS.md` | critical knowledge written **the moment it appears** (rules, must-run tests, gotchas, failures) — with your approval | ~100-line cap; dedup/merge; `SUPERSEDED`, never silently deleted |
 | `TASKS.md` | cross-session task board (`Now` (max 3–5) · `Next` · `Discovered`), each item with a verifiable `done-when:` | ~100-line cap; **delete on done** — git is the archive |
 | `docs/handover-archive.md` | raw rotated blocks, verbatim | never `@`-imported → zero context cost, grep on demand |
+| `PLAN.md` | strategic phase map: status table + **colored Mermaid DAG** (renders live on GitHub/VSCode — watch nodes turn red→yellow→green) + post-completion fix log | not `@`-imported; statuses flip only at rituals; a hook warns on table↔diagram↔TASKS drift |
 
 No vector DB, no external memory service — grep-able markdown beats embeddings at this scale
 (Claude Code itself ships with agentic search and no index). `/distill` is the consolidation ritual:
@@ -195,6 +196,7 @@ claude-code-starter-kit/
 ├── HANDOVER.md               # session memory: last 5 blocks (done · tried-failed · latest · next)
 ├── LESSONS.md                # critical knowledge written the moment it appears ([rule][test][fail][gotcha])
 ├── TASKS.md                  # cross-session task board (Now (3–5) · Next · Discovered; delete-on-done)
+├── PLAN.md                   # phase map: status table (source of truth) + colored Mermaid DAG + fix log
 ├── README.md                 # this file
 ├── CONTRIBUTING.md           # how to contribute to the kit itself
 ├── LICENSE                   # MIT
@@ -202,8 +204,8 @@ claude-code-starter-kit/
 ├── .claude/                  # ⚙️  Claude Code layer — guidance + deterministic enforcement
 │   ├── settings.json         #     permissions: deny reading secrets · ask before push · hook registration
 │   ├── hooks/                #     block-dangerous · handover reminder · pre-compact snapshot ·
-│   │                         #     session-start re-ground (+ memory-cap warnings)
-│   ├── skills/               #     invokable workflows: /handover · /phase-review · /research · /adopt · /distill · /update · /audit
+│   │                         #     session-start re-ground (+ cap · staleness · audit-due · plan-drift warnings)
+│   ├── skills/               #     invokable workflows: /handover · /phase-review · /research · /adopt · /distill · /update · /audit · /plan
 │   ├── agents/               #     reusable subagents: researcher · verifier · auditor (isolated context)
 │   ├── hooks/hooks.json      #     plugin-mode hook registration (standalone mode uses settings.json)
 │   └── rules/                #     optional path-scoped rules (load only when matching files are touched)

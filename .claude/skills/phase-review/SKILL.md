@@ -13,6 +13,8 @@ Checklist:
 - [ ] **Tests** — relevant unit/integration (e2e if needed) written and run; results summarized under
   `tests/` + in HANDOVER.md (rules.md §2.8).
 - [ ] **Architecture** — every structural change recorded in `docs/architecture.md` (rules.md §1.6).
+- [ ] **PLAN.md** — the finished phase's gate flipped to `done` (+ next phase set `wip`, _Current focus_
+  updated, diagram regenerated from the table — see `/plan`).
 - [ ] **ADRs** — any significant decision captured as an ADR in `docs/adr/` (+ index row).
 - [ ] **Docs** — CLAUDE.md / docs/user_manual.md updated if behavior/usage changed.
 - [ ] **HANDOVER.md** — session block added (run `/handover`); caps respected (else `/distill`).
