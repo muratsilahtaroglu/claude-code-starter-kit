@@ -28,7 +28,8 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
 - **Always-on discipline** (`rules.md`, `HANDOVER.md`, `LESSONS.md`, `TASKS.md`) → `@`-imported by `CLAUDE.md`.
 - **Procedures** → skills: `/keel-handover`, `/keel-phase-review`, `/keel-research`, `/keel-adopt`, `/keel-distill`, `/keel-update`
   (pull the latest template with per-file approval), `/keel-audit` (rules-compliance spot-check when due),
-  `/keel-plan` (phase map: status table + regenerated Mermaid DAG in `PLAN.md`).
+  `/keel-plan` (phase map: status table + regenerated Mermaid DAG in `PLAN.md`), `/keel-compact`
+  (pre-compact bundle: refresh the disk via `/keel-handover`, verify freshness, hand off to `/compact`).
 - **Side tasks** → subagents: `researcher`, `verifier`, `auditor` (`.claude/agents/`).
 - **Guarantees** → hooks (`block-dangerous`, `pre-compact-snapshot`, `session-start-reground`, handover
   reminder, `plan-phase-nudge`) + `settings.json` permissions.

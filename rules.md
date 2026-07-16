@@ -51,7 +51,8 @@
 ## 1. Documentation discipline
 3. **At the end of every task/phase**, the relevant `.md` files are updated (CLAUDE.md, docs/user_manual.md,
    docs/architecture.md, ADRs) — **but USER approval is required before committing/updating.**
-4. **`HANDOVER.md` is updated BEFORE every compact/session end** — one dated **session block** (newest
+4. **`HANDOVER.md` is updated BEFORE every compact/session end** (before a manual compact, the
+   `/keel-compact` skill bundles this + the cap check, then hands off to `/compact`) — one dated **session block** (newest
    first) with (a) completed, (b) tried-and-failed (so they aren't retried), (c) latest updates,
    (d) next steps. **Hard cap: max 5 blocks / ~200 lines** (it is `@`-imported into every session — bloat
    is a per-session token tax and an adherence tax). On overflow run **`/keel-distill`** (§9.33): oldest

@@ -36,7 +36,7 @@ This repo is **also its own Claude Code plugin marketplace** — install the enf
 ```
 That gives you the **skills** (each `keel-`-prefixed, so under the plugin namespace: `/keel:keel-handover` ·
 `/keel:keel-distill` · `/keel:keel-phase-review` · `/keel:keel-research` · `/keel:keel-adopt` ·
-`/keel:keel-update` · `/keel:keel-audit` · `/keel:keel-plan`), the `researcher` +
+`/keel:keel-update` · `/keel:keel-audit` · `/keel:keel-plan` · `/keel:keel-compact`), the `researcher` +
 `verifier` + `auditor` **subagents**, and the
 memory/safety **hooks** — across every repo. **A clone is a snapshot; the plugin is a subscription:**
 when the template improves, one `/plugin marketplace update keel` brings the new tooling to *all* your
@@ -113,6 +113,10 @@ from disk** after every compaction. Keel exploits that with a two-sided pincer a
   top HANDOVER block, `LESSONS.md`, and `TASKS.md ## Now`, and warns when a memory file needs `/keel-distill`.
 - **Standing directive in `CLAUDE.md`**: what every compaction summary must preserve (modified files,
   open tasks, test commands, unwritten agreements → write them to `LESSONS.md` first).
+- **One command before a manual compact — `/keel-compact`**: the pincer restores only what is on
+  disk, so a forgotten `/keel-handover` still loses the conversation-only state. `/keel-compact` runs
+  the whole ritual (`/keel-handover` → `/keel-distill` when due → PLAN flips), verifies freshness,
+  then hands off to the built-in `/compact`. The individual skills stay invokable as always.
 
 Compaction becomes a curation step, not an information-loss event.
 
@@ -213,7 +217,7 @@ claude-code-starter-kit/
 │   ├── settings.json         #     permissions: deny reading secrets · ask before push · hook registration
 │   ├── hooks/                #     block-dangerous · handover reminder · phase-done nudge · pre-compact snapshot ·
 │   │                         #     session-start re-ground (+ cap · staleness · audit-due · plan-drift warnings)
-│   ├── skills/               #     invokable workflows: /keel-handover · /keel-phase-review · /keel-research · /keel-adopt · /keel-distill · /keel-update · /keel-audit · /keel-plan
+│   ├── skills/               #     invokable workflows: /keel-handover · /keel-phase-review · /keel-research · /keel-adopt · /keel-distill · /keel-update · /keel-audit · /keel-plan · /keel-compact
 │   ├── agents/               #     reusable subagents: researcher · verifier · auditor (isolated context)
 │   ├── hooks/hooks.json      #     plugin-mode hook registration (standalone mode uses settings.json)
 │   └── rules/                #     optional path-scoped rules (load only when matching files are touched)

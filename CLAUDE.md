@@ -16,7 +16,8 @@
 - **During:** the moment a rule / must-run test / gotcha / failed approach is agreed or discovered — ask
   "shall I note this?" and append it to `LESSONS.md` immediately (don't wait for compaction).
 - **End (or before compact):** `/keel-handover` (new HANDOVER block) · delete done TASKS items · commit with
-  approval. If any memory file exceeds its cap → `/keel-distill`.
+  approval. If any memory file exceeds its cap → `/keel-distill`. About to compact manually? Run
+  `/keel-compact` — it bundles all of the above, verifies freshness, then hands off to `/compact`.
 - **When compacting, always preserve:** the list of modified files, open `TASKS.md ## Now` items, test
   commands, and any agreement not yet written to `LESSONS.md` (write it there first).
 

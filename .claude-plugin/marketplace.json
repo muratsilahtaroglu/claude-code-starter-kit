@@ -11,7 +11,7 @@
     {
       "name": "keel",
       "source": "./",
-      "description": "The Keel enforcement layer: /keel-handover /keel-distill /keel-phase-review /keel-research /keel-adopt /keel-update /keel-audit /keel-plan skills, researcher + verifier + auditor subagents, and the memory/safety hooks. Pair with the cloned template for the discipline docs + permissions."
+      "description": "The Keel enforcement layer: /keel-handover /keel-distill /keel-phase-review /keel-research /keel-adopt /keel-update /keel-audit /keel-plan /keel-compact skills, researcher + verifier + auditor subagents, and the memory/safety hooks. Pair with the cloned template for the discipline docs + permissions."
     }
   ]
 }
