@@ -105,7 +105,7 @@
     (Enforced, not just advised: `.claude/settings.json` denies reading `.env`/secrets and a
     `PreToolUse` hook blocks staging a `.env` — see `.claude/hooks/`.)
 13. Input validation, ORM (SQL injection protection), and external service calls follow the project's
-    ADR decisions.
+    ADR decisions. Needs MCP? → project-level **root `.mcp.json`** (git-tracked, reviewed like config — see docs/steering.md).
 14. Minimize personal data / PII collection; comply with applicable regulation (e.g. GDPR/local law).
 
 ## 6. Version control (host-agnostic: GitHub / GitLab / Gitea / none)

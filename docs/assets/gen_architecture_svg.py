@@ -94,7 +94,7 @@ p.append(f'<text x="52" y="86" font-size="14.5" fill="{MUTED}">The discipline sc
          f'first — everything @-imported is re-injected after every compaction.</text>')
 p.append(f'<rect x="{W-138}" y="34" width="88" height="26" rx="13" fill="{INK}"/>')
 p.append(f'<text x="{W-94}" y="51.5" font-family="{MONO}" font-size="13" font-weight="700" fill="#fff" '
-         f'text-anchor="middle">v0.8.2</text>')
+         f'text-anchor="middle">v0.8.3</text>')
 
 root_y = START_Y - 8
 p.append(f'<text x="{FICON_X}" y="{root_y}" font-family="{MONO}" font-size="15" font-weight="700" '

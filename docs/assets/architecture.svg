@@ -6,7 +6,7 @@
 <text x="50" y="58" font-size="34" font-weight="800" letter-spacing="0.5" fill="#212a35">KEEL<tspan font-weight="500" fill="#5b6673"> — project structure</tspan></text>
 <text x="52" y="86" font-size="14.5" fill="#5b6673">The discipline scaffold Claude Code reads first — everything @-imported is re-injected after every compaction.</text>
 <rect x="1062" y="34" width="88" height="26" rx="13" fill="#212a35"/>
-<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.2</text>
+<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.3</text>
 <text x="74" y="142" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="15" font-weight="700" fill="#212a35">claude-code-starter-kit/</text>
 <path d="M62 150 V970.0" stroke="#d7dde5" stroke-width="1.6" fill="none"/>
 <path d="M62 179.0 H70" stroke="#d6336c" stroke-width="1.8" fill="none"/>

@@ -31,6 +31,10 @@ rsync -av --ignore-existing <keel>/ ./ --exclude .git
 - **Merge, don't replace** an existing `CLAUDE.md` and `.claude/settings.json` (union the permissions; keep the project's).
 - Map the existing source layout to the nearest `docs/layouts.md` profile — don't create parallel folders beside it.
 - Prune template parts the project won't use, cascading reference cleanup (rules.md §0a).
+- **Plugin-only team?** If the team takes the tooling as the plugin instead of the full overlay, offer to
+  wire auto-install into the project's `.claude/settings.json` (`extraKnownMarketplaces` + `enabledPlugins`
+  — recipe in `docs/steering.md`) so every teammate gets the tooling on open. Never combine it with
+  settings-registered keel hooks: dual registration fires each hook twice.
 
 ## 4. Security migration (rules.md §7 — as a migration, not a rewrite)
 - Freeze **currently-installed** versions into `==` in `requirements/base.txt`; `pip-compile --generate-hashes`.

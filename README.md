@@ -46,6 +46,21 @@ projects at once — no re-cloning. It does **not** install the discipline docs 
 files or permission rules). The clone above is the full kit; the plugin is the tooling half for teams
 that already have the docs or want the skills everywhere.
 
+**Team auto-install (plugin-only projects):** commit these two keys to the project's
+`.claude/settings.json` and everyone who opens the repo gets the keel tooling registered and enabled
+automatically — no per-person `/plugin marketplace add` + `/plugin install`:
+```json
+{
+  "extraKnownMarketplaces": {
+    "keel": { "source": { "source": "github", "repo": "muratsilahtaroglu/claude-code-starter-kit" } }
+  },
+  "enabledPlugins": { "keel@keel": true }
+}
+```
+Don't add this to a **full clone** of the kit — the clone already registers the same hooks via
+`.claude/settings.json`, and plugin + settings registration together fire each hook twice (the
+dual-registration note in `docs/steering.md`).
+
 **Updating a cloned kit** works the same reviewed way: run **`/keel-update`** in the project — it fetches the
 latest template, skips what your bootstrap pruned, and shows the rest as diffs: kit tooling in one
 reviewed batch, likely-tailored files (`rules.md`, config, workflows) hunk-by-hunk. Only hunks you
@@ -125,6 +140,26 @@ from disk** after every compaction. Keel exploits that with a two-sided pincer a
   then hands off to the built-in `/compact`. The individual skills stay invokable as always.
 
 Compaction becomes a curation step, not an information-loss event.
+
+### No AI? The repo still tells you what to do (human handover)
+
+Everything above is plain, capped markdown **written for humans too** — if Claude Code access ends
+mid-project (billing, outage, a teammate without a seat), the project continues from the repo alone.
+Read in this order:
+
+1. **`HANDOVER.md` (top block)** — where the last session stopped: (a) done, (b) tried-and-FAILED
+   (don't retry these), (c) latest changes, (d) **next steps in priority order**.
+2. **`TASKS.md ## Now`** — today's 3–5 work items, each with a verifiable `done-when:`.
+3. **`PLAN.md`** — the phase map: what is `done`/`wip`/`todo`, each phase's gate, the current focus.
+4. **`LESSONS.md`** — the traps and must-run tests (`[gotcha]`/`[test]`/`[fail]`) accumulated so far.
+5. **`docs/architecture.md`** — what every module/file does; **`docs/adr/`** — why it was decided that way.
+6. **`CLAUDE.md` + `Makefile`** — build/test/run commands; then `git log` for fine-grained history.
+
+Freshness is enforced, not hoped for: the handover ritual runs at every session end (a Stop hook
+reminds you; a stale manual `/compact` is blocked outright), staleness warnings fire at session start,
+and the caps keep every file short enough to actually read. Worst case you lose the tail of one
+interrupted session — and the hot-path rule (critical facts go to `LESSONS.md` the moment they appear)
+shrinks even that.
 
 ## Two layers: guidance + enforcement
 Rules alone can be ignored; Keel also wires the discipline into Claude Code's **native, deterministic** layer.
