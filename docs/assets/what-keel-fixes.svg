@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1408" viewBox="0 0 1200 1408" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" role="img" aria-label="What Keel fixes: each problem of undisciplined AI-assisted work paired with the Keel mechanism that closes it">
+<rect width="1200" height="1408" fill="#f4f6f9"/>
+<rect width="1200" height="108" fill="#eef1f6"/>
+<rect y="108" width="1200" height="1" fill="#d7dde5"/>
+<text x="50" y="58" font-size="34" font-weight="800" letter-spacing="0.5" fill="#212a35">KEEL<tspan font-weight="500" fill="#5b6673"> — what it fixes</tspan></text>
+<text x="52" y="86" font-size="14.5" fill="#5b6673"><tspan font-weight="700" fill="#9a244d">left:</tspan> what goes wrong without discipline   <tspan font-weight="700" fill="#087756">right:</tspan> the mechanism that closes it</text>
+<rect x="1062" y="34" width="88" height="26" rx="13" fill="#212a35"/>
+<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.3</text>
+<rect x="30" y="126" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="150" font-size="14" font-weight="750" fill="#9a244d">Volatile memory</text>
+<text x="46" y="175" font-size="13" fill="#212a35" opacity="0.82">Context fills → lossy compaction; decisions, verbal agreements and</text>
+<text x="46" y="192" font-size="13" fill="#212a35" opacity="0.82">warnings vanish — every session restarts half-blind.</text>
+<rect x="618" y="126" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="150" font-size="14" font-weight="750" fill="#087756">Repo = durable disk</text>
+<text x="634" y="175" font-size="13" fill="#212a35" opacity="0.82">Critical facts hit HANDOVER / LESSONS / TASKS the moment they appear</text>
+<text x="634" y="192" font-size="13" fill="#212a35" opacity="0.82">and auto-reload every session; a stale manual /compact is blocked</text>
+<text x="634" y="209" font-size="13" fill="#212a35" opacity="0.82">outright (compact-gate).</text>
+<text x="590.0" y="181.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="234" width="532" height="79" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="258" font-size="14" font-weight="750" fill="#9a244d">Repeated mistakes</text>
+<text x="46" y="283" font-size="13" fill="#212a35" opacity="0.82">Failed approaches aren't remembered — the same dead end is</text>
+<text x="46" y="300" font-size="13" fill="#212a35" opacity="0.82">re-entered, burning time and tokens.</text>
+<rect x="618" y="234" width="532" height="79" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="258" font-size="14" font-weight="750" fill="#087756">Permanent “tried, didn't work” record</text>
+<text x="634" y="283" font-size="13" fill="#212a35" opacity="0.82">HANDOVER (b) + LESSONS [fail] load automatically every session — a</text>
+<text x="634" y="300" font-size="13" fill="#212a35" opacity="0.82">dead end is entered once.</text>
+<text x="590.0" y="280.5" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="325" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="349" font-size="14" font-weight="750" fill="#9a244d">A free hand</text>
+<text x="46" y="374" font-size="13" fill="#212a35" opacity="0.82">A model slip or prompt injection becomes rm -rf, a committed secret,</text>
+<text x="46" y="391" font-size="13" fill="#212a35" opacity="0.82">a force-push. Writing “don't” is not a guarantee.</text>
+<rect x="618" y="325" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="349" font-size="14" font-weight="750" fill="#087756">Enforcement layer</text>
+<text x="634" y="374" font-size="13" fill="#212a35" opacity="0.82">Hooks reject the command before it runs; permissions make secrets</text>
+<text x="634" y="391" font-size="13" fill="#212a35" opacity="0.82">unreadable; push waits for approval. Text advises — hooks and</text>
+<text x="634" y="408" font-size="13" fill="#212a35" opacity="0.82">permissions guarantee.</text>
+<text x="590.0" y="380.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="433" width="532" height="79" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="457" font-size="14" font-weight="750" fill="#9a244d">Dependency + supply-chain chaos</text>
+<text x="46" y="482" font-size="13" fill="#212a35" opacity="0.82">Scattered manifests, open ranges (&gt;=) — one poisoned release away</text>
+<text x="46" y="499" font-size="13" fill="#212a35" opacity="0.82">from an incident.</text>
+<rect x="618" y="433" width="532" height="79" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="457" font-size="14" font-weight="750" fill="#087756">One home + five barriers</text>
+<text x="634" y="482" font-size="13" fill="#212a35" opacity="0.82">requirements/ with == pins + hashed lock + pip-audit + .pth scan +</text>
+<text x="634" y="499" font-size="13" fill="#212a35" opacity="0.82">non-root container + security CI on every PR.</text>
+<text x="590.0" y="479.5" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="524" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="548" font-size="14" font-weight="750" fill="#9a244d">File sprawl</text>
+<text x="46" y="573" font-size="13" fill="#212a35" opacity="0.82">The agent invents files ad hoc; the root fills with mystery files;</text>
+<text x="46" y="590" font-size="13" fill="#212a35" opacity="0.82">the architecture drifts.</text>
+<rect x="618" y="524" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="548" font-size="14" font-weight="750" fill="#087756">Layout contract</text>
+<text x="634" y="573" font-size="13" fill="#212a35" opacity="0.82">Code only under src/; every structural change lands in</text>
+<text x="634" y="590" font-size="13" fill="#212a35" opacity="0.82">architecture.md; no unexplained file survives a session — drift</text>
+<text x="634" y="607" font-size="13" fill="#212a35" opacity="0.82">hunted by hooks + auditor.</text>
+<text x="590.0" y="579.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="632" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="656" font-size="14" font-weight="750" fill="#9a244d">Scattered throwaway code &amp; prompts</text>
+<text x="46" y="681" font-size="13" fill="#212a35" opacity="0.82">Experiments and one-off scripts leak into the main tree; the same</text>
+<text x="46" y="698" font-size="13" fill="#212a35" opacity="0.82">prompt is improvised again and again.</text>
+<rect x="618" y="632" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="656" font-size="14" font-weight="750" fill="#087756">Quarantine + promotion</text>
+<text x="634" y="681" font-size="13" fill="#212a35" opacity="0.82">Experiments only in scratch/ (1-line purpose header); runtime</text>
+<text x="634" y="698" font-size="13" fill="#212a35" opacity="0.82">prompts versioned under src/; the SECOND similar ad-hoc prompt is</text>
+<text x="634" y="715" font-size="13" fill="#212a35" opacity="0.82">promoted to a skill.</text>
+<text x="590.0" y="687.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="740" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="764" font-size="14" font-weight="750" fill="#9a244d">Unproven “it works”</text>
+<text x="46" y="789" font-size="13" fill="#212a35" opacity="0.82">Tests postponed, claims not backed by a run, bulk outputs shipped</text>
+<text x="46" y="806" font-size="13" fill="#212a35" opacity="0.82">blind.</text>
+<rect x="618" y="740" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="764" font-size="14" font-weight="750" fill="#087756">Test contract + pilot gate</text>
+<text x="634" y="789" font-size="13" fill="#212a35" opacity="0.82">Tests written + run per change; e2e evidence at phase gates; bulk</text>
+<text x="634" y="806" font-size="13" fill="#212a35" opacity="0.82">jobs pass /keel-pilot: smoke → gold set → staged ramp → acceptance</text>
+<text x="634" y="823" font-size="13" fill="#212a35" opacity="0.82">sample.</text>
+<text x="590.0" y="795.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="848" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="872" font-size="14" font-weight="750" fill="#9a244d">Plan-free drift</text>
+<text x="46" y="897" font-size="13" fill="#212a35" opacity="0.82">Phases skipped, five things in flight, “done” claimed without proof.</text>
+<rect x="618" y="848" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="872" font-size="14" font-weight="750" fill="#087756">Gated phase map + single-task flow</text>
+<text x="634" y="897" font-size="13" fill="#212a35" opacity="0.82">PLAN.md DAG with verifiable gates; work only from TASKS ## Now (max</text>
+<text x="634" y="914" font-size="13" fill="#212a35" opacity="0.82">3–5); done flips only via /keel-phase-review — a Stop hook catches</text>
+<text x="634" y="931" font-size="13" fill="#212a35" opacity="0.82">skipped flips.</text>
+<text x="590.0" y="903.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="956" width="532" height="79" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="980" font-size="14" font-weight="750" fill="#9a244d">Person-dependent knowledge</text>
+<text x="46" y="1005" font-size="13" fill="#212a35" opacity="0.82">The project lives in one head / one machine; a departure resets it.</text>
+<rect x="618" y="956" width="532" height="79" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="980" font-size="14" font-weight="750" fill="#087756">Memory in the repo</text>
+<text x="634" y="1005" font-size="13" fill="#212a35" opacity="0.82">Travels through git; a new person or session loads the same five</text>
+<text x="634" y="1022" font-size="13" fill="#212a35" opacity="0.82">files and is oriented in minutes — even with no AI access at all.</text>
+<text x="590.0" y="1002.5" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="1047" width="532" height="79" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="1071" font-size="14" font-weight="750" fill="#9a244d">No trail</text>
+<text x="46" y="1096" font-size="13" fill="#212a35" opacity="0.82">“Why did we build it this way?” has no answer; there is nothing to</text>
+<text x="46" y="1113" font-size="13" fill="#212a35" opacity="0.82">audit.</text>
+<rect x="618" y="1047" width="532" height="79" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="1071" font-size="14" font-weight="750" fill="#087756">Audit-ready trail</text>
+<text x="634" y="1096" font-size="13" fill="#212a35" opacity="0.82">Every decision an ADR, every session a HANDOVER block, every phase</text>
+<text x="634" y="1113" font-size="13" fill="#212a35" opacity="0.82">in PLAN.md + its fix log.</text>
+<text x="590.0" y="1093.5" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="1138" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="1162" font-size="14" font-weight="750" fill="#9a244d">Unmeasurable discipline</text>
+<text x="46" y="1187" font-size="13" fill="#212a35" opacity="0.82">Rules exist on paper; nobody knows whether they actually run.</text>
+<rect x="618" y="1138" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="1162" font-size="14" font-weight="750" fill="#087756">Enforce + measure</text>
+<text x="634" y="1187" font-size="13" fill="#212a35" opacity="0.82">Telemetry logs every skill/command/compact/BLOCK; /keel-stats</text>
+<text x="634" y="1204" font-size="13" fill="#212a35" opacity="0.82">renders it visually; /keel-audit samples commit ranges against the</text>
+<text x="634" y="1221" font-size="13" fill="#212a35" opacity="0.82">rules.</text>
+<text x="590.0" y="1193.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect x="30" y="1246" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
+<text x="46" y="1270" font-size="14" font-weight="750" fill="#9a244d">One-size-fits-all templates</text>
+<text x="46" y="1295" font-size="13" fill="#212a35" opacity="0.82">Starter kits dump their full structure onto every project.</text>
+<rect x="618" y="1246" width="532" height="96" rx="11" fill="#ecfaf5" stroke="#0ca678" stroke-width="1.4" opacity="0.97"/>
+<text x="634" y="1270" font-size="14" font-weight="750" fill="#087756">Prune-to-fit bootstrap</text>
+<text x="634" y="1295" font-size="13" fill="#212a35" opacity="0.82">The first session tailors the kit to THIS project (remove · add ·</text>
+<text x="634" y="1312" font-size="13" fill="#212a35" opacity="0.82">layout) with approval; /keel-adopt overlays existing projects</text>
+<text x="634" y="1329" font-size="13" fill="#212a35" opacity="0.82">non-destructively.</text>
+<text x="590.0" y="1301.0" font-size="20" font-weight="800" fill="#5b6673" text-anchor="middle">→</text>
+<rect y="1364" width="1200" height="1" fill="#d7dde5"/>
+<text x="50" y="1386" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" font-weight="700" fill="#212a35">keel</text>
+<text x="86" y="1386" font-size="12.5" fill="#5b6673">text advises &#8226; hooks and permissions guarantee &#8226; telemetry proves it ran</text>
+</svg>

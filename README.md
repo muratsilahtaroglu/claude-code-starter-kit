@@ -74,8 +74,17 @@ docs (`CLAUDE.md`, architecture, ADRs) are never touched.
 
 ## What Keel fixes (problem → mechanism)
 
-The whole kit in one table — left, what goes wrong in long AI-assisted projects; right, the concrete
+The whole kit in one picture — left, what goes wrong in long AI-assisted projects; right, the concrete
 mechanism that closes it:
+
+<p align="center">
+  <img src="docs/assets/what-keel-fixes.svg" alt="What Keel fixes: twelve problem-to-mechanism pairs — volatile memory, repeated mistakes, a free-handed agent, dependency chaos, file sprawl, scattered throwaway code, unproven claims, plan-free drift, person-dependent knowledge, no trail, unmeasurable discipline, one-size-fits-all templates — each paired with the Keel mechanism that closes it" width="960">
+</p>
+
+<sub>Generated from [`docs/assets/gen_architecture_svg.py`](docs/assets/gen_architecture_svg.py) (the `FIXES` list) — same data-driven pipeline as the structure maps.</sub>
+
+<details>
+<summary><b>Text version</b> (searchable)</summary>
 
 | Without Keel | With Keel — the mechanism |
 |---|---|
@@ -91,6 +100,8 @@ mechanism that closes it:
 | **No trail.** "Why did we build it this way?" has no answer; there is nothing to audit. | **Audit-ready trail.** Every decision an ADR, every session a HANDOVER block, every phase in `PLAN.md` + its fix log. |
 | **Unmeasurable discipline.** Rules exist on paper; nobody knows whether they actually run. | **Enforce + measure.** Telemetry logs every skill/command/compact/BLOCK; `/keel-stats` renders it visually; `/keel-audit` samples commit ranges against the rules. |
 | **One-size-fits-all templates.** Starter kits dump their full structure onto every project. | **Prune-to-fit bootstrap.** The first session tailors the kit to THIS project (remove · add · layout) with approval; `/keel-adopt` overlays existing projects non-destructively. |
+
+</details>
 
 ## When (not) to use Keel
 Honest scoping: **solo developer, one machine, a weekend project?** Claude Code's built-in auto-memory +
