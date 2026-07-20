@@ -70,8 +70,8 @@
    and is not `done` until its gate is flipped to `done` in `PLAN.md` via `/keel-phase-review` (a Stop hook
    nudges the moment a `wip` phase's `## Now` tasks are all checked but its status was never flipped).
 8. After every code change, the relevant **unit/integration (and e2e if needed) tests** are written/run;
-   results are summarized under `tests/` + in the handover. **Bulk outputs** (mass labeling/generation/
-   migration) pass the **pilot gate** before any full run (`/keel-pilot`: smoke → gold-set → staged ramp → acceptance).
+   `make test` auto-logs each run to `reports/tests/` (dated; summary → handover; a why-one-liner per test file in its folder README — `tests/README.md`);
+   **bulk outputs** (mass labeling/generation/migration) pass the **pilot gate** before any full run (`/keel-pilot`).
 9. **Reusability:** repeated scripts/helpers/prompts are not written once and thrown away. By kind:
    **prompts that steer Claude Code** → a skill (`.claude/skills/`) or a subagent (`.claude/agents/`);
    **prompts your app sends at runtime** (LLM apps only) → a versioned file under `src/` (code never

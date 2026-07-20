@@ -1,6 +1,6 @@
 {
   "name": "keel",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Discipline that survives compaction: durable memory rituals (handover · lessons · tasks), staged verification gates before bulk runs, and hooks that block secret leaks + dangerous commands. Installs the TOOLING — 11 /keel-* skills, 3 subagents (researcher · verifier · auditor), memory + safety hooks. A plugin CANNOT ship permissions or docs, so also clone github.com/muratsilahtaroglu/claude-code-starter-kit to get rules.md, the HANDOVER/LESSONS/TASKS/PLAN memory files, and the deny/ask permission rules.",
   "author": { "name": "Murat Silahtaroğlu" },
   "homepage": "https://github.com/muratsilahtaroglu/claude-code-starter-kit",

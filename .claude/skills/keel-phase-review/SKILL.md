@@ -10,8 +10,10 @@ a commit.
 
 Checklist:
 - [ ] **Working product** — the phase's feature runs; include a one-line "how to test this".
-- [ ] **Tests** — relevant unit/integration (e2e if needed) written and run; results summarized under
-  `tests/` + in HANDOVER.md (rules.md §2.8); bulk outputs passed the `/keel-pilot` gates where applicable.
+- [ ] **Tests** — relevant unit/integration (e2e if needed) written and run via `make test` (auto-log →
+  `reports/tests/<date>/`); the phase's **committed summary** written to `reports/tests/<date>-phase<N>.md`
+  (suites, counts, what was verified); new test/fixture files one-lined in their folder README; one-line
+  summary in HANDOVER.md (rules.md §2.8); bulk outputs passed the `/keel-pilot` gates where applicable.
 - [ ] **Architecture** — every structural change recorded in `docs/architecture.md` (rules.md §1.6).
 - [ ] **PLAN.md (do not skip — this is what marks the phase `done`)** — the finished phase's gate
   flipped to `done` (+ next phase set `wip`, _Current focus_ updated, diagram regenerated from the

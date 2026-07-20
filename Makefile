@@ -1,3 +1,4 @@
+SHELL := /bin/bash  # the test target needs bash (pipefail); assumed at /bin/bash like everywhere mainstream
 .PHONY: setup setup-dev lint test run lock audit
 
 setup:  ## Install pinned runtime deps with hash verification
@@ -18,8 +19,10 @@ lint:  ## Lint + format-check with ruff (config in pyproject.toml)
 	ruff check .
 	ruff format --check .
 
-test:  ## Run the full test suite
-	pytest tests/
+test:  ## Run the full test suite (auto-log: reports/tests/<date>/<time>-pytest.log)
+	@d="reports/tests/$$(date +%F)"; mkdir -p "$$d"; log="$$d/$$(date +%H%M%S)-pytest.log"; \
+	echo "# test run $$(date '+%F %T') · commit $$(git rev-parse --short HEAD 2>/dev/null || echo none) · branch $$(b=$$(git branch --show-current 2>/dev/null); echo $${b:-none})" >> "$$log"; \
+	set -o pipefail; pytest tests/ 2>&1 | tee -a "$$log"
 
 run:  ## <wire up the app entrypoint>
 	@echo "TODO: configure run command"

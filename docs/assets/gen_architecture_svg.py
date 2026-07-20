@@ -13,7 +13,7 @@ import os
 GROUND, BANDTOP = "#f4f6f9", "#eef1f6"
 INK, MUTED, HAIR = "#212a35", "#5b6673", "#d7dde5"
 CARD_BG = "#ffffff"
-VERSION = "v0.8.3"
+VERSION = "v0.8.4"
 
 # ---- data: each group -> (pill label, accent, [(name, desc), ...]) ----------
 GROUPS = [
@@ -218,7 +218,7 @@ def emit(groups, title_thin, subtitle, root_label, footer_text, aria, outfile):
 
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), outfile)
     with open(out, "w", encoding="utf-8") as f:
-        f.write("\n".join(p))
+        f.write("\n".join(p) + "\n")
     print(f"wrote {out}  ({total_h}px tall)")
 
 
@@ -291,7 +291,7 @@ def emit_fixes(rows, outfile):
 
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), outfile)
     with open(out, "w", encoding="utf-8") as f:
-        f.write("\n".join(p))
+        f.write("\n".join(p) + "\n")
     print(f"wrote {out}  ({total_h}px tall)")
 
 

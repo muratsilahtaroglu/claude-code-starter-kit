@@ -41,6 +41,12 @@ qdrant_storage/
 scratch/archive/
 scratch/**/__pycache__/
 scratch/**/*.out
+# Personal notes/experiments (throwaway per rules.md §3) — keep only the READMEs that document each folder
+scratch/**/*.md
+!scratch/**/README.md
+
+# === Reports — raw test-run logs stay local; dated phase summaries are committed ===
+reports/tests/*/
 
 # === Claude Code — commit settings.json/skills/hooks; ignore personal ===
 .claude/settings.local.json
