@@ -1,4 +1,6 @@
-# pip install pre-commit==3.8.0 && pre-commit install
+# Setup — run ONCE per clone/machine (.git/hooks is NOT tracked, so it doesn't ship with the repo):
+#   pip install pre-commit==3.8.0 && pre-commit install
+# Until you do, these checks are INACTIVE and commits are unprotected. Verify anytime: pre-commit run --all-files
 # Enforces rules.md §6.18 (secret scan before push) automatically.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
