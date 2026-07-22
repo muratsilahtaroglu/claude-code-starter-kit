@@ -147,6 +147,18 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
   fi
 fi
 
+# Role line (multi-user, .claude/project-owner): tell a DEVELOPER session whose project it acts in —
+# governance surfaces are owner-only (enforced by the owner-guard PreToolUse hook, docs/steering.md).
+if [ -f "$DIR/.claude/project-owner" ]; then
+  own="$(head -n1 "$DIR/.claude/project-owner" 2>/dev/null | tr -d '\r' | sed 's/^ *//;s/ *$//')"
+  me_o="$(git -C "$DIR" config user.name 2>/dev/null)"
+  if [ -n "$own" ] && [ -n "$me_o" ] && [ "$own" != "$me_o" ]; then
+    echo "[keel] Multi-user project — you are DEVELOPER '@${me_o}' (owner: @${own}). Governance (PLAN/rules/CLAUDE/architecture/ADR/.claude) is owner-only — owner-guard blocks those edits; work your @-assigned TASKS items, PROPOSE the rest to the owner."
+  elif [ -n "$own" ] && [ -z "$me_o" ]; then
+    echo "[keel] .claude/project-owner exists but git user.name is UNSET — owner-guard cannot attribute you (it fails open). Set: git config user.name '<you>'."
+  fi
+fi
+
 # Ownership check (multi-user, rules: TASKS ## Now @owner tag): warn when open ## Now items are ALL
 # owned by others — so the AI doesn't do work assigned to someone else (the parallel-work collision the
 # tag exists to prevent). Silent when no @owner tags exist (single-user projects pay nothing). The tag

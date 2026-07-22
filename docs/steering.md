@@ -76,6 +76,23 @@ The plugin-bundled variant (an `.mcp.json` at a plugin's root, as drawn in ecosy
 third row — *distribution*, not project config. Agent Teams and observer agents remain experimental:
 watch, don't build on them.
 
+## Multi-user: owner vs developers (optional — off by default)
+Single-user projects: skip this — no file, zero cost. When helpers join, the FOUNDER declares ownership
+by writing **`.claude/project-owner`** (one line: the owner's `git config user.name`; a bootstrap run by
+someone else ASKS who the owner is, never assumes). Roles from then on:
+- **Owner (founder)** — the only one who changes GOVERNANCE: `PLAN.md` (the plan itself + assignments),
+  `rules.md`, `CLAUDE.md`, `docs/architecture.md`, ADRs, `.claude/` config. Assigns work by tagging
+  TASKS items `(@name)` / the PLAN `owner` column, then pushes.
+- **Developers** — pull, work ONLY their `@name` (or unassigned) items, mark them `[x]`, add
+  `## Discovered` lines, write their own HANDOVER blocks (headings carry `@<git user.name>`), append
+  LESSONS. Their sessions: the re-ground hook prints the role line; `/keel-autopilot` STOPS at
+  foreign-owned items; the **`owner-guard` hook BLOCKS governance edits** (exit 2, propose-to-owner
+  message). Ritual surfaces stay shared — a session that cannot write HANDOVER/LESSONS/TASKS cannot
+  run the discipline at all.
+Enforcement honesty (layered): the hook stops the AI *drafting* foreign governance edits — the
+accidental collision. The wall for intentional human edits is the HOST: branch protection + PRs the
+owner reviews (rules.md §6 / CONTRIBUTING) — every developer change lands through the owner anyway.
+
 ## Team auto-install of the keel plugin
 On a **plugin-only** team project (tooling via plugin, no full clone), commit these two keys to the
 project's `.claude/settings.json` so everyone who opens the repo gets the tooling registered and

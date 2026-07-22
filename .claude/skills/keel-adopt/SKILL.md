@@ -31,6 +31,9 @@ rsync -av --ignore-existing <keel>/ ./ --exclude .git
 - **Merge, don't replace** an existing `CLAUDE.md` and `.claude/settings.json` (union the permissions; keep the project's).
 - Map the existing source layout to the nearest `docs/layouts.md` profile — don't create parallel folders beside it.
 - Prune template parts the project won't use, cascading reference cleanup (rules.md §0a).
+- **Multi-user team?** Ask who the project OWNER (founder) is — default the adopter, never assumed —
+  and write their `git config user.name` into `.claude/project-owner`: governance files become
+  owner-only via the `owner-guard` hook (docs/steering.md "Multi-user"). Single-user: skip, no file.
 - **Plugin-only team?** If the team takes the tooling as the plugin instead of the full overlay, offer to
   wire auto-install into the project's `.claude/settings.json` (`extraKnownMarketplaces` + `enabledPlugins`
   — recipe in `docs/steering.md`) so every teammate gets the tooling on open. Never combine it with

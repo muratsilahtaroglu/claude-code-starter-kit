@@ -14,7 +14,13 @@ view; `TASKS.md` stays the tactical board — never duplicate checkboxes across 
    (siblings with no mutual `after` may run in parallel), and — on a multi-user project — an `owner`
    (the person's `git config user.name`; blank = anyone). Ask who owns what when parallel branches are
    assigned to different people; only the owner advances an owned phase (`/keel-autopilot` stops at a
-   foreign one). Single-user projects leave `owner` blank. Map **product** phases only — what the project
+   foreign one). Single-user projects leave `owner` blank.
+   **Multi-user governance:** when the project declares itself multi-user, ASK who the PROJECT owner
+   (founder) is — never assume it's whoever is bootstrapping — and write their `git config user.name`
+   as the single line of **`.claude/project-owner`**. That file arms the `owner-guard` hook (governance
+   files — PLAN/rules/CLAUDE/architecture/ADR/.claude — become owner-only) and the session role line.
+   Assignments (`@name` tags in TASKS, the `owner` column here) are then the OWNER's call
+   (docs/steering.md "Multi-user"). Single-user: no file, nothing changes. Map **product** phases only — what the project
    builds and ships. One-time meta/tooling work (a mid-project tool adoption, a dependency/CVE sweep, a
    pure refactor) is **not** a phase node: record it in an ADR and/or the Fix log. A meta stub given an
    `after` becomes a permanent dead-end fork in the graph — exactly the noise the map should avoid. Show

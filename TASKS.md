@@ -19,6 +19,8 @@
 >   **surfaced, not done** — doing another person's assigned work is how parallel work collides. Single-user
 >   projects leave the tag off and ignore this. Enforced where it bites most: `/keel-autopilot` STOPS at a
 >   foreign-owned item, and the SessionStart hook warns when `## Now` is entirely someone else's.
+>   On owner-run projects (`.claude/project-owner` exists) ASSIGNING the tags is the project owner's call;
+>   developers complete + `[x]` their items and add `## Discovered` lines (docs/steering.md "Multi-user").
 
 ## Now (max 3–5 — the only section to work from)
 - [ ] T1: <task> — done-when: <verifiable criterion>

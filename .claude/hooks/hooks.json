@@ -12,6 +12,12 @@
         "hooks": [
           { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}\"/.claude/hooks/ritual-log.sh" }
         ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}\"/.claude/hooks/owner-guard.sh" }
+        ]
       }
     ],
     "UserPromptExpansion": [

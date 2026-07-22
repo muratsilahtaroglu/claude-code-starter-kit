@@ -27,7 +27,8 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   `docs/handover-archive.md` · `docs/architecture.md` · `docs/adr/*` (except the kit-owned `0000`
   template and the folder `README.md` — those are TOOLING) · `CLAUDE.md` · `README.md` · `LICENSE` ·
   `config/` · `requirements/*.{txt,lock}` contents · `.env.example` values · `src/` · `tests/` ·
-  `scratch/` · `research/` findings · `reports/` · `.claude/last-audit` (project audit state).
+  `scratch/` · `research/` findings · `reports/` · `.claude/last-audit` · `.claude/project-owner`
+  (project state: audit clock + governance owner).
 - **REVIEW — likely tailored; full diff, apply hunk-by-hunk with approval:** `rules.md` ·
   `.claude/settings.json` (permissions merge = union, keep the project's) · `.gitignore` ·
   `.pre-commit-config.yaml` · `pyproject.toml` · `Makefile` · `Dockerfile*` · `.dockerignore` ·
