@@ -170,6 +170,17 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ -f "$DIR/T
   if [ -n "$owners" ] && [ -n "$me" ] && ! printf '%s\n' "$owners" | grep -qixF "$me"; then
     echo "[keel] TASKS.md '## Now' is owned by others ($(printf '@%s ' $owners)) but you are '${me}' — don't do another owner's assigned work; take an unassigned/your-own item or hand back (TASKS ownership tag)."
   fi
+  # Owner review queue: on owner-run projects, developer-completed items wait in '## Review' for the
+  # OWNER to verify (accept = delete → owner HANDOVER (a); reject = back to ## Now). Owner-session only.
+  if [ -f "$DIR/.claude/project-owner" ] && [ -n "$me" ]; then
+    own_r="$(head -n1 "$DIR/.claude/project-owner" 2>/dev/null | tr -d '\r' | sed 's/^ *//;s/ *$//')"
+    if [ "$me" = "$own_r" ]; then
+      rq=$(sed -n '/^## Review/,/^## /{/^## Review/d; /^## /d; p}' "$DIR/TASKS.md" 2>/dev/null | grep -c '^- \[')
+      if [ "${rq:-0}" -gt 0 ]; then
+        echo "[keel] ${rq} completed developer item(s) await YOUR review in TASKS.md '## Review' — verify each done-when (run/observe it; spawn the verifier agent when in doubt, rules.md §4.11), then accept (delete → your HANDOVER (a) as 'reviewed') or reject (back to ## Now with one reason line)."
+      fi
+    fi
+  fi
 fi
 
 # Double-fire check: back-to-back IDENTICAL ritual-log lines mean hooks fired twice for one event —

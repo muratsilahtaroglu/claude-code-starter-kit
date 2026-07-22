@@ -20,7 +20,11 @@ Steps:
    original HH:MM. A NEW session always adds a NEW block, even on the same day — same-day sessions
    must stay distinguishable. The block contains:
    - **(a) Completed** — what was done, dated; link decisions to their ADR/docs; include one-liners for
-     TASKS.md items finished this session (then delete them from TASKS.md).
+     TASKS.md items finished this session (then delete them from TASKS.md). **Multi-user exception**
+     (`.claude/project-owner` exists and you are NOT the owner): do not delete your finished items —
+     MOVE each to a TASKS `## Review` section (create it if missing) as
+     `- [x] <id> ... (@you) — evidence: <how the done-when was met>`; the OWNER verifies and deletes on
+     accept (their session is nudged). The owner's own items follow the normal delete flow.
    - **(b) Tried, didn't work** — approaches that failed + the reason, so they aren't retried. This is
      the highest-value section — don't skip it.
    - **(c) Latest updates** — the most recent concrete changes.

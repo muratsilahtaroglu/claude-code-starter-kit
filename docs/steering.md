@@ -89,6 +89,13 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   foreign-owned items; the **`owner-guard` hook BLOCKS governance edits** (exit 2, propose-to-owner
   message). Ritual surfaces stay shared — a session that cannot write HANDOVER/LESSONS/TASKS cannot
   run the discipline at all.
+- **Review loop (owner verifies developer work)** — a developer's finished item is MOVED, not deleted,
+  to a TASKS `## Review` section at their handover (`- [x] ... (@dev) — evidence: <done-when result>`).
+  The owner's next session is nudged by the re-ground hook, verifies the `done-when` (run/observe it;
+  verifier agent for adversarial doubt, rules.md §4.11), then **accepts** (delete → owner's HANDOVER (a)
+  as "reviewed") or **rejects** (back to `## Now`, one reason line, still @-tagged). Phase grain needs no
+  extra machinery: PLAN.md is governance, so a developer cannot flip a phase — the owner flips it after
+  reviewing the gate evidence.
 Enforcement honesty (layered): the hook stops the AI *drafting* foreign governance edits — the
 accidental collision. The wall for intentional human edits is the HOST: branch protection + PRs the
 owner reviews (rules.md §6 / CONTRIBUTING) — every developer change lands through the owner anyway.

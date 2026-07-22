@@ -21,6 +21,10 @@
 >   foreign-owned item, and the SessionStart hook warns when `## Now` is entirely someone else's.
 >   On owner-run projects (`.claude/project-owner` exists) ASSIGNING the tags is the project owner's call;
 >   developers complete + `[x]` their items and add `## Discovered` lines (docs/steering.md "Multi-user").
+>   **Owner review:** a developer does NOT delete their finished item — at their handover it MOVES to a
+>   `## Review` section (created on first use; `- [x] T7 ... (@dev) — evidence: <done-when result>`).
+>   The OWNER verifies the done-when, then accepts (delete → owner's HANDOVER (a) as "reviewed") or
+>   rejects (back to `## Now` with one reason line). Single-user projects: no such section, delete-on-done as above.
 
 ## Now (max 3–5 — the only section to work from)
 - [ ] T1: <task> — done-when: <verifiable criterion>
