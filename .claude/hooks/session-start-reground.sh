@@ -103,5 +103,29 @@ if [ -f "$DIR/PLAN.md" ] && ! grep -q 'REPLACE this example at bootstrap' "$DIR/
       echo "[keel] PLAN.md has a wip phase but TASKS.md '## Now' is empty — refill Now from the wip gate (or flip the phase)."
     fi
   fi
+  # User-manual placeholder check (rules.md §1.3): phases keep shipping but the manual is still the
+  # untouched template — the phase-review Docs item FAILs on this; warn early, at session start.
+  if [ -f "$DIR/docs/user_manual.md" ] && grep -qE '<PROJECT NAME>|\(TEMPLATE\)' "$DIR/docs/user_manual.md"; then
+    done_n=$(awk -F'|' '$2 ~ /^ *[a-z][a-z0-9_]* *$/ && $4 ~ /^ *done *$/' "$DIR/PLAN.md" 2>/dev/null | wc -l)
+    if [ "${done_n:-0}" -ge 2 ]; then
+      echo "[keel] docs/user_manual.md is still the untouched template while ${done_n} phases are done — fill it (or state why nothing is user-facing yet); the phase-review Docs item fails on this."
+    fi
+  fi
+fi
+
+# Doc-drift check (rules.md §1.6): source commits kept landing but docs/architecture.md didn't move —
+# module rows and the component overview rot silently (the PLAN table→diagram problem, minus the hook).
+# Deterministic detection only — updating the map is a ritual/task job. Skips the untouched template.
+if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+   && [ -f "$DIR/docs/architecture.md" ] && ! grep -q '(TEMPLATE)' "$DIR/docs/architecture.md"; then
+  la=$(git -C "$DIR" log -1 --format=%H -- docs/architecture.md 2>/dev/null)
+  if [ -n "$la" ]; then
+    drift=$(git -C "$DIR" rev-list --count "${la}..HEAD" -- . ':(exclude)docs' ':(exclude).claude' \
+            ':(exclude).claude-plugin' ':(exclude)reports' ':(exclude)scratch' ':(exclude)research' \
+            ':(exclude).github' ':(exclude)*.md' 2>/dev/null || true)
+    if [ "${drift:-0}" -gt 10 ]; then
+      echo "[keel] docs/architecture.md hasn't moved for ${drift} source commits — record the structural changes: module rows AND the component overview (the table is the source of truth; rules.md §1.6)."
+    fi
+  fi
 fi
 exit 0

@@ -52,6 +52,14 @@ auto memory = one person's scratch recall; **anything the team must know goes to
 `HANDOVER.md`** (git-shared, `@`-imported, cap-controlled). A team-relevant lesson that lives only
 in one machine's auto memory is a lesson the team does not have.
 
+## Headless `claude` calls from inside the repo (trap)
+A script or LLM-provider that shells out to the `claude` CLI **with cwd inside the project** (benchmark
+runners, LLM judges, batch jobs) starts a FULL Claude Code session per call: SessionStart hooks fire
+(`.claude/ritual-log` fills with `session-start startup` lines), and `CLAUDE.md` + its `@`-imports
+(~500 lines of constitution) load into EVERY call — per-call token cost, plus the callee model reads
+your project rules (judge-bias risk in eval pipelines). Run such calls from a neutral cwd outside the
+repo; a burst of same-minute `session-start startup` lines in the ritual-log is the telltale.
+
 ## MCP (external tool servers)
 The kit ships **no MCP servers** — the discipline layer needs none (files + bash + hooks cover it).
 MCP itself is often essential (semantic search, vLLM endpoints, DB bridges…); what Keel standardizes

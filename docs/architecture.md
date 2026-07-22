@@ -1,6 +1,9 @@
 # docs/architecture.md — Live Architecture Map (TEMPLATE)
 
 > Updated on every structural change. What each significant file/module does. Status: ✅ exists · 🟡 skeleton · ⬜ planned.
+> The **module map table is the source of truth** — when its rows change, resync the component overview
+> diagram in the same edit (same contract as PLAN.md's table → diagram; appending rows while the top
+> diagram rots is the documented failure mode — the SessionStart hook warns when the whole file lags the code).
 
 ## Component overview
 ```

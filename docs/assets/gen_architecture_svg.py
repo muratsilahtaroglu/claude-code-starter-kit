@@ -13,7 +13,7 @@ import os
 GROUND, BANDTOP = "#f4f6f9", "#eef1f6"
 INK, MUTED, HAIR = "#212a35", "#5b6673", "#d7dde5"
 CARD_BG = "#ffffff"
-VERSION = "v0.8.7"
+VERSION = "v0.8.8"
 
 # ---- data: each group -> (pill label, accent, [(name, desc), ...]) ----------
 GROUPS = [

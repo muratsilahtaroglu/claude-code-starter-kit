@@ -5,7 +5,7 @@
 <text x="50" y="58" font-size="34" font-weight="800" letter-spacing="0.5" fill="#212a35">KEEL<tspan font-weight="500" fill="#5b6673"> — what it fixes</tspan></text>
 <text x="52" y="86" font-size="14.5" fill="#5b6673"><tspan font-weight="700" fill="#9a244d">left:</tspan> what goes wrong without discipline   <tspan font-weight="700" fill="#087756">right:</tspan> the mechanism that closes it</text>
 <rect x="1062" y="34" width="88" height="26" rx="13" fill="#212a35"/>
-<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.7</text>
+<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.8</text>
 <rect x="30" y="126" width="532" height="96" rx="11" fill="#fdf0f5" stroke="#d6336c" stroke-width="1.4" opacity="0.97"/>
 <text x="46" y="150" font-size="14" font-weight="750" fill="#9a244d">Volatile memory</text>
 <text x="46" y="175" font-size="13" fill="#212a35" opacity="0.82">Context fills → lossy compaction; decisions, verbal agreements and</text>
