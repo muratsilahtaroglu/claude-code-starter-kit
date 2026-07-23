@@ -48,10 +48,17 @@ first HANDOVER block / tailoring ADR) are **not re-added** — list them as "pru
 user explicitly asks for them back.
 
 ## 3. Present the plan, then apply approved-only
-One table — **new · changed · pruned-skipped · protected** — one line per file with what/why. Then the
+**Enumerate changes MECHANICALLY — do not eyeball.** For EVERY path in the TOOLING + REVIEW buckets,
+`diff -q <template-copy> <project-copy>`; every differing file MUST appear in the plan. Hand-picking "the
+files that obviously changed" is how a hook lands while the skill it references does not — a half-applied
+update leaves the hooks ahead of the skills (e.g. an owner-review nudge with no `## Review` write logic).
+Then one table — **new · changed · pruned-skipped · protected** — one line per file with what/why, and the
 diffs per §2 buckets. Apply only what was approved; never resolve a conflict silently.
 
 ## 4. Verify + record
+- **Consistency re-diff:** after applying, `diff -q` the TOOLING paths against the template again — none
+  should still differ except the ones consciously skipped. A leftover diff means a skill/hook pair is
+  half-updated (the §3 failure mode) — finish it before committing.
 - Hooks stay executable: `chmod +x .claude/hooks/*.sh`. If `.claude-plugin/` changed:
   `claude plugin validate <project-root>`.
 - Quick smoke: the project's tests still pass (rules.md §2.8).
