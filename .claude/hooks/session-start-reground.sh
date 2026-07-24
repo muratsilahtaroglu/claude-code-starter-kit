@@ -197,6 +197,23 @@ if [ -f "$DIR/TASKS.md" ]; then
   fi
 fi
 
+# Decorative-hook check: a hook FILE that no registration references NEVER fires — enforcement that
+# looks installed but is off (live case: owner-guard.sh shipped in v0.8.9 but its settings.json entry
+# was skipped in a tailored REVIEW merge — the wall stood unplugged for two releases, caught only by
+# /keel-update's mechanical diff). Name-level presence only; matcher-level completeness stays
+# /keel-update's consistency re-diff job.
+if [ -d "$DIR/.claude/hooks" ] && [ -f "$DIR/.claude/settings.json" ]; then
+  unreg=""
+  for h in "$DIR"/.claude/hooks/*.sh; do
+    [ -f "$h" ] || continue
+    hb="$(basename "$h")"
+    grep -q "$hb" "$DIR/.claude/settings.json" 2>/dev/null || unreg="$unreg $hb"
+  done
+  if [ -n "$unreg" ]; then
+    echo "[keel] Hook file(s) present but NOT registered in .claude/settings.json:${unreg} — they never fire (decorative enforcement). Wire each under its matcher (template: settings.json in the kit), or delete it if pruned on purpose; plugin-run projects can ignore this when the plugin registers them."
+  fi
+fi
+
 # Double-fire check: back-to-back IDENTICAL ritual-log lines mean hooks fired twice for one event —
 # either a stale long-lived session that predates a settings change, or plugin + settings dual
 # registration (docs/steering.md). Detect only; NEVER auto-dedup the log (that masks the cause).
