@@ -13,7 +13,8 @@
 >   Done items never survive a handover.
 > - Mid-session discoveries ("tests are broken", "this module needs a refactor") get ONE line in
 >   `## Discovered` immediately — then return to your current task. Triage Discovered at session end.
-> - Optional inline tags: `blocked-by: T3` · `discovered-from: T1` · `@owner` (see below).
+> - Optional inline tags: `blocked-by: T3` · `discovered-from: T1` · `due: YYYY-MM-DD` (sprint
+>   target — the SessionStart hook surfaces past-due dates) · `@owner` (see below).
 > - **Ownership (multi-user projects).** An item may carry `@owner` (the owner's `git config user.name`).
 >   Work ONLY unassigned items or ones owned by the CURRENT git user; an item tagged for someone else is
 >   **surfaced, not done** — doing another person's assigned work is how parallel work collides. Single-user

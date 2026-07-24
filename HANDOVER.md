@@ -46,5 +46,10 @@ agent/LLM) it can grow noisy — then, when an area is developed in its own sess
   structure in `docs/architecture.md`** (+ wire the nested `CLAUDE.md` `@`-import). Start with one file;
   split only when it hurts.
 
+**Per-USER variant (teams):** when ≥~4 people write concurrently, the same valve applies per user —
+`handovers/HANDOVER-<user>.md` (same block format + 3-block cap), this root file as the index (one
+"latest" per person, no duplicated truth). Never split LESSONS per user — sign lines with your `@tag`
+instead (docs/steering.md "Multi-user").
+
 ### Area handovers (index)
 - <area> → `<area>/HANDOVER.md` — <one-line status>  <!-- add rows only when you actually split -->

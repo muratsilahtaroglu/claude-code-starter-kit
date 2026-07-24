@@ -37,7 +37,8 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
 - **Side tasks** → subagents: `researcher`, `verifier`, `auditor` (`.claude/agents/`).
 - **Guarantees** → hooks (`block-dangerous`, `compact-gate` (blocks a stale manual `/compact`),
   `pre-compact-snapshot`, `session-start-reground`, handover reminder, `plan-phase-nudge`,
-  `owner-guard` (multi-user: blocks non-owner governance edits, armed by `.claude/project-owner`)) +
+  `owner-guard` (multi-user: blocks non-owner governance edits AND non-owner `git push` to main,
+  armed by `.claude/project-owner`)) +
   `settings.json` permissions. Plus `ritual-log` telemetry: every Skill-tool invocation, every
   user-typed command (built-ins included, via `UserPromptExpansion`), compact boundary
   (manual/auto), session start and hook BLOCK is appended to `.claude/ritual-log` (git-ignored,
@@ -97,9 +98,42 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   as "reviewed") or **rejects** (back to `## Now`, one reason line, still @-tagged). Phase grain needs no
   extra machinery: PLAN.md is governance, so a developer cannot flip a phase — the owner flips it after
   reviewing the gate evidence.
-Enforcement honesty (layered): the hook stops the AI *drafting* foreign governance edits — the
-accidental collision. The wall for intentional human edits is the HOST: branch protection + PRs the
-owner reviews (rules.md §6 / CONTRIBUTING) — every developer change lands through the owner anyway.
+- **Identity = `git config user.name`** — every ownership mechanism (tags, owner-guard, autopilot
+  stop, handover headings) matches this ONE string. Onboarding rule: repo-local
+  `git config user.name "<tag>"`, single token, byte-for-byte the repo's `@tag` spelling (it need
+  NOT equal the GitHub handle). A spaced or mismatched user.name silently unarms the machinery —
+  the re-ground hook nags when it is unset.
+- **Push wall (AI-side):** on armed projects `owner-guard` also blocks a non-owner session's
+  `git push` that targets `main`/`master` (explicit refspec, or a bare push while checked out on
+  it) — developers push topic branches and open PRs; even a fork's own main stays clean (= a clean
+  PR base). The owner keeps the normal `ask`-gated push.
+- **Host wall (the one humans can't bypass) — pick by hosting reality:**
+  | Hosting | The wall |
+  |---|---|
+  | Public GitHub repo | branch ruleset on `main` (free): require PR, block force-push + deletion |
+  | Private PERSONAL repo (free) | ⚠️ NO real wall: collaborators always get WRITE (no read-only role) and rulesets aren't enforced without a paid plan — hooks + discipline only |
+  | Private repo in a FREE organization | transfer the repo to an org → developers get the **Read** role, org setting "allow forking of private repos" ON → they fork + PR; write access physically stays with the owner |
+  | Paid GitHub (Pro/Team) · GitLab | enforced ruleset / protected branches directly on the private repo |
+- **Team etiquette on shared surfaces** (a PR should merge without stepping on anyone): sign
+  LESSONS / `## Discovered` lines with your `@tag` (HANDOVER block headings carry it automatically);
+  a developer PR touches only their OWN TASKS items + their OWN handover block; a HANDOVER merge
+  conflict resolves as keep-both-blocks, newest first. `## Now` reads per-person on teams (~2–3
+  items each). Sprint deadlines ride the item as `due: YYYY-MM-DD` — the re-ground hook surfaces
+  past-due dates at session start.
+- **Onboarding doc:** materialize the team's concrete flow as a project-owned `docs/team.md` (roles
+  table, fork/clone + `git config` steps, secret handoff via a safe channel, ritual etiquette). The
+  kit deliberately ships NO team.md template — it is project content, and `/keel-update` must never
+  overwrite it.
+- **Scaling beyond a few developers:** the 3-block HANDOVER cap churns when ≥~4 people write
+  concurrently — then apply the per-area valve per USER: `handovers/HANDOVER-<user>.md` (same block
+  format + cap), root `HANDOVER.md` becomes the program index linking them (one "latest" per person,
+  no duplicated truth). Do NOT split LESSONS per user: lessons are PROJECT knowledge — one person's
+  gotcha is exactly what the others need. Sign lines instead; split per AREA if the file truly hurts.
+
+Enforcement honesty (layered): hooks stop the AI *drafting* foreign governance edits or main-pushes —
+the accidental collision. The wall for intentional human action is the HOST row above — a plain
+terminal bypasses any hook, and on a free private personal repo that wall DOES NOT EXIST: either move
+to a free org (Read + fork PRs) or accept discipline-only and say so in the project's team doc.
 
 ## Team auto-install of the keel plugin
 On a **plugin-only** team project (tooling via plugin, no full clone), commit these two keys to the

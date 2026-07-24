@@ -18,9 +18,10 @@ view; `TASKS.md` stays the tactical board — never duplicate checkboxes across 
    **Multi-user governance:** when the project declares itself multi-user, ASK who the PROJECT owner
    (founder) is — never assume it's whoever is bootstrapping — and write their `git config user.name`
    as the single line of **`.claude/project-owner`**. That file arms the `owner-guard` hook (governance
-   files — PLAN/rules/CLAUDE/architecture/ADR/.claude — become owner-only) and the session role line.
-   Assignments (`@name` tags in TASKS, the `owner` column here) are then the OWNER's call
-   (docs/steering.md "Multi-user"). Single-user: no file, nothing changes. Map **product** phases only — what the project
+   files — PLAN/rules/CLAUDE/architecture/ADR/.claude — become owner-only; non-owner `git push` to
+   main blocked) and the session role line. Assignments (`@name` tags in TASKS, the `owner` column
+   here) are then the OWNER's call; sprint deadlines ride the TASKS item as `due: YYYY-MM-DD` (the
+   re-ground hook nags past-due) (docs/steering.md "Multi-user"). Single-user: no file, nothing changes. Map **product** phases only — what the project
    builds and ships. One-time meta/tooling work (a mid-project tool adoption, a dependency/CVE sweep, a
    pure refactor) is **not** a phase node: record it in an ADR and/or the Fix log. A meta stub given an
    `after` becomes a permanent dead-end fork in the graph — exactly the noise the map should avoid. Show
