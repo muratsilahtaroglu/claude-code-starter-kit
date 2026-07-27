@@ -60,7 +60,7 @@
 <circle cx="512" cy="403" r="3" fill="#1c7ed6"/>
 <text x="526" y="407.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">hooks/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  deterministic guards — block-dangerous · nudges</tspan></text>
 <circle cx="512" cy="426" r="3" fill="#1c7ed6"/>
-<text x="526" y="430.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">skills/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  12 /keel-* workflows — handover · plan · pilot · autopilot</tspan></text>
+<text x="526" y="430.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">skills/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  13 /keel-* workflows — handover · plan · pilot · tidy</tspan></text>
 <circle cx="512" cy="449" r="3" fill="#1c7ed6"/>
 <text x="526" y="453.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">agents/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  subagents — researcher · verifier · auditor</tspan></text>
 <circle cx="512" cy="472" r="3" fill="#1c7ed6"/>

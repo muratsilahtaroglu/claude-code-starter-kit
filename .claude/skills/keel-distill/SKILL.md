@@ -11,6 +11,7 @@ that cadence is yours to keep, the hook only detects cap overflows. Memory that 
 reviewed degrades the project — consolidation is what keeps it useful (rules.md §9).
 
 Propose the full plan, get user approval, then apply. Never lossy-delete.
+(File-TREE clutter — stray scripts, logs, dead code — is not this ritual's job: that is `/keel-tidy`, §3.10.)
 
 ## 1. Rotate HANDOVER blocks (oldest first, until ≤2 blocks AND under ~150 lines)
 For each block being rotated, triage by criticality — **content-aware, not age-blind**:

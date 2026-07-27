@@ -89,7 +89,7 @@
     `scratch/` subfolder, with a **1-line purpose comment** at the top. No file of unclear purpose is left in the main source tree.
     At the end of a session, no file is left unanswered for "what is this file?": it is either moved into
     a module (+architecture.md), moved to `scratch/archive/`, or deleted. If layout drifts, **tidy up
-    layout first**.
+    layout first** (`/keel-tidy`).
 
 ## 4. Sub-agent usage
 11. Use sub-agents for parallelizable work; but never accept their output blindly — as the main agent,

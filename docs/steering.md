@@ -33,7 +33,9 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
   (pre-compact bundle: refresh the disk via `/keel-handover`, verify freshness, hand off to `/compact`),
   `/keel-pilot` (staged bulk-run gate: declare thresholds → smoke → gold-set validation → ramp → acceptance),
   `/keel-autopilot` (gated autonomy for one session: phases advance back-to-back, every gate still runs the
-  full `/keel-phase-review` with real evidence, commits are local, pushes batch for ONE approval).
+  full `/keel-phase-review` with real evidence, commits are local, pushes batch for ONE approval),
+  `/keel-tidy` (layout-hygiene sweep, rules.md §3.10: stray/obsolete files triaged with evidence +
+  approval — module-ize · delete [git is the archive] · `scratch/archive/` · gitignore the class).
 - **Side tasks** → subagents: `researcher`, `verifier`, `auditor` (`.claude/agents/`).
 - **Guarantees** → hooks (`block-dangerous`, `compact-gate` (blocks a stale manual `/compact`),
   `pre-compact-snapshot`, `session-start-reground`, handover reminder, `plan-phase-nudge`,
