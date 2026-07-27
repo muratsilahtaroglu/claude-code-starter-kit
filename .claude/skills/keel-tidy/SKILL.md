@@ -1,6 +1,6 @@
 ---
 name: keel-tidy
-description: Layout-hygiene ritual — sweep stray/obsolete files (loose root scripts, dead code, logs, stale scratch), attach EVIDENCE to each (git age, references, test collection), then triage with approval — module-ize · delete (git is the archive) · scratch/archive/ · gitignore the class. Never touches memory files or the reports/ evidence trail.
+description: Layout-hygiene ritual — sweep stray/obsolete files (loose root scripts, dead code, logs, stale scratch), attach EVIDENCE to each (git age, references, test collection), then triage with approval — module-ize · delete (git is the archive; deletes are a separately-confirmed list, never inside a blanket yes) · scratch/archive/ · gitignore the class. Never touches memory files or the reports/ evidence trail.
 ---
 
 # /keel-tidy — the §3.10 sweep: no file left unanswered
@@ -40,7 +40,12 @@ check `tests/fixtures/` and the tests-folder README why-lines before calling any
   header (the §3.10 triad's middle door).
 - **Runtime junk** → delete AND add the PATTERN to `.gitignore` so the class never returns (§10.39:
   fix the class, not the instance).
-Present ONE table — file · evidence · verdict · action — apply only approved rows, never silently.
+Present ONE table — file · evidence · verdict · action. **Deletions are their own separately-confirmed
+list:** a blanket "apply all" NEVER covers delete rows — read the delete list back and get an explicit
+yes on it (per row on request); anything not explicitly confirmed is NOT deleted (it stays, or drops to
+`scratch/archive/` if the user prefers). State recoverability honestly in the table: a tracked delete
+is restorable (`git log --diff-filter=D` → `git checkout <sha>^ -- <path>`); an UNTRACKED delete is
+gone for good — flag those rows. Apply only approved rows, never silently.
 
 ## 4. Cascade + verify + record
 - Cascade every move/delete: grep the old path across `*.md` (README, docs/, folder READMEs),
