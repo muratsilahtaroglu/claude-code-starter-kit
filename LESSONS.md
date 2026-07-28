@@ -12,7 +12,7 @@
 >
 > **Format:** atomic one-line entries, dated + tagged, newest first within a tag group. Never silently
 > delete: mark superseded entries as `SUPERSEDED by <entry/date>` (or remove them during `/keel-distill` once
-> promoted to rules.md/a skill). **Cap: ~150 lines** — `/keel-distill` dedups, merges, and promotes.
+> promoted to rules.md/a skill). **Cap: ~250 lines** — `/keel-distill` dedups, merges, and promotes.
 >
 > **Long projects — two pressure valves before you ever raise the cap** (the file is `@`-imported every
 > session, so every line is a permanent token + attention tax): (1) **graduate** — a 3×-applied entry

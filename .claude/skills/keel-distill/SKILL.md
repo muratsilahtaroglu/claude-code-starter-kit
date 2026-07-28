@@ -5,7 +5,7 @@ description: Consolidate project memory — rotate old HANDOVER blocks to the ar
 
 # /keel-distill — the memory consolidation ritual ("sleep" for the project)
 
-Run when `HANDOVER.md` exceeds **3 session blocks / ~150 lines**, when `LESSONS.md` exceeds **~150** or
+Run when `HANDOVER.md` exceeds **3 session blocks / ~150 lines**, when `LESSONS.md` exceeds **~250** or
 `TASKS.md` **~100 lines** (the SessionStart hook warns on all of these), or every ~5 sessions as hygiene —
 that cadence is yours to keep, the hook only detects cap overflows. Memory that is written but never
 reviewed degrades the project — consolidation is what keeps it useful (rules.md §9).
@@ -43,7 +43,10 @@ For each block being rotated, triage by criticality — **content-aware, not age
   ritual-log-derivable, and it's usually what pushed the file over cap (keep decisions + their WHY).
 - Contradictions between `rules.md` / `LESSONS.md` / `CLAUDE.md` — flag, ask the user which wins.
 - Stale claims (files/commands/paths that no longer exist) — fix or mark superseded.
-- Cap check: `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~150, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
+- Stale cap HEADERS in the memory files themselves (e.g. a LESSONS.md header still quoting an old
+  "~100"): correct to the current thresholds below — headers are prose, the SessionStart hook is the
+  authority; they drift in adopted projects because `/keel-update` never touches PROTECTED memory files.
+- Cap check: `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~250, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
   `rules.md` ≤ ~300 (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
 
 ## 5. Report → approve → commit

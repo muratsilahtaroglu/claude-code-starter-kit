@@ -30,7 +30,7 @@ warn_cap() { # $1=file $2=max_lines
   fi
 }
 warn_cap "HANDOVER.md" 150
-warn_cap "LESSONS.md" 150
+warn_cap "LESSONS.md" 250
 warn_cap "TASKS.md" 100
 
 # Rule-budget check (rules.md §10.38): the constitution is capped like the memory files — a rules.md

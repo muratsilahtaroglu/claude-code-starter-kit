@@ -167,7 +167,7 @@
     `## Discovered` immediately, triaged at session end.
 33. **Consolidation (`/keel-distill`).** These caps are the single source of truth — the `keel-distill` skill and
     `.claude/hooks/session-start-reground.sh` mirror them; change one, change all three. Memory written
-    but never reviewed degrades: when caps hit (HANDOVER > 3 blocks/~150 lines, LESSONS > ~150, TASKS >
+    but never reviewed degrades: when caps hit (HANDOVER > 3 blocks/~150 lines, LESSONS > ~250, TASKS >
     ~100 lines) or every ~5 sessions, run `/keel-distill` — rotate old blocks (critical → LESSONS,
     raw → `docs/handover-archive.md` **verbatim**), dedup/merge lessons (mark `SUPERSEDED`, never
     silently delete), promote 3×-applied lessons into rules/skills/ADRs, and lint for contradictions.
