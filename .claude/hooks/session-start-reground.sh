@@ -168,7 +168,7 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ -f "$DIR/T
   owners=$(sed -n '/^## Now/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep '^- \[ \]' \
            | grep -oE '@[A-Za-z0-9_.-]+' | sed 's/^@//' | sort -u)
   if [ -n "$owners" ] && [ -n "$me" ] && ! printf '%s\n' "$owners" | grep -qixF "$me"; then
-    echo "[keel] TASKS.md '## Now' is owned by others ($(printf '@%s ' $owners)) but you are '${me}' — don't do another owner's assigned work; take an unassigned/your-own item or hand back (TASKS ownership tag)."
+    echo "[keel] TASKS.md '## Now' is owned by others ($(printf '@%s ' $owners)) but you are '${me}' — don't do another owner's assigned work; take an unassigned/your-own item or hand back (TASKS ownership tag). If one of those tags IS you under another spelling, your git identity is MIS-WIRED and every ownership mechanism sees a stranger — fix: repo-local git config user.name '<your-@tag>' (identity invariant, docs/steering.md 'Multi-user')."
   fi
   # Owner review queue: on owner-run projects, developer-completed items wait in '## Review' for the
   # OWNER to verify (accept = delete → owner HANDOVER (a); reject = back to ## Now). Owner-session only.
