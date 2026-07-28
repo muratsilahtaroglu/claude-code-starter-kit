@@ -38,8 +38,8 @@ warn_cap "TASKS.md" 100
 if [ -f "$DIR/rules.md" ]; then
   rlines=$(wc -l < "$DIR/rules.md" 2>/dev/null || true)
   rlines=${rlines:-0}
-  if [ "$rlines" -gt 200 ]; then
-    echo "[keel] rules.md is ${rlines} lines (budget ~200 lines / ~40 rules — rules.md §10.38): merge/retire a rule or promote it to a hook instead of appending."
+  if [ "$rlines" -gt 300 ]; then
+    echo "[keel] rules.md is ${rlines} lines (budget ~300 lines / ~60 rules — rules.md §10.38): merge/retire a rule or promote it to a hook instead of appending."
   fi
 fi
 

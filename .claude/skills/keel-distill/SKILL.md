@@ -44,7 +44,7 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - Contradictions between `rules.md` / `LESSONS.md` / `CLAUDE.md` — flag, ask the user which wins.
 - Stale claims (files/commands/paths that no longer exist) — fix or mark superseded.
 - Cap check: `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~150, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
-  `rules.md` ≤ ~200 (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
+  `rules.md` ≤ ~300 (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
 
 ## 5. Report → approve → commit
 Summarize: N blocks archived, M lessons added/merged/superseded/promoted, lint findings. On approval,

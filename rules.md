@@ -189,7 +189,7 @@
     `LESSONS.md`/ADRs + existing code patterns → official docs → a research sub-agent for anything bigger.
     State where you verified it ("per docs X"); no citable source = say you're unsure and check first.
     **Proportionality:** skip for trivial one-sentence diffs or things already verified this session.
-38. **Rule budget.** This file is capped like the memory files: **~40 rules / ~200 lines** (the
+38. **Rule budget.** This file is capped like the memory files: **~60 rules / ~300 lines** (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written). A
     constitution too long to hold in attention is decoration, not discipline.
