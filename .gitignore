@@ -44,6 +44,8 @@ scratch/**/*.out
 # Personal notes/experiments (throwaway per rules.md §3) — keep only the READMEs that document each folder
 scratch/**/*.md
 !scratch/**/README.md
+# Build sources for external deliverables (e.g. the handbook HTML that publishes to an Artifact)
+scratch/**/*.html
 
 # === Reports — raw test-run logs stay local; dated phase summaries are committed ===
 reports/tests/*/
