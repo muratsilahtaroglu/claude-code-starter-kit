@@ -19,27 +19,42 @@ case "$source" in
     echo "[keel] Keel project — skim HANDOVER.md (top block) · LESSONS.md · TASKS.md '## Now' · PLAN.md (current focus) to get oriented (rules.md §1)." ;;
 esac
 
-# Cap checks (rules.md §9.33): warn when a memory file needs /keel-distill. Thresholds mirror rules.md §1.4
-# / §9.33 and HANDOVER.md's header — keep the three in sync if you change a cap.
+# Cap checks (rules.md §9.33): warn when a memory file needs /keel-distill. The numbers below are the
+# SOLO DEFAULTS — a team project tunes them in .claude/keel-caps (PROTECTED: /keel-update never touches
+# it; owner-only via owner-guard; rules.md §10.40), one KEY=NUMBER per line:
+#   HANDOVER=150  LESSONS=250  TASKS=300  RULES=300  HANDOVER_BLOCKS=3
+# The AI PROPOSES a raise (headcount grew, board starves), the USER approves, the file pins it — never
+# raised silently. Skills (distill/compact) and template headers defer to this same file.
+cap_H=150; cap_L=250; cap_T=100; cap_R=300; cap_B=3
+if [ -f "$DIR/.claude/keel-caps" ]; then
+  while IFS='=' read -r k v; do
+    k="$(printf '%s' "$k" | tr -d '[:space:]\r')"; v="$(printf '%s' "$v" | tr -cd '0-9')"
+    [ -n "$v" ] || continue
+    case "$k" in
+      HANDOVER) cap_H=$v ;; LESSONS) cap_L=$v ;; TASKS) cap_T=$v ;;
+      RULES) cap_R=$v ;; HANDOVER_BLOCKS) cap_B=$v ;;
+    esac
+  done < "$DIR/.claude/keel-caps"
+fi
 warn_cap() { # $1=file $2=max_lines
   [ -f "$DIR/$1" ] || return 0
   lines=$(wc -l < "$DIR/$1" 2>/dev/null || true)
   lines=${lines:-0}
   if [ "$lines" -gt "$2" ]; then
-    echo "[keel] $1 is ${lines} lines (cap ~$2) — run /keel-distill before adding more."
+    echo "[keel] $1 is ${lines} lines (cap ~$2, project-tuned via .claude/keel-caps) — run /keel-distill before adding more."
   fi
 }
-warn_cap "HANDOVER.md" 150
-warn_cap "LESSONS.md" 250
-warn_cap "TASKS.md" 100
+warn_cap "HANDOVER.md" "$cap_H"
+warn_cap "LESSONS.md" "$cap_L"
+warn_cap "TASKS.md" "$cap_T"
 
 # Rule-budget check (rules.md §10.38): the constitution is capped like the memory files — a rules.md
 # nobody can hold in attention stops steering anything.
 if [ -f "$DIR/rules.md" ]; then
   rlines=$(wc -l < "$DIR/rules.md" 2>/dev/null || true)
   rlines=${rlines:-0}
-  if [ "$rlines" -gt 300 ]; then
-    echo "[keel] rules.md is ${rlines} lines (budget ~300 lines / ~60 rules — rules.md §10.38): merge/retire a rule or promote it to a hook instead of appending."
+  if [ "$rlines" -gt "$cap_R" ]; then
+    echo "[keel] rules.md is ${rlines} lines (budget ~${cap_R} lines — rules.md §10.38; project-tuned via .claude/keel-caps): merge/retire a rule or promote it to a hook instead of appending."
   fi
 fi
 
@@ -49,8 +64,8 @@ fi
 if [ -f "$DIR/HANDOVER.md" ]; then
   blocks=$(grep -cE '^### [0-9]{4}-[0-9]{2}-[0-9]{2}' "$DIR/HANDOVER.md" 2>/dev/null || true)
   blocks=${blocks:-0}
-  if [ "$blocks" -gt 3 ]; then
-    echo "[keel] HANDOVER.md has ${blocks} session blocks (max 3) — run /keel-distill to rotate the oldest to docs/handover-archive.md."
+  if [ "$blocks" -gt "$cap_B" ]; then
+    echo "[keel] HANDOVER.md has ${blocks} session blocks (max ${cap_B}) — run /keel-distill to rotate the oldest to docs/handover-archive.md."
   fi
 fi
 

@@ -122,6 +122,19 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   conflict resolves as keep-both-blocks, newest first. `## Now` reads per-person on teams (~2–3
   items each). Sprint deadlines ride the item as `due: YYYY-MM-DD` — the re-ground hook surfaces
   past-due dates at session start.
+- **Caps scale with the team:** the kit's memory caps are SOLO defaults — on a growing team the AI
+  proposes larger ones (a starving `## Now`, a churning handover) and, with the owner's approval, pins
+  them in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER · LESSONS · TASKS · RULES ·
+  HANDOVER_BLOCKS). PROTECTED + owner-guarded: `/keel-update` never resets it, developers can't edit it.
+- **Spec + solution-note convention (the board stays lean):** `TASKS.md ## Now` carries only
+  id + `@owner` + `due:` + done-when; the detailed SPEC of an assignment (requirements, manual test
+  scripts, acceptance details) is an owner-approved `reports/team/<task>_spec.md`, and every delivered
+  fix ships a SOLUTION NOTE (`reports/team/<task>_fix_<date>.md`: problem → root cause → fix + why →
+  changed files → tests). `## Review` evidence links BOTH files — the owner verifies against the spec.
+- **Dev-local runs:** every developer runs the product on their OWN machine without editing tracked
+  files — machine-local knobs (PORT, hosts, creds) come from their own `.env` (defaults documented in
+  `.env.example`; Makefile targets accept `make run-x PORT=8135`-style overrides); scarce shared
+  backends (GPU endpoints, live read-only DBs) are consumed as services named in the team doc.
 - **Onboarding doc:** materialize the team's concrete flow as a project-owned `docs/team.md` (roles
   table, fork/clone + `git config` steps, secret handoff via a safe channel, ritual etiquette). The
   kit deliberately ships NO team.md template — it is project content, and `/keel-update` must never

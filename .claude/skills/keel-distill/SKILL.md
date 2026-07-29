@@ -46,7 +46,8 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - Stale cap HEADERS in the memory files themselves (e.g. a LESSONS.md header still quoting an old
   "~100"): correct to the current thresholds below — headers are prose, the SessionStart hook is the
   authority; they drift in adopted projects because `/keel-update` never touches PROTECTED memory files.
-- Cap check: `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~250, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
+- Cap check (solo defaults — the project's `.claude/keel-caps` overrides them, rules §10.40):
+  `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~250, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
   `rules.md` ≤ ~300 (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
 
 ## 5. Report → approve → commit

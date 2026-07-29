@@ -2,7 +2,8 @@
 
 > Updated BEFORE every compact/session end. The repo is durable disk; the context window is volatile
 > RAM — anything not written here is assumed lost. This file is `@`-imported into EVERY session, so it
-> has a **hard cap: max 3 session blocks / ~150 lines.** When a 4th block would be added (or the cap is
+> has a **hard cap: max 3 session blocks / ~150 lines** (team override: `.claude/keel-caps`, rules
+> §10.40). When a 4th block would be added (or the cap is
 > hit), run **`/keel-distill`** first: the oldest block's critical facts go to `LESSONS.md` (tagged, distilled)
 > and the raw block moves verbatim to `docs/handover-archive.md` (never imported — costs no context,
 > grep-able forever). Compaction is a curation step, not an information-loss event.

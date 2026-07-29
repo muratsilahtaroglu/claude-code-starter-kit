@@ -4,7 +4,7 @@
 > scratch only** (ephemeral / machine-local) — this file is the single cross-session source of truth;
 > mirror open items here before compaction/session end. Rules: `rules.md §9`.
 >
-> **Anti-bloat is the whole design (cap ~100 lines):**
+> **Anti-bloat is the whole design (cap ~100 lines — team override via `.claude/keel-caps`, rules §10.40):**
 > - **Work ONLY from `## Now`** (max 3–5 items). Refill it from `## Next` when it empties.
 > - Every item carries a verifiable **`done-when:`** criterion (a test to run, an output to observe) —
 >   not a vague description. It is unacceptable to remove or weaken a `done-when:` to make a task pass.

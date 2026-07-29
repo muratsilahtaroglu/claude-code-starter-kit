@@ -21,7 +21,8 @@ always — this is the umbrella, not a replacement.
          (same-day ≠ same-session: another session's block from today is still stale — add your own).
    - [ ] `TASKS.md ## Now` matches reality; finished items deleted (one-liners in block (a)).
    - [ ] No agreement / gotcha / failed approach from this conversation is still unwritten (§9.31).
-   - [ ] Caps respected: HANDOVER ≤ 3 blocks / ~150 lines · LESSONS ≤ ~250 · TASKS ≤ ~100 (else `/keel-distill`).
+   - [ ] Caps respected (defaults — `.claude/keel-caps` overrides, rules §10.40): HANDOVER ≤ 3 blocks /
+         ~150 · LESSONS ≤ ~250 · TASKS ≤ ~100 (else `/keel-distill`).
    - [ ] `PLAN.md` statuses + _Current focus_ current (if the project uses PLAN.md).
 3. **Offer an approved commit + the batched push** (rules.md §1.3, §6.15) — this is the natural push
    boundary: commits accrued through the session go out here in ONE approval (the `ask` on push fires

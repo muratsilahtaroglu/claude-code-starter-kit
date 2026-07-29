@@ -165,9 +165,9 @@
     finished item is marked `[x]` immediately and **deleted at `/keel-handover`** as its one-liner lands in
     the new HANDOVER block (a) — git is the archive; mid-session discoveries get one line in
     `## Discovered` immediately, triaged at session end.
-33. **Consolidation (`/keel-distill`).** These caps are the single source of truth — the `keel-distill` skill and
-    `.claude/hooks/session-start-reground.sh` mirror them; change one, change all three. Memory written
-    but never reviewed degrades: when caps hit (HANDOVER > 3 blocks/~150 lines, LESSONS > ~250, TASKS >
+33. **Consolidation (`/keel-distill`).** The caps are SOLO DEFAULTS — a team project tunes them in
+    `.claude/keel-caps` (§10.40); the SessionStart hook reads that file, skills/headers follow it. Memory
+    written but never reviewed degrades: when caps hit (defaults: HANDOVER > 3 blocks/~150 lines, LESSONS > ~250, TASKS >
     ~100 lines) or every ~5 sessions, run `/keel-distill` — rotate old blocks (critical → LESSONS,
     raw → `docs/handover-archive.md` **verbatim**), dedup/merge lessons (mark `SUPERSEDED`, never
     silently delete), promote 3×-applied lessons into rules/skills/ADRs, and lint for contradictions.
@@ -189,7 +189,7 @@
     `LESSONS.md`/ADRs + existing code patterns → official docs → a research sub-agent for anything bigger.
     State where you verified it ("per docs X"); no citable source = say you're unsure and check first.
     **Proportionality:** skip for trivial one-sentence diffs or things already verified this session.
-38. **Rule budget.** This file is capped like the memory files: **~60 rules / ~300 lines** (the
+38. **Rule budget.** This file is capped like the memory files: **~60 rules / ~300 lines**, `.claude/keel-caps`-tunable (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written). A
     constitution too long to hold in attention is decoration, not discipline.
@@ -198,3 +198,13 @@
     runtime prompts or code so one example passes. Verified = a **variant case the fix was not built on**
     also passes + the original failing case joins the regression/golden set (§2.8, `tests/fixtures/`).
     A deliberate point-fix is OK only when **declared**: "point fix — generalize later" in TASKS/LESSONS.
+40. **Team scale-up.** Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
+    person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
+    LESSONS · TASKS · RULES · HANDOVER_BLOCKS) — owner-only, `/keel-update`-safe, never raised silently.
+    `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + done-when; the detailed SPEC
+    (requirements, manual test scripts) is an owner-approved `reports/team/<task>_spec.md`, and delivery
+    evidence includes a SOLUTION NOTE (`reports/team/<task>_fix_<date>.md`: problem → root cause →
+    fix + why → changed files → tests). Every developer must be able to run the product LOCALLY:
+    machine-local knobs (port, hosts, creds) live in their own `.env` (defaults documented in
+    `.env.example`; `make run PORT=…`-style overrides) — "runs only on the owner's machine" is a
+    bootstrap bug, not a norm.

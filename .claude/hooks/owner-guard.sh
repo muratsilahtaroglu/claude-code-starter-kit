@@ -76,7 +76,7 @@ fp="$(field '.get("tool_input", {}).get("file_path", "")')"
 rel="${fp#"$DIR"/}"
 
 case "$rel" in
-  PLAN.md|rules.md|CLAUDE.md|docs/architecture.md|docs/adr/*|.claude/settings.json|.claude/settings.local.json|.claude/hooks/*|.claude/skills/*|.claude/agents/*|.claude/rules/*|.claude/project-owner)
+  PLAN.md|rules.md|CLAUDE.md|docs/architecture.md|docs/adr/*|.claude/settings.json|.claude/settings.local.json|.claude/hooks/*|.claude/skills/*|.claude/agents/*|.claude/rules/*|.claude/project-owner|.claude/keel-caps)
     deny "$rel" "BLOCKED by .claude/hooks/owner-guard.sh: '$rel' is a GOVERNANCE file — owner-only (owner: @$owner · you: @$me). Developers work their @-assigned TASKS items; plan/architecture/rules/ADR changes are PROPOSED to the owner (or land via a PR the owner reviews). Shared surfaces stay writable: HANDOVER/LESSONS/TASKS, src/, tests/." ;;
 esac
 exit 0
