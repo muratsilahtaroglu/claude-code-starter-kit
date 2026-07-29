@@ -208,3 +208,13 @@
     machine-local knobs (port, hosts, creds) live in their own `.env` (defaults documented in
     `.env.example`; `make run PORT=…`-style overrides) — "runs only on the owner's machine" is a
     bootstrap bug, not a norm.
+41. **Human ownership (AI-assisted ≠ AI-verified).** The assignee OWNS their delivery: the human/manual
+    part of a `done-when` (eyes-on tests, live checks) is performed PERSONALLY — an AI-run check never
+    substitutes for it, and evidence names WHO ran WHAT, HOW. Before work starts on an `@`-assigned
+    item, the session BRIEFS the spec and confirms understanding with 2–3 spec-targeted questions
+    (Q&A summary → the task's `reports/team/<task>_spec.md` "Comprehension log"); it does not proceed
+    until confirmed — the assignee advances KNOWING what they are doing, not rubber-stamping AI output.
+    At `## Review` the owner probes the same understanding proportionally — a delivery its author
+    cannot explain is REJECTED back to `## Now` ("comprehension gap"). Binds work carrying
+    test/verification claims or changing product behavior (owner may waive for trivial items); applies
+    to EVERYONE, the owner included (their probe = the phase-review gate).

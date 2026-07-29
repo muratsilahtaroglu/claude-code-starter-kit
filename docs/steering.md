@@ -131,6 +131,14 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   scripts, acceptance details) is an owner-approved `reports/team/<task>_spec.md`, and every delivered
   fix ships a SOLUTION NOTE (`reports/team/<task>_fix_<date>.md`: problem → root cause → fix + why →
   changed files → tests). `## Review` evidence links BOTH files — the owner verifies against the spec.
+- **Human ownership (comprehension gate, rules §10.41):** AI-assisted ≠ AI-verified. At task START the
+  assignee's session briefs the spec and confirms understanding with 2–3 spec-targeted questions —
+  Q&A summary appended to the task's spec file as a **`## Comprehension log`**; work doesn't start
+  until confirmed. The manual/eyes-on parts of a done-when are run PERSONALLY by the assignee
+  (evidence names who/how). At `## Review` the owner probes the same understanding proportionally —
+  a delivery its author cannot explain is rejected ("comprehension gap"). Honesty about enforcement:
+  the dev-session briefing is a NUDGE that steers the assignee into conscious, controlled work; the
+  probe that BITES is the owner's — final say stays with the owner.
 - **Dev-local runs:** every developer runs the product on their OWN machine without editing tracked
   files — machine-local knobs (PORT, hosts, creds) come from their own `.env` (defaults documented in
   `.env.example`; Makefile targets accept `make run-x PORT=8135`-style overrides); scarce shared

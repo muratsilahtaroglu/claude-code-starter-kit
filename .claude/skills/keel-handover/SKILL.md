@@ -23,8 +23,11 @@ Steps:
      TASKS.md items finished this session (then delete them from TASKS.md). **Multi-user exception**
      (`.claude/project-owner` exists and you are NOT the owner): do not delete your finished items —
      MOVE each to a TASKS `## Review` section (create it if missing) as
-     `- [x] <id> ... (@you) — evidence: <how the done-when was met>`; the OWNER verifies and deletes on
-     accept (their session is nudged). The owner's own items follow the normal delete flow.
+     `- [x] <id> ... (@you) — evidence: <how the done-when was met>` — link the PROOF (solution note /
+     test report under `reports/team/`); an evidence-less line is flagged at session start, and the
+     owner's probe may also test your UNDERSTANDING of the delivery (rules.md §10.41). The OWNER
+     verifies and deletes on accept (their session is nudged). The owner's own items follow the
+     normal delete flow.
    - **(b) Tried, didn't work** — approaches that failed + the reason, so they aren't retried. This is
      the highest-value section — don't skip it.
    - **(c) Latest updates** — the most recent concrete changes.

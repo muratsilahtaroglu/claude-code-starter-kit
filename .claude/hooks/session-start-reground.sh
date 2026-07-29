@@ -168,7 +168,7 @@ if [ -f "$DIR/.claude/project-owner" ]; then
   own="$(head -n1 "$DIR/.claude/project-owner" 2>/dev/null | tr -d '\r' | sed 's/^ *//;s/ *$//')"
   me_o="$(git -C "$DIR" config user.name 2>/dev/null)"
   if [ -n "$own" ] && [ -n "$me_o" ] && [ "$own" != "$me_o" ]; then
-    echo "[keel] Multi-user project — you are DEVELOPER '@${me_o}' (owner: @${own}). Governance (PLAN/rules/CLAUDE/architecture/ADR/.claude) is owner-only — owner-guard blocks those edits; work your @-assigned TASKS items, PROPOSE the rest to the owner."
+    echo "[keel] Multi-user project — you are DEVELOPER '@${me_o}' (owner: @${own}). Governance (PLAN/rules/CLAUDE/architecture/ADR/.claude) is owner-only — owner-guard blocks those edits; work your @-assigned TASKS items — START each with the spec briefing (explain it, confirm the assignee's understanding, log the Q&A; rules.md §10.41) — and PROPOSE the rest to the owner."
   elif [ -n "$own" ] && [ -z "$me_o" ]; then
     echo "[keel] .claude/project-owner exists but git user.name is UNSET — owner-guard cannot attribute you (it fails open). Set: git config user.name '<you>'."
   fi
@@ -192,9 +192,19 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ -f "$DIR/T
     if [ "$me" = "$own_r" ]; then
       rq=$(sed -n '/^## Review/,/^## /{/^## Review/d; /^## /d; p}' "$DIR/TASKS.md" 2>/dev/null | grep -c '^- \[')
       if [ "${rq:-0}" -gt 0 ]; then
-        echo "[keel] ${rq} completed developer item(s) await YOUR review in TASKS.md '## Review' — verify each done-when (run/observe it; spawn the verifier agent when in doubt, rules.md §4.11), then accept (delete → your HANDOVER (a) as 'reviewed') or reject (back to ## Now with one reason line)."
+        echo "[keel] ${rq} completed developer item(s) await YOUR review in TASKS.md '## Review' — verify each done-when (run/observe it; verifier agent when in doubt, rules.md §4.11) AND, where the work carries verification claims, the author's own understanding (§10.41 comprehension probe: can they explain it? no → reject 'comprehension gap'), then accept (delete → your HANDOVER (a) as 'reviewed') or reject (back to ## Now with one reason line)."
       fi
     fi
+  fi
+fi
+
+# Evidence-link check: every '## Review' delivery must link its proof ("— evidence: <path>") — an
+# evidence-less claim can't be verified (rules.md §10.41; keel-handover Review flow). Deterministic
+# only: presence of the token, not its quality — quality is the owner's probe.
+if [ -f "$DIR/TASKS.md" ]; then
+  noev=$(sed -n '/^## Review/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -E '^- \[' | grep -cv 'evidence:')
+  if [ "${noev:-0}" -gt 0 ]; then
+    echo "[keel] ${noev} '## Review' item(s) carry NO 'evidence:' link — an unverifiable delivery; add the proof (reports/team/ solution note / test report) to the item line before the owner reviews."
   fi
 fi
 

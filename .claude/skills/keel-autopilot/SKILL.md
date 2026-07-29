@@ -13,7 +13,8 @@ Mode contract (4 rules):
 1. **In-phase autonomy.** Work the wip phase's `TASKS ## Now` items back-to-back without pausing for
    confirmation; make routine judgment calls yourself (§10.36). Memory discipline stays hot-path:
    LESSONS the moment something is learned, TASKS updated as you go — autopilot without the rituals
-   is just drift at higher speed.
+   is just drift at higher speed. On a multi-user project, an `@`-assigned item still STARTS with the
+   §10.41 spec briefing (confirm the assignee's understanding, log the Q&A) before the work.
 2. **Gates stay evidence-based.** When `## Now` empties, run the FULL `/keel-phase-review` checklist
    yourself. PASS needs real evidence (tests green via `make test`, the gate's done-when observed) —
    never narrate a pass. PASS → flip the phase, seed the next `## Now` from PLAN.md, continue.
