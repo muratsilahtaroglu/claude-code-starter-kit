@@ -12,7 +12,9 @@
 >   this file as its one-liner lands in the new `HANDOVER.md` block (a) — git history is the archive.
 >   Done items never survive a handover.
 > - Mid-session discoveries ("tests are broken", "this module needs a refactor") get ONE line in
->   `## Discovered` immediately — then return to your current task. Triage Discovered at session end.
+>   `## Discovered` immediately — then return to your current task. Discovered is an INBOX, not
+>   storage: at `/keel-handover` every line converges OUT (→ `## Next` with a done-when · docs ·
+>   LESSONS · ADR · delete if resolved); the SessionStart hook flags lines older than ~a week.
 > - Optional inline tags: `blocked-by: T3` · `discovered-from: T1` · `due: YYYY-MM-DD` (sprint
 >   target — the SessionStart hook surfaces past-due dates) · `@owner` (see below).
 > - **Ownership (multi-user projects).** An item may carry `@owner` (the owner's `git config user.name`).

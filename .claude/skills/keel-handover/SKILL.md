@@ -46,7 +46,14 @@ Steps:
    evidence exists), **propose `/keel-phase-review`** to the user — don't run it unasked: flipping a
    phase to `done` is the review's job, not this skill's (rules.md §2.7).
 4. Update the global **Open questions / pending user decisions** section (add new, delete resolved).
-5. Sweep the conversation for unwritten agreements (rules §9.31): any rule/test/gotcha agreed this
+5. **Drain TASKS `## Discovered`** (an INBOX, not storage — this includes project variants like
+   `## Discovered-team`): converge every line OUT — a real task → `## Next` (with a done-when) · a
+   domain/provider fact → `docs/` (architecture "known limitations" / the project's R-request or
+   integration doc) · a lesson → `LESSONS.md` · a design decision → an ADR · resolved/superseded →
+   DELETE (git keeps it). Entries are ONE line; anything longer is a report/spec/ADR fragment — write
+   it there, leave a pointer. A line that survives two handovers is in the wrong file; leave only this
+   session's genuinely untriaged finds (the re-ground hook flags week-old leftovers).
+6. Sweep the conversation for unwritten agreements (rules §9.31): any rule/test/gotcha agreed this
    session that isn't in `LESSONS.md` yet — ask, then append.
-6. Set the `_Last updated:_` line to today's date + a one-line status.
-7. Do NOT commit/push without user approval (rules.md §1.3, §6.15).
+7. Set the `_Last updated:_` line to today's date + a one-line status.
+8. Do NOT commit/push without user approval (rules.md §1.3, §6.15).

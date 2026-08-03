@@ -208,6 +208,23 @@ if [ -f "$DIR/TASKS.md" ]; then
   fi
 fi
 
+# Discovered-inbox age check: '## Discovered*' sections are an INBOX — lines converge OUT at
+# handover/distill (keel-handover step 5, distill §3). Week-old dated lines mean it isn't draining:
+# they belong in ## Next / docs / LESSONS / an ADR — or deleted if resolved. Presence-only, no judgment.
+if [ -f "$DIR/TASKS.md" ]; then
+  cutoff=$(date -d '7 days ago' +%F 2>/dev/null || true)
+  if [ -n "$cutoff" ]; then
+    stale_d=$(awk -v c="$cutoff" '
+      /^## Discovered/ {f=1; next}
+      /^## / {f=0}
+      f && /^- 20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ {d=substr($0,3,10); if (d < c) n++}
+      END {print n+0}' "$DIR/TASKS.md" 2>/dev/null)
+    if [ "${stale_d:-0}" -gt 0 ]; then
+      echo "[keel] ${stale_d} '## Discovered' line(s) are older than 7 days — the inbox isn't draining (token tax + buried finds); converge them at handover/distill: ## Next with a done-when · docs known-limitations · LESSONS · ADR · delete if resolved."
+    fi
+  fi
+fi
+
 # Due-date nudge: open '## Now' (and an in-between '## Review') items may carry `due: YYYY-MM-DD`
 # (sprint targets, multi-user assignments — docs/steering.md "Multi-user"). Surface past dates at
 # session start; the fix is finishing, re-scoping, or re-dating WITH the owner — never silent rot.

@@ -35,7 +35,12 @@ For each block being rotated, triage by criticality — **content-aware, not age
 
 ## 3. Prune TASKS.md
 - Verify done items were deleted (their one-liner lives in HANDOVER (a)); delete any stragglers.
-- Triage `## Discovered` into `## Next` (or drop with a reason); refill `## Now` (max 3–5).
+- **Drain `## Discovered` to convergence** (incl. project variants like `## Discovered-team`) — it is
+  an INBOX, not storage: each line → `## Next` (real task, with done-when) · `docs/` known-limitations
+  / R-request doc (domain/provider fact) · `LESSONS.md` (lesson) · an ADR (design decision) · DELETE
+  (resolved/superseded — git keeps it). One line per entry; longer → a report/ADR + pointer here. A
+  line surviving TWO distills is in the wrong file — after this step the section holds only the
+  current week's untriaged finds. Refill `## Now` (max 3–5, per person on teams).
 
 ## 4. Lint the memory set (drift check)
 - **Strip noise:** delete VCS/ritual bookkeeping ("pushed N commits", sha ranges, "ran /keel-distill")
