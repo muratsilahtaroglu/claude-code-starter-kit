@@ -117,7 +117,9 @@
     made **as the project owner** (git config: `<git-user> <git-email>`); no AI co-author line unless
     requested.
 17. Branch strategy: default is a short-lived branch per phase → self-review → merge to `main` → push;
-    a simpler direct-to-`main` flow is fine with approval. User preference is decisive.
+    a simpler direct-to-`main` flow is fine with approval. User preference is decisive. Multi-user
+    projects adopt what the HOST can enforce — same-repo branch→PR, or **fork→PR** where developers are
+    Read-only (docs/steering.md "Multi-user") — and rewrite this §6 to match (ADR it, §10.40).
 18. **Secret-leak scan before push:** review `git diff --cached`; if `.env`/secrets appear, STOP.
 19. Handover + docs updates go out in the same push round as the code.
 
@@ -131,7 +133,10 @@
     (high-signal pattern). `.dockerignore` prevents `.env`/secrets from leaking into the image.
 23. **New dependency:** question its necessity + check for typosquatting/repo health → add with `==` →
     refresh the lock → `pip-audit` → rebuild/test.
-24. **CI:** a security job runs on every PR/`main` push (pip-audit + hash-verify + `.pth` scan).
+24. **CI:** a security job runs on every PR/`main` push (pip-audit + hash-verify + `.pth` scan) —
+    **shaped to the §6 contribution model:** fork PRs receive NO repo secrets, so the gating suite must
+    pass secret-less (a live-cred/network test SKIPs, never fails); a bootstrap that pruned `.github/`
+    reverses the prune at team scale-up (ADR addendum, never a silent re-add).
 25. **If a dependency-attack is suspected:** follow the **emergency checklist** in docs/security.md.
 26. In production, secrets live in Vault/a secret store; network egress is allowlisted. Roadmap: SBOM,
     Sigstore, Dependabot/Renovate + manual approval, private package mirror.

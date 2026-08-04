@@ -116,6 +116,12 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   | Private PERSONAL repo (free) | ⚠️ NO real wall: collaborators always get WRITE (no read-only role) and rulesets aren't enforced without a paid plan — hooks + discipline only |
   | Private repo in a FREE organization | transfer the repo to an org → developers get the **Read** role, org setting "allow forking of private repos" ON → they fork + PR; write access physically stays with the owner |
   | Paid GitHub (Pro/Team) · GitLab | enforced ruleset / protected branches directly on the private repo |
+- **Fork-CI discipline (shape CI to the contribution flow, not the other way around):** on a fork PR
+  the host injects NO repo secrets (and GitHub holds a first-time contributor's workflow run for
+  approval) — so the PR-gating suite must pass SECRET-LESS: a test needing live creds/network SKIPs
+  instead of failing (the CI twin of §10.40's "runs only on the owner's machine" bootstrap bug). If
+  bootstrap pruned `.github/` in the solo era, team scale-up is the moment the prune is reversed —
+  as a recorded ADR addendum, never a silent re-add.
 - **Team etiquette on shared surfaces** (a PR should merge without stepping on anyone): sign
   LESSONS / `## Discovered` lines with your `@tag` (HANDOVER block headings carry it automatically);
   a developer PR touches only their OWN TASKS items + their OWN handover block; a HANDOVER merge
