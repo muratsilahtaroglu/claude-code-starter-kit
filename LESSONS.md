@@ -17,8 +17,10 @@
 >
 > **Long projects — two pressure valves before you ever raise the cap** (the file is `@`-imported every
 > session, so every line is a permanent token + attention tax): (1) **graduate** — a 3×-applied entry
-> leaves for `rules.md`/a skill/an ADR, and a permanent DOMAIN fact (data quirk, API contract) moves to
-> `docs/` (architecture "known limitations" / a guide), not here; (2) **per-area split** on big
+> leaves for `rules.md`/a skill/an ADR, a permanent DOMAIN fact (data quirk, API contract) moves to
+> `docs/` (architecture "known limitations" / a guide), and a FILE-scoped constraint (must-run test
+> after touching X, append-only dir) becomes a `paths:`-scoped `.claude/rules/<name>.md` rule — loads
+> only when a matching file is touched, never for must-always-hold discipline; (2) **per-area split** on big
 > multi-area projects — see the section at the bottom.
 
 ## [rule] — mid-project agreements on how to work

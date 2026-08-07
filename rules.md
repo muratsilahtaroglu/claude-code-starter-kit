@@ -175,7 +175,8 @@
     written but never reviewed degrades: when caps hit (defaults: HANDOVER > 3 blocks/~150 lines, LESSONS > ~250, TASKS >
     ~100 lines) or every ~5 sessions, run `/keel-distill` — rotate old blocks (critical → LESSONS,
     raw → `docs/handover-archive.md` **verbatim**), dedup/merge lessons (mark `SUPERSEDED`, never
-    silently delete), promote 3×-applied lessons into rules/skills/ADRs, and lint for contradictions.
+    silently delete), promote 3×-applied lessons into rules/skills/ADRs (file-scoped ones → a
+    `paths:`-scoped `.claude/rules/` rule), and lint for contradictions.
 34. **Restorable compression.** Distillation never lossy-deletes: every distilled line points back to the
     raw record ("docs/handover-archive.md, block <date>"); the archive is never `@`-imported — grep it on demand.
 35. **No vector DB / RAG for memory (by default).** Grep-able markdown beats embeddings on freshness,

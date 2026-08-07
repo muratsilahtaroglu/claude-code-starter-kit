@@ -30,7 +30,12 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - **Promote what has graduated:** a lesson applied 3+ times is no longer a lesson — move it into
   `rules.md` (conduct), a `.claude/skills/` skill (procedure), an ADR (decision), or — for a permanent
   DOMAIN fact (a data quirk, an API contract) — the relevant **docs** (`docs/architecture.md` "known
-  limitations" / a guide), then drop it here. This is the main pressure valve on a long project's
+  limitations" / a guide), then drop it here. A lesson that binds only SPECIFIC files (a must-run
+  test after touching X, an append-only dir, a never-hand-edit generated file) becomes a
+  **path-scoped rule** — `.claude/rules/<name>.md` with `paths:` frontmatter: it loads ONLY when a
+  matching file is touched, so it is cheaper than both `rules.md` and this file. Never put
+  must-always-hold discipline there (a path rule stays unloaded after compaction until a match —
+  see `.claude/rules/README.md`). This is the main pressure valve on a long project's
   `[gotcha]` list: reference facts belong in docs, not the always-loaded `LESSONS.md`.
 
 ## 3. Prune TASKS.md
