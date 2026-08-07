@@ -34,8 +34,10 @@ For each block being rotated, triage by criticality — **content-aware, not age
   test after touching X, an append-only dir, a never-hand-edit generated file) becomes a
   **path-scoped rule** — `.claude/rules/<name>.md` with `paths:` frontmatter: it loads ONLY when a
   matching file is touched, so it is cheaper than both `rules.md` and this file. Never put
-  must-always-hold discipline there (a path rule stays unloaded after compaction until a match —
-  see `.claude/rules/README.md`). This is the main pressure valve on a long project's
+  must-always-hold discipline there (a path rule stays unloaded after compaction until a match).
+  The new rule is shown as its FULL text in the distill plan and lands owner-approved, written
+  self-contained — constraint + why + check inline, evidence pointing only to permanent artifacts,
+  never to TASKS/PLAN live state (`.claude/rules/README.md` "Writing discipline"). This is the main pressure valve on a long project's
   `[gotcha]` list: reference facts belong in docs, not the always-loaded `LESSONS.md`.
 
 ## 3. Prune TASKS.md

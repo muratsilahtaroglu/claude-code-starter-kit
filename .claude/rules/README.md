@@ -14,4 +14,17 @@ compaction until a matching file is touched again** (unlike `rules.md`, which is
 every compaction). So must-always-hold discipline (handover, security posture, judgment) belongs in
 `rules.md`; only genuinely file-local constraints belong here.
 
+**Writing discipline (rules here can bite — treat them as governance):**
+- **Owner approves the text.** A new or changed rule here is PROPOSED as its full text and lands only
+  with the owner's explicit approval — never silently as a side effect of another ritual (a distill
+  turn shows it in its plan). On armed multi-user projects the owner-guard hook already blocks
+  non-owner writes to `.claude/rules/*`; this approval bar binds the owner's own AI sessions too.
+- **Self-contained or it's a bug.** A rule must read cold: the constraint + WHY + a verifiable check,
+  inline. Evidence may cite PERMANENT artifacts (a `reports/` file, an ADR, `docs/handover-archive.md`)
+  — never live state: a TASKS item, a PLAN phase status, `## Review`, or "today's/current" work. Those
+  dangle the moment the board changes, leaving a rule nobody can interpret.
+- **When it loads:** only while a file matching `paths:` is being read/edited — not at session start,
+  and (as above) not after compaction until a match is touched again. Write it assuming the reader
+  has NO other context.
+
 (Mechanism trade-offs across skills / hooks / subagents / rules / CLAUDE.md: see `docs/steering.md`.)
