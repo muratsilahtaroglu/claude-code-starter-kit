@@ -54,6 +54,12 @@ For each block being rotated, triage by criticality — **content-aware, not age
   and conversational meta ("user asked if I saved", "don't rush") from HANDOVER — it's git-log /
   ritual-log-derivable, and it's usually what pushed the file over cap (keep decisions + their WHY).
 - Contradictions between `rules.md` / `LESSONS.md` / `CLAUDE.md` — flag, ask the user which wins.
+- **Decision/constraint drift (`docs/adr/` + `.claude/rules/`):** an *Accepted* ADR contradicted by a
+  newer decision, a measurement, or the code as it now stands → PROPOSE `Superseded (by ...)` — the
+  OWNER flips the status, never this ritual; a path-scoped rule whose constraint has been overtaken
+  → propose rewrite or retirement the same way. Also verify each rule's `paths:` globs still match
+  existing files (a glob matching nothing = the rule silently never loads — a dead rule), and the
+  ADR README index still mirrors the folder.
 - Stale claims (files/commands/paths that no longer exist) — fix or mark superseded.
 - Stale cap HEADERS in the memory files themselves (e.g. a LESSONS.md header still quoting an old
   "~100"): correct to the current thresholds below — headers are prose, the SessionStart hook is the
