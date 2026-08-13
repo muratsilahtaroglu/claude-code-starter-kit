@@ -24,6 +24,8 @@
 >   foreign-owned item, and the SessionStart hook warns when `## Now` is entirely someone else's.
 >   On owner-run projects (`.claude/project-owner` exists) ASSIGNING the tags is the project owner's call;
 >   developers complete + `[x]` their items and add `## Discovered` lines (docs/steering.md "Multi-user").
+>   **AI co-agent sessions** (rules §10.42) follow the same discipline as teammates: their own
+>   `### <name>` lane, edits only INSIDE their own items (no rituals/git/curation), delivery via `## Review`.
 >   **Owner review:** a developer does NOT delete their finished item — at their handover it MOVES to a
 >   `## Review` section (created on first use; `- [x] T7 ... (@dev) — evidence: <done-when result>`).
 >   The OWNER verifies the done-when, then accepts (delete → owner's HANDOVER (a) as "reviewed") or

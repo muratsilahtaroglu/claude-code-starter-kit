@@ -224,3 +224,14 @@
     cannot explain is REJECTED back to `## Now` ("comprehension gap"). Binds work carrying
     test/verification claims or changing product behavior (owner may waive for trivial items); applies
     to EVERYONE, the owner included (their probe = the phase-review gate).
+42. **Parallel co-agent sessions.** Extra Claude sessions in the same repo may work the board like
+    teammates ("co-agents" — sub-agent-like, but with their own chat history the owner can inspect
+    and steer mid-task). A co-agent runs INTERMEDIATE work only, in its own lane: a `### <name>`
+    lane / `@<name>` tag in TASKS + its own `reports/` files. FORBIDDEN to a co-agent: rituals/skills
+    (handover · distill · compact · phase-review · audit), commit/push, and rewriting/compressing
+    anyone ELSE's lines — it appends only inside its own items. Rituals, git, and memory curation
+    (cap tightening, block rotation, drainage) belong to the MAIN session alone — which in turn READS
+    fresh co-agent writes (`git status`/`git diff`) before curating lines away: memory files are
+    SINGLE-WRITER surfaces, and two concurrent writers clobber each other silently (field case:
+    alice_v2 2026-08-12 — fresh co-agent progress nearly overwritten twice during a cap pass). A
+    co-agent delivery lands in `## Review` and §10.41 + the §4.11 verify duty apply unchanged.

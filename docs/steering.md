@@ -145,6 +145,16 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   a delivery its author cannot explain is rejected ("comprehension gap"). Honesty about enforcement:
   the dev-session briefing is a NUDGE that steers the assignee into conscious, controlled work; the
   probe that BITES is the owner's — final say stays with the owner.
+- **Co-agent sessions (one human, many hands — rules §10.42):** the owner may run EXTRA Claude
+  sessions in the same repo as pseudo-teammates ("co-agents") — unlike a spawned sub-agent they keep
+  their own chat history, so the owner inspects and steers them mid-task. Give each its own TASKS
+  lane (`### <name>`) and hold it to intermediate work only: no rituals/skills, no commit/push, no
+  touching anyone else's lines — memory files are single-writer surfaces and concurrent writers
+  clobber each other SILENTLY; the main session reads fresh co-agent writes (`git diff`) before any
+  curation pass. Honest enforcement note: a co-agent runs under the owner's git identity, so
+  owner-guard cannot wall it — the rule is discipline, backed by the ritual gates it cannot pass
+  (its `/compact` stalls at the compact-gate because HANDOVER is not its surface; the main session's
+  handover clears it). Deliveries land in `## Review` like any teammate's (§10.41).
 - **Dev-local runs:** every developer runs the product on their OWN machine without editing tracked
   files — machine-local knobs (PORT, hosts, creds) come from their own `.env` (defaults documented in
   `.env.example`; Makefile targets accept `make run-x PORT=8135`-style overrides); scarce shared
