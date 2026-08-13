@@ -134,9 +134,20 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   HANDOVER_BLOCKS). PROTECTED + owner-guarded: `/keel-update` never resets it, developers can't edit it.
 - **Spec + solution-note convention (the board stays lean):** `TASKS.md ## Now` carries only
   id + `@owner` + `due:` + done-when; the detailed SPEC of an assignment (requirements, manual test
-  scripts, acceptance details) is an owner-approved `reports/team/<task>_spec.md`, and every delivered
-  fix ships a SOLUTION NOTE (`reports/team/<task>_fix_<date>.md`: problem → root cause → fix + why →
-  changed files → tests). `## Review` evidence links BOTH files — the owner verifies against the spec.
+  scripts, acceptance details) is an owner-approved `<task>_spec.md`, and every delivered fix ships a
+  SOLUTION NOTE (`<task>_fix_<date>.md`: problem → root cause → fix + why → changed files → tests).
+  `## Review` evidence links BOTH files — the owner verifies against the spec.
+- **Team reports: per-author folders + one index (clutter control, rules §10.40):** everything under
+  `reports/team/` files into the AUTHOR's own folder — `reports/team/<@tag>/` for each developer, the
+  owner, and every co-agent — with task-prefixed names inside (`<task>_spec.md`, `<task>_fix_<date>.md`;
+  bulky/raw evidence as a `<task>_<what>/` subfolder), **Markdown only** (no .docx/binary docs).
+  `reports/team/README.md` is the single INDEX: one line per report — `file · task · what · status` —
+  appended at delivery (part of the solution-note step), status flipped to `closed <date>` when the
+  owner accepts the `## Review` item. Reports are NEVER deleted or moved: they are the permanent
+  artifacts that Review evidence, LESSONS, ADRs, and path-scoped rules cite — moving dangles those
+  references, and the trail costs zero always-on tokens (never `@`-imported); findability is the
+  index's job. Adopting mid-project: leave existing flat files exactly where they are, back-fill
+  their index lines, and let NEW reports be born into author folders.
 - **Human ownership (comprehension gate, rules §10.41):** AI-assisted ≠ AI-verified. At task START the
   assignee's session briefs the spec and confirms understanding with 2–3 spec-targeted questions —
   Q&A summary appended to the task's spec file as a **`## Comprehension log`**; work doesn't start

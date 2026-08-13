@@ -208,9 +208,13 @@
     person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
     LESSONS · TASKS · RULES · HANDOVER_BLOCKS) — owner-only, `/keel-update`-safe, never raised silently.
     `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + done-when; the detailed SPEC
-    (requirements, manual test scripts) is an owner-approved `reports/team/<task>_spec.md`, and delivery
-    evidence includes a SOLUTION NOTE (`reports/team/<task>_fix_<date>.md`: problem → root cause →
-    fix + why → changed files → tests). Every developer must be able to run the product LOCALLY:
+    (requirements, manual test scripts) is an owner-approved SPEC file and every delivery ships a
+    SOLUTION NOTE (problem → root cause → fix + why → changed files → tests). Team reports file
+    per AUTHOR — `reports/team/<@tag>/<task>_spec.md` / `<task>_fix_<date>.md` (+ evidence subfolders;
+    **Markdown only**) — indexed in `reports/team/README.md` (one line per report: task · what ·
+    status; appended at delivery, flipped to closed at Review-accept). Reports are never deleted or
+    moved — they are the permanent artifacts other files cite (§ steering "Team reports");
+    findability lives in the index. Every developer must be able to run the product LOCALLY:
     machine-local knobs (port, hosts, creds) live in their own `.env` (defaults documented in
     `.env.example`; `make run PORT=…`-style overrides) — "runs only on the owner's machine" is a
     bootstrap bug, not a norm.
@@ -227,7 +231,8 @@
 42. **Parallel co-agent sessions.** Extra Claude sessions in the same repo may work the board like
     teammates ("co-agents" — sub-agent-like, but with their own chat history the owner can inspect
     and steer mid-task). A co-agent runs INTERMEDIATE work only, in its own lane: a `### <name>`
-    lane / `@<name>` tag in TASKS + its own `reports/` files. FORBIDDEN to a co-agent: rituals/skills
+    lane / `@<name>` tag in TASKS + its own `reports/team/<name>/` author folder (§10.40).
+    FORBIDDEN to a co-agent: rituals/skills
     (handover · distill · compact · phase-review · audit), commit/push, and rewriting/compressing
     anyone ELSE's lines — it appends only inside its own items. Rituals, git, and memory curation
     (cap tightening, block rotation, drainage) belong to the MAIN session alone — which in turn READS
