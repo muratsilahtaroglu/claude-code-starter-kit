@@ -168,7 +168,7 @@ if [ -f "$DIR/.claude/project-owner" ]; then
   own="$(head -n1 "$DIR/.claude/project-owner" 2>/dev/null | tr -d '\r' | sed 's/^ *//;s/ *$//')"
   me_o="$(git -C "$DIR" config user.name 2>/dev/null)"
   if [ -n "$own" ] && [ -n "$me_o" ] && [ "$own" != "$me_o" ]; then
-    echo "[keel] Multi-user project — you are DEVELOPER '@${me_o}' (owner: @${own}). Governance (PLAN/rules/CLAUDE/architecture/ADR/.claude) is owner-only — owner-guard blocks those edits; work your @-assigned TASKS items — START each with the spec briefing (explain it, confirm the assignee's understanding, log the Q&A; rules.md §10.41) — and PROPOSE the rest to the owner."
+    echo "[keel] Multi-user project — you are DEVELOPER '@${me_o}' (owner: @${own}). Governance (PLAN/rules/CLAUDE/architecture/ADR/.claude) is owner-only — owner-guard blocks those edits; work your @-assigned TASKS items — START each with the spec briefing (task-SPECIFIC, self-explanatory questions; READ the spec's Comprehension log first — an answered question is never re-asked; rules.md §10.41) — and PROPOSE the rest to the owner."
   elif [ -n "$own" ] && [ -z "$me_o" ]; then
     echo "[keel] .claude/project-owner exists but git user.name is UNSET — owner-guard cannot attribute you (it fails open). Set: git config user.name '<you>'."
   fi

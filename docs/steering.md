@@ -148,10 +148,17 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   references, and the trail costs zero always-on tokens (never `@`-imported); findability is the
   index's job. Adopting mid-project: leave existing flat files exactly where they are, back-fill
   their index lines, and let NEW reports be born into author folders.
-- **Human ownership (comprehension gate, rules §10.41):** AI-assisted ≠ AI-verified. At task START the
-  assignee's session briefs the spec and confirms understanding with 2–3 spec-targeted questions —
-  Q&A summary appended to the task's spec file as a **`## Comprehension log`**; work doesn't start
-  until confirmed. The manual/eyes-on parts of a done-when are run PERSONALLY by the assignee
+- **Human ownership (comprehension gate, rules §10.41):** AI-assisted ≠ AI-verified. At EVERY task
+  start (assigned or the owner's own) the session briefs the task and confirms understanding with
+  2–3 questions. **Question quality bar:** each question (1) derives from THIS task's spec/done-when —
+  it names the concrete file, metric, threshold, or risk; a question that would fit any task is a
+  violation; (2) is self-explanatory — it carries its own context ("X works via Y; why not Z?" — the
+  assignee learns while answering), never a bare yes/no; (3) targets why · how-it-will-be-verified ·
+  what-breaks — the three things a reviewer must know. Q&A is appended DATED to the task's spec file
+  (`reports/team/<@tag>/<task>_spec.md` **`## Comprehension log`**), and the gate is IDEMPOTENT: the
+  session reads the log before asking and never re-asks an answered question — a task spanning
+  sessions/compacts resumes from the log; only genuinely new-scope questions are added. Work doesn't
+  start until confirmed. The manual/eyes-on parts of a done-when are run PERSONALLY by the assignee
   (evidence names who/how). At `## Review` the owner probes the same understanding proportionally —
   a delivery its author cannot explain is rejected ("comprehension gap"). Honesty about enforcement:
   the dev-session briefing is a NUDGE that steers the assignee into conscious, controlled work; the

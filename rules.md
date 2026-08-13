@@ -220,10 +220,17 @@
     bootstrap bug, not a norm.
 41. **Human ownership (AI-assisted ≠ AI-verified).** The assignee OWNS their delivery: the human/manual
     part of a `done-when` (eyes-on tests, live checks) is performed PERSONALLY — an AI-run check never
-    substitutes for it, and evidence names WHO ran WHAT, HOW. Before work starts on an `@`-assigned
-    item, the session BRIEFS the spec and confirms understanding with 2–3 spec-targeted questions
-    (Q&A summary → the task's `reports/team/<task>_spec.md` "Comprehension log"); it does not proceed
-    until confirmed — the assignee advances KNOWING what they are doing, not rubber-stamping AI output.
+    substitutes for it, and evidence names WHO ran WHAT, HOW. Before work starts on EVERY task
+    (assigned or not, the owner's own included), the session BRIEFS it and confirms understanding
+    with 2–3 questions that are (a) SPECIFIC to this task's spec/done-when — naming its files,
+    metrics, risks; a question that fits any task is a violation — and (b) SELF-EXPLANATORY: each
+    carries the context needed to answer it (state the mechanism, ask the why/consequence) — shallow
+    yes/no quizzes teach nothing. Q&A lands dated in the task's spec file
+    (`reports/team/<@tag>/<task>_spec.md` "## Comprehension log"), which makes the gate IDEMPOTENT:
+    READ the log before asking — an answered question is NEVER re-asked (a task spanning
+    sessions/compacts resumes from the log; only genuinely new-scope questions are added). Work does
+    not proceed until confirmed — the assignee advances KNOWING what they are doing, not
+    rubber-stamping AI output.
     At `## Review` the owner probes the same understanding proportionally — a delivery its author
     cannot explain is REJECTED back to `## Now` ("comprehension gap"). Binds work carrying
     test/verification claims or changing product behavior (owner may waive for trivial items); applies
