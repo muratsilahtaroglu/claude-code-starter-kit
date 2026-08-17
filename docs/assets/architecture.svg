@@ -6,7 +6,7 @@
 <text x="50" y="58" font-size="34" font-weight="800" letter-spacing="0.5" fill="#212a35">KEEL<tspan font-weight="500" fill="#5b6673"> — project structure</tspan></text>
 <text x="52" y="86" font-size="14.5" fill="#5b6673">The discipline scaffold Claude Code reads first — everything @-imported is re-injected after every compaction.</text>
 <rect x="1062" y="34" width="88" height="26" rx="13" fill="#212a35"/>
-<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.21</text>
+<text x="1106" y="51.5" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">v0.8.22</text>
 <text x="74" y="142" font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-size="15" font-weight="700" fill="#212a35">claude-code-starter-kit/</text>
 <path d="M62 150 V993.0" stroke="#d7dde5" stroke-width="1.6" fill="none"/>
 <path d="M62 179.0 H70" stroke="#d6336c" stroke-width="1.8" fill="none"/>
@@ -60,7 +60,7 @@
 <circle cx="512" cy="403" r="3" fill="#1c7ed6"/>
 <text x="526" y="407.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">hooks/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  deterministic guards — block-dangerous · nudges</tspan></text>
 <circle cx="512" cy="426" r="3" fill="#1c7ed6"/>
-<text x="526" y="430.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">skills/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  13 /keel-* workflows — handover · plan · pilot · tidy</tspan></text>
+<text x="526" y="430.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">skills/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  14 /keel-* workflows — start · handover · plan · pilot</tspan></text>
 <circle cx="512" cy="449" r="3" fill="#1c7ed6"/>
 <text x="526" y="453.5" font-size="13.5"><tspan font-family="'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace" font-weight="700" fill="#145a9a">agents/</tspan><tspan font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" fill="#5b6673">  subagents — researcher · verifier · auditor</tspan></text>
 <circle cx="512" cy="472" r="3" fill="#1c7ed6"/>
