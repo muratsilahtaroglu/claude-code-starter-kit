@@ -8,7 +8,8 @@
 > **Write policy (hot path — rules.md §9.31):** the MOMENT the user corrects you, an approach fails, a
 > must-run test or a mid-project rule is agreed — ask **"shall I note this?"** and on approval append it
 > HERE immediately. Do NOT wait for session end or compaction: conversation-only agreements are exactly
-> what compaction destroys.
+> what compaction destroys. Unsure where a lesson belongs? Write it HERE — misfiled beats lost;
+> `/keel-distill` re-files it.
 >
 > **Language: ENGLISH, on every project** (rules §9.31) — this file and `HANDOVER.md` are read by
 > SESSIONS, not humans, and they are `@`-imported every time: EN costs fewer tokens per always-loaded
@@ -17,18 +18,33 @@
 > decision is raised in CHAT in that language — the line here stays EN. Adopting mid-project: never
 > bulk-translate; lines convert as `/keel-distill` rewrites them.
 >
-> **Format:** atomic one-line entries, dated + tagged, newest first within a tag group. Never silently
-> delete: mark superseded entries as `SUPERSEDED by <entry/date>` (or remove them during `/keel-distill` once
-> promoted to rules.md/a skill). **Cap: ~250 lines** (team override: `.claude/keel-caps`, rules §10.40)
-> — `/keel-distill` dedups, merges, and promotes.
+> **Keep this file to ALWAYS-relevant lessons (scope triage — rules §9.33).** Every line is paid in
+> EVERY session, and an irrelevant line is not just token cost: context-rot measurements show even a
+> single distractor degrades retrieval of the lines that DO apply (`research/web/findings.md`). Field
+> audit of a mature project: only ~26% of accumulated lessons were always-relevant; ~52% bound
+> specific files; any one task needed ~15% of the file (`reports/2026-08-17-lessons-scope-audit.md`).
+> So, per entry (and `/keel-distill` for the stock):
+> - **(A) Always-relevant** (verification duty, measurement epistemics, protocol) → stays HERE.
+> - **(B) File/area-scoped** (matters only when touching X) → graduates to a `paths:`-scoped
+>   `.claude/rules/<name>.md` — or a **`paths:`-scoped SKILL** when the cluster must survive a
+>   mid-task compaction (invoked skill bodies re-inject; a path rule waits for the next file match).
+> - **(C) Permanent domain/API facts** → `docs/` (architecture "known limitations" / a guide).
+> - **(D) Superseded / closed / promoted** → DELETED (git is the archive). **Promotion deletes the
+>   entry** — never leave a "moved to X" stub; the `## Index` line below is the only pointer.
 >
-> **Long projects — two pressure valves before you ever raise the cap** (the file is `@`-imported every
-> session, so every line is a permanent token + attention tax): (1) **graduate** — a 3×-applied entry
-> leaves for `rules.md`/a skill/an ADR, a permanent DOMAIN fact (data quirk, API contract) moves to
-> `docs/` (architecture "known limitations" / a guide), and a FILE-scoped constraint (must-run test
-> after touching X, append-only dir) becomes a `paths:`-scoped `.claude/rules/<name>.md` rule — loads
-> only when a matching file is touched, never for must-always-hold discipline; (2) **per-area split** on big
-> multi-area projects — see the section at the bottom.
+> **Format:** atomic one-line entries, dated + tagged, newest first within a tag group. An entry that
+> is contradicted but still instructive is marked `SUPERSEDED by <entry/date>` — visible, never
+> silently removed. **Cap: ~250 lines** for this always-on core (team override: `.claude/keel-caps`,
+> rules §10.40). On a large multi-area project the per-area split still applies — see the bottom.
+
+## Index (task router — ONE line per graduated lesson cluster; keep ~10–20 lines)
+<!-- The always-loaded map of lessons that live OUTSIDE this file, so they stay findable even when
+     their trigger hasn't fired. Format: what → where (when it loads). Maintained by /keel-distill,
+     linted mechanically (a dead target or an unlisted cluster is flagged at session start). E.g.:
+- <topic, e.g. word-boundary contract> → .claude/rules/<name>.md (loads on <paths glob>)
+- <procedure, e.g. release drill> → .claude/skills/<name>/SKILL.md (invoke / loads on <paths glob>)
+- <domain quirks, e.g. provider API> → docs/<guide>.md (read before writing queries)
+-->
 
 ## [rule] — mid-project agreements on how to work
 - <YYYY-MM-DD> — <e.g. "never regenerate the lock file on Fridays before the release cut">
@@ -41,16 +57,12 @@
 
 ## [gotcha] — surprising facts that cost time once
 - <YYYY-MM-DD> — <e.g. "ENTITY_KEY is float64-lossy — always JOIN on ENTITY_KEY_STR">
-<!-- A [gotcha] that is a PERMANENT domain fact (not situational) graduates to docs/ at /keel-distill —
-     see the graduation note at the top — so this section stays the HOT set, not a growing archive. -->
-
 ---
 
 ## Scaling: per-area lessons (optional)
 **Default: this single file.** On a **large multi-area** project (backend + frontend + agent), when an
-area's active lesson set needs its own room, give it `<area>/LESSONS.md` (same `[rule]/[test]/[fail]/
-[gotcha]` format + the ~150 cap), `@`-imported by that area's nested `<area>/CLAUDE.md` so it loads
-ONLY when working there — exactly how per-area HANDOVER works (see `HANDOVER.md` → "Scaling"). Register
-the split in `docs/architecture.md`. This is how a long project holds MANY lessons without paying for
-all of them every session — the alternative to just enlarging the always-loaded file. Split only when
-one file hurts.
+area's active lesson set needs its own room, give it `<area>/LESSONS.md` (same format + tiers + cap),
+`@`-imported by that area's nested `<area>/CLAUDE.md` so it loads ONLY when working there — exactly
+how per-area HANDOVER works (see `HANDOVER.md` → "Scaling"). Register the split in
+`docs/architecture.md`. Split only when one file hurts — scope-triage (above) is the FIRST valve;
+this is the second.

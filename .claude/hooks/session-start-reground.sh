@@ -240,6 +240,19 @@ if [ -f "$DIR/TASKS.md" ]; then
   fi
 fi
 
+# LESSONS router-index integrity (rules §9.33): '## Index' lines point at graduated lesson files —
+# a dead target hides lessons that still exist (index rot is the default failure of index systems).
+# Placeholder lines with <angle-bracket> blanks don't match the path regex, so templates stay quiet.
+if [ -f "$DIR/LESSONS.md" ]; then
+  lidx=$(sed -n '/^## Index/,/^## /p' "$DIR/LESSONS.md" 2>/dev/null | grep -E '^- ' \
+         | grep -oE '(\.claude|docs|reports)/[A-Za-z0-9_./@-]+\.(md|yaml|yml)' | sort -u)
+  lmiss=""
+  for p in $lidx; do [ -f "$DIR/$p" ] || lmiss="$lmiss $p"; done
+  if [ -n "$lmiss" ]; then
+    echo "[keel] LESSONS '## Index' points at MISSING file(s):${lmiss} — a dead router line hides graduated lessons; fix the line or restore the file (/keel-distill lints both directions)."
+  fi
+fi
+
 # Evidence-FILE existence check (rules §10.40 file-first): a '## Review' line may cite a path that
 # doesn't exist on disk — a chat-only "delivery". Repo paths are space-free by convention, so plain
 # word-splitting over the extracted list is safe.

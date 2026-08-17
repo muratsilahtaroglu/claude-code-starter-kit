@@ -183,7 +183,9 @@
     ~100 lines) or every ~5 sessions, run `/keel-distill` — rotate old blocks (critical → LESSONS,
     raw → `docs/handover-archive.md` **verbatim**), dedup/merge lessons (mark `SUPERSEDED`, never
     silently delete), promote 3×-applied lessons into rules/skills/ADRs (file-scoped ones → a
-    `paths:`-scoped `.claude/rules/` rule), and lint for contradictions.
+    `paths:`-scoped `.claude/rules/` rule, or a `paths:`-scoped SKILL when the cluster must survive
+    a mid-task compaction; **promotion DELETES the entry** — its one pointer is a router line in
+    LESSONS `## Index`, never a "moved to X" stub), and lint for contradictions.
 34. **Restorable compression.** Distillation never lossy-deletes: every distilled line points back to the
     raw record ("docs/handover-archive.md, block <date>"); the archive is never `@`-imported — grep it on demand.
 35. **No vector DB / RAG for memory (by default).** Grep-able markdown beats embeddings on freshness,

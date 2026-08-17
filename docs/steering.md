@@ -19,7 +19,8 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
   line. Instructions are probabilistic; only hooks/permissions are guarantees.
 - **A 30-line procedure** → a **skill**, not `CLAUDE.md`. Facts go in `CLAUDE.md`; procedures go in skills.
 - **A file-specific constraint** ("migrations are append-only") → a **path-scoped rule** so it stays out
-  of context during unrelated work.
+  of context during unrelated work. Must it survive a mid-task compaction? → a **`paths:`-scoped
+  skill** (invoked bodies re-inject, ≈5k/25k budget; a path rule waits for the next file match).
 - **A read-heavy side investigation** whose details you won't reference again → a **subagent** (it returns
   only a distilled summary; the raw exploration never enters your main context).
 - **Keep `CLAUDE.md` under ~200 lines** and treat it as an index pointing to the above, not a manual.
@@ -54,6 +55,13 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
   self-trimmed). **`/keel-stats`** renders it into `reports/ritual-stats.md` — PLAN.md-style
   colored Mermaid interval boxes + a counts table.
 - **File-local constraints** → optional `.claude/rules/` (see the example there).
+- **Task-scoped lessons (three tiers)** → `LESSONS.md` keeps only the ALWAYS-relevant core plus an
+  `## Index` router (one line per graduated cluster: what → where → when it loads); file-scoped
+  lesson clusters graduate to `paths:`-scoped rules — or `paths:`-scoped skills when they must
+  survive compaction — and domain facts go to docs. Why this shape and not a note graph or RAG:
+  `research/{articles,web}/findings.md` + the field audit `reports/2026-08-17-lessons-scope-audit.md`
+  (a focused context measurably beats a full one CONTAINING the same facts; index+scoped-bodies is
+  the only pattern the platform ships and enforces).
 
 ## Language: machine surfaces vs human surfaces (rules §9.31)
 Split by READER, not by project. `HANDOVER.md` · `LESSONS.md` · agent-team worker boards are read by

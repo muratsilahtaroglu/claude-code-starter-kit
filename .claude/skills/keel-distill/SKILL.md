@@ -24,21 +24,35 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - Then move the WHOLE block **verbatim** to the TOP of `docs/handover-archive.md` (prepend, newest
   first — restorable compression: the distilled lines keep pointers back to it).
 
-## 2. Consolidate LESSONS.md (write-policy: add / update / supersede — never silent delete)
+## 2. Consolidate LESSONS.md (write-policy: add / update / supersede / promote-and-delete — never LOSSY delete)
+- **Scope-triage every entry first (A/B/C/D — the LESSONS header defines the tiers):** always-relevant
+  stays; file-scoped graduates (below); a permanent domain fact → docs; superseded/closed/already-
+  promoted → DELETE. Field measurement behind the triage: in a mature file ~52% of entries were
+  file-scoped and any one task needed ~15% of the file — the always-on core is the minority
+  (`reports/2026-08-17-lessons-scope-audit.md`).
 - Merge duplicates and near-duplicates into the stronger phrasing (keep the earliest date).
-- A contradicted entry is marked `SUPERSEDED by <entry/date>` — visible, dated, never just removed.
+- A contradicted-but-instructive entry is marked `SUPERSEDED by <entry/date>` — visible, dated.
 - **Promote what has graduated:** a lesson applied 3+ times is no longer a lesson — move it into
   `rules.md` (conduct), a `.claude/skills/` skill (procedure), an ADR (decision), or — for a permanent
   DOMAIN fact (a data quirk, an API contract) — the relevant **docs** (`docs/architecture.md` "known
-  limitations" / a guide), then drop it here. A lesson that binds only SPECIFIC files (a must-run
+  limitations" / a guide). A lesson CLUSTER that binds only SPECIFIC files (a must-run
   test after touching X, an append-only dir, a never-hand-edit generated file) becomes a
   **path-scoped rule** — `.claude/rules/<name>.md` with `paths:` frontmatter: it loads ONLY when a
-  matching file is touched, so it is cheaper than both `rules.md` and this file. Never put
-  must-always-hold discipline there (a path rule stays unloaded after compaction until a match).
-  The new rule is shown as its FULL text in the distill plan and lands owner-approved, written
+  matching file is touched, so it is cheaper than both `rules.md` and this file — **or a
+  `paths:`-scoped SKILL** (`.claude/skills/<name>/SKILL.md`, same `paths:` format) when the cluster
+  must SURVIVE a mid-task compaction: invoked skill bodies are the one scoped mechanism re-injected
+  after compaction (≈5k tokens/skill, 25k total, truncation keeps the TOP — put the load-bearing
+  lines first), while a path rule waits for the next file match. Never put
+  must-always-hold discipline in either (that stays in LESSONS tier A / rules.md).
+  The new rule/skill is shown as its FULL text in the distill plan and lands owner-approved, written
   self-contained — constraint + why + check inline, evidence pointing only to permanent artifacts,
-  never to TASKS/PLAN live state (`.claude/rules/README.md` "Writing discipline"). This is the main pressure valve on a long project's
-  `[gotcha]` list: reference facts belong in docs, not the always-loaded `LESSONS.md`.
+  never to TASKS/PLAN live state (`.claude/rules/README.md` "Writing discipline").
+- **Promotion DELETES the LESSONS entry** — lossless: the content lives in its target and git keeps
+  the history. Never leave a "moved to X" stub (field case: 10 promoted entries left 42 lines of
+  stubs, taxing every session). The ONE surviving pointer is a line in LESSONS `## Index`
+  (what → where → when it loads) — add or refresh it in the same pass. This is the main pressure
+  valve on a long project's `[gotcha]` list: reference facts belong in docs, file-scoped stock
+  behind its trigger — not in the always-loaded core.
 
 ## 3. Prune TASKS.md
 - Verify done items were deleted (their one-liner lives in HANDOVER (a)); delete any stragglers.
@@ -57,14 +71,21 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - **Decision/constraint drift (`docs/adr/` + `.claude/rules/`):** an *Accepted* ADR contradicted by a
   newer decision, a measurement, or the code as it now stands → PROPOSE `Superseded (by ...)` — the
   OWNER flips the status, never this ritual; a path-scoped rule whose constraint has been overtaken
-  → propose rewrite or retirement the same way. Also verify each rule's `paths:` globs still match
-  existing files (a glob matching nothing = the rule silently never loads — a dead rule), and the
-  ADR README index still mirrors the folder. Same mirror check for `reports/team/README.md`: every
+  → propose rewrite or retirement the same way. Also verify each rule's/skill's `paths:` globs still
+  match existing files (a glob matching nothing = the rule silently never loads — a dead rule; brace
+  expansions past the documented 1,000-pattern budget and malformed `[` brackets ALSO match nothing,
+  silently), and the ADR README index still mirrors the folder.
+- **LESSONS `## Index` router mirror:** every Index line's target file exists, and every
+  graduated-lesson rule/skill/doc has its ONE Index line — an orphan cluster is invisible to
+  sessions whose trigger hasn't fired; a dead line hides lessons that still exist. (The reground
+  hook flags dead targets at session start; the missing-line direction is checked here.) Same mirror check for `reports/team/README.md`: every
   report file has exactly ONE index line (an orphan = unfindable evidence; a duplicate diverges —
   field case: the same report indexed twice with two different status texts), and statuses use only
   the controlled vocabulary (`wip · delivered · verified — owner part: <…> · closed <date>
   accepted|rejected`, `[x]` only at closed).
-- Stale claims (files/commands/paths that no longer exist) — fix or mark superseded.
+- Stale claims (files/commands/paths that no longer exist) — fix or mark superseded. Resolve bare
+  BASENAMES against the tree before flagging: field measurement found ~54% of citations are
+  basename-only and DO resolve — a naive path check reports them as false staleness.
 - **Language drift (rules §9.31):** HANDOVER/LESSONS/worker boards are ENGLISH on every project.
   Convert only the lines this run already rewrites/merges/rotates (gradual, no bulk-translation pass:
   a mass rewrite risks meaning loss and buries the real diff) — quoted user wording stays as-is.

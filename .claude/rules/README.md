@@ -14,6 +14,13 @@ compaction until a matching file is touched again** (unlike `rules.md`, which is
 every compaction). So must-always-hold discipline (handover, security posture, judgment) belongs in
 `rules.md`; only genuinely file-local constraints belong here.
 
+**Must it survive a mid-task compaction?** Use a `paths:`-scoped **skill** instead
+(`.claude/skills/<name>/SKILL.md` — skills accept the same `paths:` frontmatter): invoked skill
+bodies are the one scoped mechanism re-injected after compaction (≈5k tokens/skill, 25k total,
+truncation keeps the top), while a rule here waits for the next file match. Either way, a
+graduated-lesson cluster keeps ONE router line in `LESSONS.md ## Index` so it stays findable when
+its trigger hasn't fired (`/keel-distill` lints both directions).
+
 **Writing discipline (rules here can bite — treat them as governance):**
 - **Owner approves the text.** A new or changed rule here is PROPOSED as its full text and lands only
   with the owner's explicit approval — never silently as a side effect of another ritual (a distill
