@@ -32,7 +32,8 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
   brief; read-only, so even co-agents may run it),
   `/keel-agent-team-create` + `/keel-agent-team-start` (same-machine agent team: owner-only
   roster/charters · per-chat identity that survives compaction via the session map — see "Agent
-  teams" under Multi-user below),
+  teams" under Multi-user below), `/keel-team` (human team on different machines: owner-only one-run
+  setup of the whole Multi-user playbook),
   `/keel-handover`, `/keel-phase-review`, `/keel-research`, `/keel-adopt`, `/keel-distill`, `/keel-update`
   (pull the latest template with per-file approval), `/keel-audit` (rules-compliance spot-check when due),
   `/keel-plan` (phase map: status table + regenerated Mermaid DAG in `PLAN.md`), `/keel-compact`
@@ -89,7 +90,9 @@ watch, don't build on them.
 ## Multi-user: owner vs developers (optional — off by default)
 Single-user projects: skip this — no file, zero cost. When helpers join, the FOUNDER declares ownership
 by writing **`.claude/project-owner`** (one line: the owner's `git config user.name`; a bootstrap run by
-someone else ASKS who the owner is, never assumes). Roles from then on:
+someone else ASKS who the owner is, never assumes). One-run setup of everything below: **`/keel-team`**
+(owner-only wizard — members/@tags, contribution model + host wall, caps, author folders, team doc).
+Roles from then on:
 - **Owner (founder)** — the only one who changes GOVERNANCE: `PLAN.md` (the plan itself + assignments),
   `rules.md`, `CLAUDE.md`, `docs/architecture.md`, ADRs, `.claude/` config. Assigns work by tagging
   TASKS items `(@name)` / the PLAN `owner` column, then pushes.

@@ -204,7 +204,7 @@
     runtime prompts or code so one example passes. Verified = a **variant case the fix was not built on**
     also passes + the original failing case joins the regression/golden set (§2.8, `tests/fixtures/`).
     A deliberate point-fix is OK only when **declared**: "point fix — generalize later" in TASKS/LESSONS.
-40. **Team scale-up.** Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
+40. **Team scale-up** (one-run setup: `/keel-team`). Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
     person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
     LESSONS · TASKS · RULES · HANDOVER_BLOCKS) — owner-only, `/keel-update`-safe, never raised silently.
     `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + done-when; the detailed SPEC
