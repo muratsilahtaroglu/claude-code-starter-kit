@@ -34,10 +34,6 @@ rsync -av --ignore-existing <keel>/ ./ --exclude .git
 - **Multi-user team?** Ask who the project OWNER (founder) is — default the adopter, never assumed —
   and write their `git config user.name` into `.claude/project-owner`: governance files become
   owner-only via the `owner-guard` hook (docs/steering.md "Multi-user"). Single-user: skip, no file.
-- **Plugin-only team?** If the team takes the tooling as the plugin instead of the full overlay, offer to
-  wire auto-install into the project's `.claude/settings.json` (`extraKnownMarketplaces` + `enabledPlugins`
-  — recipe in `docs/steering.md`) so every teammate gets the tooling on open. Never combine it with
-  settings-registered keel hooks: dual registration fires each hook twice.
 
 ## 4. Security migration (rules.md §7 — as a migration, not a rewrite)
 - Freeze **currently-installed** versions into `==` in `requirements/base.txt`; `pip-compile --generate-hashes`.

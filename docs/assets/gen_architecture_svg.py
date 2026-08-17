@@ -13,7 +13,9 @@ import os
 GROUND, BANDTOP = "#f4f6f9", "#eef1f6"
 INK, MUTED, HAIR = "#212a35", "#5b6673", "#d7dde5"
 CARD_BG = "#ffffff"
-VERSION = "v0.8.22"
+_VER_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "VERSION")
+with open(_VER_FILE, encoding="utf-8") as _f:      # root VERSION is the single source of truth
+    VERSION = "v" + _f.read().strip()
 
 # ---- data: each group -> (pill label, accent, [(name, desc), ...]) ----------
 GROUPS = [
@@ -22,6 +24,7 @@ GROUPS = [
         ("rules.md", "working discipline: docs·tests·security·git"),
         ("HANDOVER · LESSONS · TASKS", "session memory — survives every compaction"),
         ("PLAN.md", "phase map: status table + Mermaid DAG"),
+        ("VERSION", "template version — bumped at each release"),
     ]),
     (".claude/", "#1c7ed6", [
         ("settings.json", "permissions — deny secrets · ask before push"),
@@ -30,10 +33,6 @@ GROUPS = [
         ("agents/", "subagents — researcher · verifier · auditor"),
         ("rules/", "optional path-scoped rules"),
         ("snapshots/ · last-audit · ritual-log", "runtime state — appears as you work"),
-    ]),
-    (".claude-plugin/", "#7048e8", [
-        ("plugin.json", "bundles skills·agents·hooks as the “keel” plugin"),
-        ("marketplace.json", "self-hosted — /plugin marketplace add"),
     ]),
     ("docs/", "#0ca678", [
         ("architecture.md", "live module map — updated on every change"),
@@ -299,7 +298,7 @@ emit(GROUPS,
      "project structure",
      "The discipline scaffold Claude Code reads first — everything @-imported is re-injected after every compaction.",
      "claude-code-starter-kit/",
-     'clone = full kit + docs + permissions &#8226; /plugin install keel@keel = the tooling layer, everywhere',
+     'clone = full kit: docs + permissions + tooling &#8226; /keel-update pulls later template improvements in, reviewed',
      "Keel repository structure map",
      "architecture.svg")
 

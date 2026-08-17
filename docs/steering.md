@@ -89,7 +89,7 @@ is **where each server lives**, by who needs it:
 |---|---|---|
 | **Only this project** (its own DB/API) | **root `.mcp.json`** (rules.md §5.13) | git-tracked, reviewed like config, teammates get it with the repo |
 | **You, in every project** (your personal toolbelt) | `claude mcp add --scope user` | written ONCE into your user config, available machine-wide — never re-written per project |
-| **A team / several machines**, versioned | a small personal **MCP plugin** in your own marketplace (same pattern as keel's) | one `/plugin install` (or the auto-install keys below) distributes + updates the whole set centrally |
+| **A team / several machines**, versioned | a small personal **MCP plugin** in your own marketplace | one `/plugin install` distributes + updates the whole set centrally (needs marketplace access — blocked networks fall back to the row above) |
 
 So "rewriting the same MCP config in every project" is the one option that should never happen.
 The plugin-bundled variant (an `.mcp.json` at a plugin's root, as drawn in ecosystem diagrams) is that
@@ -243,30 +243,21 @@ the accidental collision. The wall for intentional human action is the HOST row 
 terminal bypasses any hook, and on a free private personal repo that wall DOES NOT EXIST: either move
 to a free org (Read + fork PRs) or accept discipline-only and say so in the project's team doc.
 
-## Team auto-install of the keel plugin
-On a **plugin-only** team project (tooling via plugin, no full clone), commit these two keys to the
-project's `.claude/settings.json` so everyone who opens the repo gets the tooling registered and
-enabled automatically — no per-person `/plugin marketplace add` + `/plugin install`:
-```json
-{
-  "extraKnownMarketplaces": {
-    "keel": { "source": { "source": "github", "repo": "muratsilahtaroglu/claude-code-starter-kit" } }
-  },
-  "enabledPlugins": { "keel@keel": true }
-}
-```
-Never add this to a **full clone** of the kit: the clone already registers the same hooks via
-`.claude/settings.json`, and plugin + settings registration together fire each hook **twice**
-(the dual-registration trap above).
+## Distribution: clone-only (and the double-fire trap)
+Keel ships as a **clone**, one channel. The plugin/marketplace half was retired in v0.8.23 (it
+shipped through v0.8.22): a plugin
+structurally cannot carry `rules.md`, the memory files, or `settings.json` permissions — so it always
+delivered a partial kit — while adding a second hook registration and needing marketplace access that
+locked-down networks block. `/keel-update` is the update path (pull, reviewed, per-file).
 
-**If a full clone double-fires anyway** (the `session-start-reground` double-fire detector flags it — see
-the ritual-log for same-second identical lines): the plugin is enabled at **user scope**
-(`~/.claude/settings.json` `enabledPlugins`) and its hooks fire in the clone too. A project-scope
-`enabledPlugins:{"keel@keel":false}` *should* override per settings precedence — but a plugin whose hooks
-load **before** the enable-filter (notably a stale/`failed to load` cache, e.g. an old 0.8.x pin) fires
-its hooks regardless of the flag. Resolution, in order: (1) try `.claude/settings.local.json` (Local
-scope, higher precedence, git-ignored) with the same `false`, then start a **fresh session**
-(`enabledPlugins` is read at session start, not hot-reloaded); (2) if hooks still fire, the stale plugin
-cache is the culprit — update it (`/plugin` → update) or remove the plugin at user scope. **A full clone
-and the plugin are mutually exclusive** — pick one per project; the clone is self-contained, the plugin
-is for non-clone projects.
+**Double-firing hooks** (every nudge printed twice; the `session-start-reground` detector flags
+same-second identical `.claude/ritual-log` lines) means the SAME hook is registered twice: a plugin
+that registers keel-style hooks (`keel@keel` from the retired marketplace, or any other) enabled at
+**user scope** (`~/.claude/settings.json` `enabledPlugins`) fires alongside the clone's own
+`.claude/settings.json` registration. A project-scope `false` *should* win by settings precedence,
+but a plugin whose hooks load before the enable-filter (a stale/`failed to load` cache) fires anyway.
+Fix, in order: (1) `.claude/settings.local.json` (Local scope, higher precedence, git-ignored) with
+`"enabledPlugins": {"<name>": false}`, then a **fresh session** (`enabledPlugins` is read at session
+start, not hot-reloaded); (2) if it still fires, remove/uninstall the plugin at user scope — a clone
+is self-contained and needs no plugin at all. The other cause is mundane: a long-lived session that
+predates a settings change; refreshing the session clears it.

@@ -154,7 +154,7 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
   la=$(git -C "$DIR" log -1 --format=%H -- docs/architecture.md 2>/dev/null)
   if [ -n "$la" ]; then
     drift=$(git -C "$DIR" rev-list --count "${la}..HEAD" -- . ':(exclude)docs' ':(exclude).claude' \
-            ':(exclude).claude-plugin' ':(exclude)reports' ':(exclude)scratch' ':(exclude)research' \
+            ':(exclude)reports' ':(exclude)scratch' ':(exclude)research' \
             ':(exclude).github' ':(exclude)*.md' 2>/dev/null || true)
     if [ "${drift:-0}" -gt 10 ]; then
       echo "[keel] docs/architecture.md hasn't moved for ${drift} source commits — record the structural changes: module rows AND the component overview (the table is the source of truth; rules.md §1.6)."
@@ -297,7 +297,7 @@ if [ -d "$DIR/.claude/hooks" ] && [ -f "$DIR/.claude/settings.json" ]; then
     grep -q "$hb" "$DIR/.claude/settings.json" 2>/dev/null || unreg="$unreg $hb"
   done
   if [ -n "$unreg" ]; then
-    echo "[keel] Hook file(s) present but NOT registered in .claude/settings.json:${unreg} — they never fire (decorative enforcement). Wire each under its matcher (template: settings.json in the kit), or delete it if pruned on purpose; plugin-run projects can ignore this when the plugin registers them."
+    echo "[keel] Hook file(s) present but NOT registered in .claude/settings.json:${unreg} — they never fire (decorative enforcement). Wire each under its matcher (template: settings.json in the kit), or delete it if pruned on purpose."
   fi
 fi
 
@@ -307,7 +307,7 @@ fi
 if [ -f "$DIR/.claude/ritual-log" ]; then
   dup=$(tail -40 "$DIR/.claude/ritual-log" 2>/dev/null | awk '$0==p&&$0!=""{n++} {p=$0} END{print n+0}')
   if [ "${dup:-0}" -gt 2 ]; then
-    echo "[keel] ritual-log has ${dup} back-to-back duplicate lines — hooks are double-firing (stale long-lived session, or plugin + settings dual registration). Refresh the session; if it persists, 'claude plugin disable <name> --scope project' (see docs/steering.md)."
+    echo "[keel] ritual-log has ${dup} back-to-back duplicate lines — hooks are double-firing (stale long-lived session, or a PLUGIN registering the same hooks on top of this clone's settings.json). Refresh the session; if it persists, disable/uninstall that plugin — a clone needs none (docs/steering.md 'Distribution')."
   fi
 fi
 exit 0

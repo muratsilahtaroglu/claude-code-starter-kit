@@ -9,11 +9,10 @@ Use when the kit was **cloned** a while ago and the template has since improved 
 fixes, workflow updates). Pull model: run it IN the project, review diffs, approve. Non-destructive is
 the hard rule (same spirit as `/keel-adopt`): nothing is applied without a shown diff + an explicit yes.
 
-**Plugin half first:** if the `keel` plugin is installed (skills show up as `/keel:keel-*`), the *live*
-tooling (skills · agents · hooks) updates centrally — run `/plugin marketplace update keel` for that
-half. The buckets below still apply in full: a plugin never writes repo files, so the committed
-`.claude/**` copies (what standalone / no-plugin sessions run), `.claude-plugin/**`, and the template
-docs are synced here.
+**One channel:** the kit is clone-only (the plugin/marketplace half was retired in v0.8.23 — it
+delivered only the tooling, double-fired hooks alongside a clone, and needed marketplace access that
+locked-down networks block). Everything therefore syncs HERE, through the buckets below. If a project
+still has `keel@keel` installed from before, removing it is the fix for double-firing hooks.
 
 ## 1. Fetch the latest template (never inside the project)
 ```bash
@@ -38,7 +37,7 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   `docs/layouts.md` · `docs/user_manual.md`.
 - **TOOLING — template-owned; summarize changes, one approval for the batch:** `.claude/skills/**` ·
   `.claude/hooks/**` · `.claude/agents/{researcher,verifier,auditor,README}.md` · `.claude/rules/README.md`
-  (+ example) · `.claude-plugin/**` · `docs/security.md` · `docs/steering.md` ·
+  (+ example) · `docs/security.md` · `docs/steering.md` ·
   `docs/adr/0000-adr-template.md` · `docs/adr/README.md` · `docs/assets/` · `CONTRIBUTING.md`
   (kit-meta by its own first line) · folder `README.md`s.
 
@@ -61,8 +60,8 @@ diffs per §2 buckets. Apply only what was approved; never resolve a conflict si
 - **Consistency re-diff:** after applying, `diff -q` the TOOLING paths against the template again — none
   should still differ except the ones consciously skipped. A leftover diff means a skill/hook pair is
   half-updated (the §3 failure mode) — finish it before committing.
-- Hooks stay executable: `chmod +x .claude/hooks/*.sh`. If `.claude-plugin/` changed:
-  `claude plugin validate <project-root>`.
+- Hooks stay executable: `chmod +x .claude/hooks/*.sh`; each new/changed hook is registered in
+  `.claude/settings.json` (an unregistered hook never fires — the re-ground hook flags this).
 - Quick smoke: the project's tests still pass (rules.md §2.8).
 - `HANDOVER.md` block (a) one-liner: `keel /keel-update applied @ <template-sha>: <files>`; structural
   changes also land in `docs/architecture.md` (rules.md §1.6). Commit with approval (rules.md §1.3);

@@ -28,39 +28,14 @@ Not every project needs the whole template — the bootstrap prunes it to fit (w
 See **How to use** below. **Already have a project?** Don't `rm -rf .git` — see
 [Adopting into an existing project](#adopting-into-an-existing-project-brownfield).
 
-### Or install just the tooling as a plugin
-This repo is **also its own Claude Code plugin marketplace** — install the enforcement layer without cloning:
-```text
-/plugin marketplace add muratsilahtaroglu/claude-code-starter-kit
-/plugin install keel@keel
-```
-That gives you the **skills** (each `keel-`-prefixed, so under the plugin namespace: `/keel:keel-handover` ·
-`/keel:keel-distill` · `/keel:keel-phase-review` · `/keel:keel-research` · `/keel:keel-adopt` ·
-`/keel:keel-update` · `/keel:keel-audit` · `/keel:keel-plan` · `/keel:keel-compact` ·
-`/keel:keel-stats` · `/keel:keel-pilot` · `/keel:keel-autopilot` · `/keel:keel-tidy` ·
-`/keel:keel-start` · `/keel:keel-team` · `/keel:keel-agent-team-create` · `/keel:keel-agent-team-start`), the `researcher` +
-`verifier` + `auditor` **subagents**, and the
-memory/safety **hooks** — across every repo. **A clone is a snapshot; the plugin is a subscription:**
-when the template improves, one `/plugin marketplace update keel` brings the new tooling to *all* your
-projects at once — no re-cloning. It does **not** install the discipline docs (`rules.md`,
-`HANDOVER/LESSONS/TASKS`, `docs/`) or the `.claude/settings.json` permissions (plugins can't seed repo
-files or permission rules). The clone above is the full kit; the plugin is the tooling half for teams
-that already have the docs or want the skills everywhere.
-
-**Team auto-install (plugin-only projects):** commit these two keys to the project's
-`.claude/settings.json` and everyone who opens the repo gets the keel tooling registered and enabled
-automatically — no per-person `/plugin marketplace add` + `/plugin install`:
-```json
-{
-  "extraKnownMarketplaces": {
-    "keel": { "source": { "source": "github", "repo": "muratsilahtaroglu/claude-code-starter-kit" } }
-  },
-  "enabledPlugins": { "keel@keel": true }
-}
-```
-Don't add this to a **full clone** of the kit — the clone already registers the same hooks via
-`.claude/settings.json`, and plugin + settings registration together fire each hook twice (the
-dual-registration note in `docs/steering.md`).
+### One distribution: the clone
+The kit ships as a **clone, not a plugin** — everything (17 `/keel-*` skills, the `researcher` ·
+`verifier` · `auditor` subagents, the memory/safety hooks, AND the parts a plugin structurally cannot
+carry: `rules.md`, the `HANDOVER/LESSONS/TASKS/PLAN` memory files, `.claude/settings.json`
+permissions, `docs/`) comes with the repo you just cloned. A marketplace/plugin channel shipped
+through v0.8.22 and was retired in v0.8.23: it could only ever deliver the tooling half, it fired every hook **twice**
+wherever a clone also registered them, and it needed marketplace access that locked-down networks
+block. If you have `keel@keel` installed from back then, remove it (`/plugin`) and use a clone.
 
 **Updating a cloned kit** works the same reviewed way: run **`/keel-update`** in the project — it fetches the
 latest template, skips what your bootstrap pruned, and shows the rest as diffs: kit tooling in one
@@ -265,7 +240,7 @@ nothing in your `src/` moves. Keel is a **shell that wraps your project, not a s
 ## Contents (all generic / project-agnostic)
 
 <p align="center">
-  <img src="docs/assets/architecture.svg" alt="Keel repository structure — a colored tree on the left with matching callout cards on the right, grouping the repo into constitution + memory, .claude/, .claude-plugin/, docs/, requirements/, and the project scaffold" width="960">
+  <img src="docs/assets/architecture.svg" alt="Keel repository structure — a colored tree on the left with matching callout cards on the right, grouping the repo into constitution + memory, .claude/, docs/, requirements/, and the project scaffold" width="960">
 </p>
 
 <sub>Diagram generated from [`docs/assets/gen_architecture_svg.py`](docs/assets/gen_architecture_svg.py) — edit the group list and re-run to regenerate. Every item's one-line role lives in the per-folder READMEs and `docs/architecture.md`.</sub>
