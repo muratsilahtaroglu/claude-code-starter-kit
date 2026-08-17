@@ -218,7 +218,8 @@
     **Markdown only**) — indexed in `reports/team/README.md` (one line per report: file · task · what ·
     status from the chain above, `[x]` only at closed — the index IS the team's review todolist:
     "what's finished under @X" = the `[x]` lines in @X's section; the author appends `wip/delivered`,
-    the orchestrator flips `verified/closed`). Reports are never deleted or
+    the orchestrator flips `verified/closed`; same-machine agent teams: the orchestrator writes ALL
+    transitions, §10.42 write-surface split). Reports are never deleted or
     moved — they are the permanent artifacts other files cite (§ steering "Team reports");
     findability lives in the index. Every developer must be able to run the product LOCALLY:
     machine-local knobs (port, hosts, creds) live in their own `.env` (defaults documented in
@@ -266,3 +267,12 @@
     `.claude/agent-team-sessions` and the reground hook re-injects the identity from DISK after
     every compaction/`--resume` — never re-asked. The ORCHESTRATOR alone runs rituals/git/assignment
     and routes reviews (§10.41), and takes NO work items; workers stay under this rule's FORBIDDEN list.
+    **Write-surface split (race-proof by construction):** humans on different machines are merged by
+    GIT; same-machine sessions have NO merge layer — so the shared memory files (TASKS · LESSONS ·
+    HANDOVER · the reports index · PLAN) are the orchestrator's ALONE. A worker's only write surface
+    is its own author folder: `reports/team/<name>/board.md` — lane MIRROR (refreshed read-only from
+    TASKS at start; assignment fields stay authoritative in TASKS, progress/status in the board) +
+    findings inbox (written the MOMENT something is learned, §9.31 — durable through compaction) +
+    requests-to-orchestrator — plus its spec/fix files. The orchestrator SYNCS boards → TASKS/LESSONS
+    (with `@<name>` attribution)/index each work block; the reground hook flags boards newer than
+    TASKS.md. Plain co-agents: same pattern strongly recommended once writes become concurrent.

@@ -23,6 +23,9 @@
 >
 > **Who flips what:** the AUTHOR appends the line and advances it to `delivered`; the ORCHESTRATOR
 > (owner's main session / leader agent) flips `verified` and `closed` — one writer per transition.
+> Same-machine AGENT teams (rules §10.42 write-surface split): the ORCHESTRATOR writes ALL
+> transitions here, syncing from each worker's `board.md` — workers never edit this index
+> (humans on their own machines still append their own lines; git merges them).
 
 ## @<owner-tag> (one `##` section per author folder — add yours when the folder is born)
 - [ ] `<task>_fix_<date>.md` · T7 · <one line: what it delivers> · delivered

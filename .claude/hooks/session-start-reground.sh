@@ -187,6 +187,12 @@ if ls "$DIR"/.claude/agents/team-*.md >/dev/null 2>&1; then
   if [ -n "$ag" ] && [ -f "$DIR/.claude/agents/team-${ag}.md" ]; then
     if grep -q '^Role: orchestrator' "$DIR/.claude/agents/team-${ag}.md" 2>/dev/null; then
       echo "[keel] Agent identity (from disk): this session is @${ag} — the ORCHESTRATOR (charter: .claude/agents/team-${ag}.md). Duties: rituals · lane/@tag assignment · review ROUTING with the mechanical half DELEGATED (rules §10.41) · memory curation (read git diff for fresh worker writes first, §10.42) — and NO work items of your own. Session-id: ${sid}"
+      # Sync nudge (§10.42 write-surface split): worker boards updated after TASKS.md last moved =
+      # unsynced progress/findings — read them BEFORE any curation, or the curation clobbers/misses.
+      nb=$(find "$DIR"/reports/team/*/board.md -newer "$DIR/TASKS.md" 2>/dev/null | wc -l)
+      if [ "${nb:-0}" -gt 0 ]; then
+        echo "[keel] ${nb} worker board(s) changed since TASKS.md last moved — read reports/team/*/board.md and SYNC first (statuses/Review moves → TASKS · findings → LESSONS with @attribution · index lines), then curate."
+      fi
     else
       echo "[keel] Agent identity (from disk): this session is @${ag} (charter: .claude/agents/team-${ag}.md · lane: TASKS '### ${ag}' · author folder: reports/team/${ag}/). Re-adopt silently. FORBIDDEN: write-rituals, commit/push, anyone else's lines (rules §10.42). Session-id: ${sid}"
     fi

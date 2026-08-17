@@ -34,10 +34,13 @@ no commit/push, no touching others' lines; rules §10.42). The `Role: orchestrat
 assumes the duties: rituals, lane/@tag assignment, review routing (§10.41), memory curation — and no
 work items of its own.
 
-## 4. Resume in-lane
-Run the `/keel-start` flow scoped to the lane: brief "where the lane left off · in-flight item ·
-warnings · next step", then work ONLY lane/@<name> items. Out-of-scope discoveries get one line in
-`## Discovered` (or go to the orchestrator) — never fixed by you.
+## 4. Resume in-lane (write-surface split, §10.42)
+Refresh your board's lane MIRROR from TASKS.md (read-only), then run the `/keel-start` flow scoped
+to it: brief "where the lane left off · in-flight item · warnings · next step", then work ONLY your
+items. Everything you write mid-work goes to YOUR surfaces — `reports/team/<name>/board.md`
+(progress · findings inbox the moment something is learned · requests) and your spec/fix files —
+NEVER to TASKS/LESSONS/HANDOVER/the index: the orchestrator syncs your board into them.
+Out-of-scope discoveries: one line in your board's requests section — never fixed by you.
 
 After a compaction/`--resume` the reground hook re-injects the identity from the mapping file —
 re-adopt silently; do NOT re-run this skill unless the hook says the session has no identity.

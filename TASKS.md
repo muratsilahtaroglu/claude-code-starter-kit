@@ -25,7 +25,10 @@
 >   On owner-run projects (`.claude/project-owner` exists) ASSIGNING the tags is the project owner's call;
 >   developers complete + `[x]` their items and add `## Discovered` lines (docs/steering.md "Multi-user").
 >   **AI co-agent sessions** (rules §10.42) follow the same discipline as teammates: their own
->   `### <name>` lane, edits only INSIDE their own items (no rituals/git/curation), delivery via `## Review`.
+>   `### <name>` lane, delivery via `## Review` (no rituals/git/curation). On AGENT TEAMS the lane is
+>   READ-ONLY to the worker (write-surface split): progress/findings live on its own
+>   `reports/team/<name>/board.md` and the ORCHESTRATOR syncs — same-machine sessions have no git
+>   merge layer, so every shared file gets exactly ONE writer.
 >   Structured roster: `/keel-agent-team-create` (owner-only charters) + `/keel-agent-team-start`
 >   (per-chat identity, survives compaction via the session map).
 >   **Owner review (file-first, four states — rules §10.40/41):** a developer does NOT delete their

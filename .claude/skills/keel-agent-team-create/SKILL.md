@@ -41,9 +41,16 @@ line is load-bearing: the reground hook greps it):
     # @<name> — <role title>
     - Mission: <one project-specific paragraph>
     - Scope (paths): <globs> — work ONLY here; out-of-scope needs are handed to the orchestrator, never done.
-    - Lane: TASKS.md `### <name>` — work ONLY your lane/@<name> items; deliveries move to `## Review`
-      with an evidence FILE (rules §10.40 file-first) + a `delivered` line in `reports/team/README.md`.
-    - Author folder: `reports/team/<name>/` — specs (+ Comprehension log, §10.41), solution notes, evidence.
+    - Lane: TASKS.md `### <name>` holds your ASSIGNMENTS and is READ-ONLY for you (§10.42
+      write-surface split — same-machine sessions have no git merge layer, shared files get ONE writer):
+      refresh your mirror from it at session start; NEVER edit TASKS/LESSONS/HANDOVER/the index.
+    - Workboard — your ONLY write surface besides spec/fix files: `reports/team/<name>/board.md` with
+      three sections: lane MIRROR (id · done-when · live status/progress) · findings INBOX
+      (`[gotcha]/[fail]/[rule]` lines the MOMENT they happen, §9.31 — orchestrator promotes them) ·
+      REQUESTS to the orchestrator (blockers, out-of-scope finds). Delivering: solution-note FILE in
+      your folder + mark `delivered` on YOUR board — the orchestrator moves the TASKS item to
+      `## Review` and writes the index line (§10.40 file-first).
+    - Author folder: `reports/team/<name>/` — board.md, specs (+ Comprehension log, §10.41), solution notes, evidence.
     - Review: routing is the orchestrator's alone — never pick your own reviewer (§10.41).
     - FORBIDDEN (worker, rules §10.42): WRITE-rituals (handover · distill · compact · phase-review ·
       audit · plan · update · tidy), commit/push, editing anyone else's lines, memory curation.
@@ -54,11 +61,16 @@ The ORCHESTRATOR charter (`Role: orchestrator`) inverts the duties: it runs the 
 (commit; push stays ask-gated), assigns lanes/@tags, routes EVERY review (delegating the mechanical
 half — it does not re-measure deliveries inline), curates memory (single-writer surfaces: it reads
 `git diff` for fresh worker writes before any curation pass, §10.42), owns external request boards,
-and takes NO work items itself.
+and takes NO work items itself. It is also the ONLY writer of the shared memory files (§10.42
+write-surface split): each work block STARTS by reading the worker boards
+(`reports/team/*/board.md` — the reground hook flags boards newer than TASKS.md) and syncing:
+statuses/`## Review` moves → TASKS · findings promoted → LESSONS with `@<name>` attribution ·
+index lines appended/flipped · requests answered.
 
 ## 3. Seed the board + folders + records (with the same approval)
 - TASKS `## Now`: a `### <name>` lane heading per worker (the orchestrator holds no items).
-- `reports/team/<name>/` folder per agent + its `##` section in the `reports/team/README.md` index.
+- `reports/team/<name>/` folder per agent + its `##` section in the `reports/team/README.md` index
+  + a seeded `board.md` per worker with the three sections (lane mirror · findings inbox · requests).
 - `.gitignore`: ensure `.claude/agent-team-sessions` is listed (machine-local session→agent map).
 - `docs/architecture.md` (§1.6): register the roster — one line per agent: name · role · scope.
 - Next `/keel-handover` block (a) gets the one-liner: "agent team created: <names>".
