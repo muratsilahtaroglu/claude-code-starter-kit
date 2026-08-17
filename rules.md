@@ -100,6 +100,12 @@
     subagents live in `.claude/agents/`: `researcher` (cited prior-art scouting), `verifier`
     (adversarial "try to refute it" checks) and `auditor` (rules-compliance spot-check via `/keel-audit`).
     Mechanism guide: `docs/steering.md`.
+    **Self-check before you deliver:** nothing is marked `delivered` straight from your own keyboard —
+    an INDEPENDENT sub-agent code-reviews the diff first (scope: changed files + what the `done-when`
+    CLAIMS; a measurement claim gets its probe re-run), findings fixed and re-reviewed until clean;
+    the orchestrator gates its OWN changes the same way before committing. Its output still isn't
+    taken blindly (verify each finding, record why one was rejected), and it never replaces §10.41's
+    routed review — you still don't pick your own official reviewer.
 
 ## 5. Security (application)
 12. **Secrets are never committed/pushed.** `.env` is git-ignored; only `.env.example` (with empty
@@ -122,7 +128,14 @@
     a simpler direct-to-`main` flow is fine with approval. User preference is decisive. Multi-user
     projects adopt what the HOST can enforce — same-repo branch→PR, or **fork→PR** where developers are
     Read-only (docs/steering.md "Multi-user") — and rewrite this §6 to match (ADR it, §10.40).
-18. **Secret-leak scan before push:** review `git diff --cached`; if `.env`/secrets appear, STOP.
+18. **Review what you stage — for secrets AND for provenance.** Secrets: read `git diff --cached`;
+    if `.env`/secrets appear, STOP. Provenance: `git add -A` / `git add .` is FORBIDDEN whenever
+    another writer may be active (a co-agent §10.42, a teammate, an open editor) — stage EXPLICIT
+    paths after reading each modified file's diff; "this `M` must be mine" is an unverified
+    attribution (§10.37) and sweeping someone's in-flight work into your commit mislabels both
+    (field: twice in one day). A shared file may also hold a STALE buffer in someone's editor that
+    silently overwrites the repo copy on their next save — re-check `git status` mid-round;
+    `git checkout HEAD -- <file>` and re-apply when in doubt.
 19. Handover + docs updates go out in the same push round as the code.
 
 ## 7. Supply-chain / dependency security (details: docs/security.md)
@@ -171,7 +184,9 @@
     tokens per always-imported line; write them in English on every project regardless of the
     project language (the user's verbatim words may stay quoted in their language; human surfaces —
     TASKS/PLAN/reports/docs — follow the project language; owner-facing questions are surfaced in
-    CHAT in the project language, the file line stays EN).
+    CHAT in the project language, the file line stays EN — and a LANGUAGE-SPECIFIC domain fact
+    (morphology, a locale's casing/collation trap) keeps its example in that language: translating
+    the example destroys the lesson).
 32. **Task board (`TASKS.md`).** Cross-session tasks live in `TASKS.md` (built-in todos are session
     scratch only). Work ONLY from `## Now` (max 3–5); every item has a verifiable `done-when:`; a
     finished item is marked `[x]` immediately and **deleted at `/keel-handover`** as its one-liner lands in
@@ -204,15 +219,27 @@
     `LESSONS.md`/ADRs + existing code patterns → official docs → a research sub-agent for anything bigger.
     State where you verified it ("per docs X"); no citable source = say you're unsure and check first.
     **Proportionality:** skip for trivial one-sentence diffs or things already verified this session.
+    **A surprising measurement indicts your own INSTRUMENT first.** Before reporting "the system is
+    wrong", re-derive the reference: assumed window/argument semantics, invented parameters, defaults
+    that don't match, raw vs. deduplicated counting. Report the discrepancy only once the instrument
+    is cleared — and say which side you checked. (Field: bit four times in one project; a probe's
+    exclusive `< end` against a tool's inclusive end manufactured a suspiciously clean ratio, and a
+    raw `count()` reference read ~17% high on unmerged row versions — the TOOL was right both times.)
 38. **Rule budget.** This file is capped like the memory files: **~60 rules / ~300 lines**, `.claude/keel-caps`-tunable (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written). A
-    constitution too long to hold in attention is decoration, not discipline.
+    constitution too long to hold in attention is decoration, not discipline. As a TEMPLATE this file
+    keeps headroom UNDER the cap on purpose — that room belongs to the project's own rules; a project
+    that genuinely outgrows it raises `RULES` in `.claude/keel-caps` (§10.40, owner-approved) instead
+    of thinning the discipline.
 39. **Fix the class, not the instance.** When a fix targets one failing case (a query, a test, an input),
     find the mechanism-level cause and fix THERE — never hard-wire case-specific instructions into
     runtime prompts or code so one example passes. Verified = a **variant case the fix was not built on**
     also passes + the original failing case joins the regression/golden set (§2.8, `tests/fixtures/`).
     A deliberate point-fix is OK only when **declared**: "point fix — generalize later" in TASKS/LESSONS.
+    Proving a fix by REMOVING it (revert-sensitivity) has a mandatory order: fix → tests green →
+    **COMMIT** → remove → show the break → restore (on an UNCOMMITTED fix the `git checkout` ending
+    the probe deletes the fix too); remove in file+suite order — a cached loader hides it otherwise.
 40. **Team scale-up** (one-run setup: `/keel-team`). Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
     person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
     LESSONS · TASKS · RULES · HANDOVER_BLOCKS) — owner-only, `/keel-update`-safe, never raised silently.
@@ -224,64 +251,48 @@
     disk), and each delivery walks ONE state chain: `wip → delivered → verified (owner part: <one
     sentence>) → closed <date> accepted|rejected`. Team reports file
     per AUTHOR — `reports/team/<@tag>/<task>_spec.md` / `<task>_fix_<date>.md` (+ evidence subfolders;
-    **Markdown only**) — indexed in `reports/team/README.md` (one line per report: file · task · what ·
-    status from the chain above, `[x]` only at closed — the index IS the team's review todolist:
-    "what's finished under @X" = the `[x]` lines in @X's section; the author appends `wip/delivered`,
-    the orchestrator flips `verified/closed`; same-machine agent teams: the orchestrator writes ALL
-    transitions, §10.42 write-surface split). Reports are never deleted or
+    **Markdown only**) — each carrying ONE line in the `reports/team/README.md` index, which IS the
+    team's review todolist ("what's finished under @X" = the `[x]` lines in their section; exact
+    format, status vocabulary and who-flips-what live in that template — on same-machine agent teams
+    the orchestrator writes every transition, §10.42). Reports are never deleted or
     moved — they are the permanent artifacts other files cite (§ steering "Team reports");
-    findability lives in the index. Every developer must be able to run the product LOCALLY:
-    machine-local knobs (port, hosts, creds) live in their own `.env` (defaults documented in
-    `.env.example`; `make run PORT=…`-style overrides) — "runs only on the owner's machine" is a
-    bootstrap bug, not a norm.
+    findability lives in the index. Every developer must be able to run the product LOCALLY from
+    their own `.env` + Makefile overrides (steering "Dev-local runs") — "runs only on the owner's
+    machine" is a bootstrap bug, not a norm.
 41. **Human ownership (AI-assisted ≠ AI-verified).** The assignee OWNS their delivery: the human/manual
     part of a `done-when` (eyes-on tests, live checks) is performed PERSONALLY — an AI-run check never
-    substitutes for it, and evidence names WHO ran WHAT, HOW. Before work starts on EVERY task
-    (assigned or not, the owner's own included), the session BRIEFS it and confirms understanding
-    with 2–3 questions that are (a) SPECIFIC to this task's spec/done-when — naming its files,
-    metrics, risks; a question that fits any task is a violation — and (b) SELF-EXPLANATORY: each
-    carries the context needed to answer it (state the mechanism, ask the why/consequence) — shallow
-    yes/no quizzes teach nothing. Q&A lands dated in the task's spec file
+    substitutes for it, and evidence names WHO ran WHAT, HOW. **Comprehension gate — before work
+    starts on EVERY task** (assigned or not, the owner's own included): the session briefs it and
+    confirms understanding with 2–3 questions that are SPECIFIC to this task's spec/done-when (one
+    that would fit any task is a violation) and SELF-EXPLANATORY (they carry their own context and
+    ask why/consequence — a bare yes/no teaches nothing). Q&A lands dated in the task's spec
     (`reports/team/<@tag>/<task>_spec.md` "## Comprehension log"), which makes the gate IDEMPOTENT:
-    READ the log before asking — an answered question is NEVER re-asked (a task spanning
-    sessions/compacts resumes from the log; only genuinely new-scope questions are added). Work does
-    not proceed until confirmed — the assignee advances KNOWING what they are doing, not
-    rubber-stamping AI output.
-    At `## Review`, ROUTING is the orchestrator's alone (the owner's main session — or the leader
-    agent where an agent team runs, §10.42): a deliverer never picks their own reviewer, and the
-    MECHANICAL half of verification (re-running done-whens, parity scripts, source reads) is
-    DELEGATED — a verifier subagent/reviewer whose written report lands in `reports/team/` and flips
-    the line to `verified (owner part: <one sentence>)` — so the owner's time goes to the one part
-    only a human can do. There the owner probes the same understanding proportionally — a delivery its author
-    cannot explain is REJECTED back to `## Now` ("comprehension gap"). Binds work carrying
-    test/verification claims or changing product behavior (owner may waive for trivial items); applies
-    to EVERYONE, the owner included (their probe = the phase-review gate).
-42. **Parallel co-agent sessions.** Extra Claude sessions in the same repo may work the board like
-    teammates ("co-agents" — sub-agent-like, but with their own chat history the owner can inspect
-    and steer mid-task). A co-agent runs INTERMEDIATE work only, in its own lane: a `### <name>`
-    lane / `@<name>` tag in TASKS + its own `reports/team/<name>/` author folder (§10.40).
-    FORBIDDEN to a co-agent: rituals/skills
-    (handover · distill · compact · phase-review · audit), commit/push, and rewriting/compressing
-    anyone ELSE's lines — it appends only inside its own items. Rituals, git, and memory curation
-    (cap tightening, block rotation, drainage) belong to the MAIN session alone — which in turn READS
-    fresh co-agent writes (`git status`/`git diff`) before curating lines away: memory files are
-    SINGLE-WRITER surfaces, and two concurrent writers clobber each other silently (field case:
-    alice_v2 2026-08-12 — fresh co-agent progress nearly overwritten twice during a cap pass). A
-    co-agent delivery lands in `## Review` and §10.41 + the §4.11 verify duty apply unchanged.
-    **Agent teams (structured co-agents):** `/keel-agent-team-create` — OWNER-only, like all
-    governance — names a roster (ONE orchestrator + specialized workers; single-token English names
-    preferred) and writes an owner-approved charter per agent to `.claude/agents/team-<name>.md`
-    (owner-guard already walls the path). A chat adopts an identity ONCE via
-    `/keel-agent-team-start @<name>`; the session→agent map lives in git-ignored
-    `.claude/agent-team-sessions` and the reground hook re-injects the identity from DISK after
-    every compaction/`--resume` — never re-asked. The ORCHESTRATOR alone runs rituals/git/assignment
-    and routes reviews (§10.41), and takes NO work items; workers stay under this rule's FORBIDDEN list.
-    **Write-surface split (race-proof by construction):** humans on different machines are merged by
-    GIT; same-machine sessions have NO merge layer — so the shared memory files (TASKS · LESSONS ·
-    HANDOVER · the reports index · PLAN) are the orchestrator's ALONE. A worker's only write surface
-    is its own author folder: `reports/team/<name>/board.md` — lane MIRROR (refreshed read-only from
-    TASKS at start; assignment fields stay authoritative in TASKS, progress/status in the board) +
-    findings inbox (written the MOMENT something is learned, §9.31 — durable through compaction) +
-    requests-to-orchestrator — plus its spec/fix files. The orchestrator SYNCS boards → TASKS/LESSONS
-    (with `@<name>` attribution)/index each work block; the reground hook flags boards newer than
-    TASKS.md. Plain co-agents: same pattern strongly recommended once writes become concurrent.
+    READ the log first — an answered question is NEVER re-asked, so a task spanning sessions/compacts
+    resumes from it. Work waits for confirmation; the assignee advances KNOWING what they do.
+    At `## Review`, ROUTING is the orchestrator's alone (owner's main session, or the leader agent
+    under §10.42): a deliverer never picks their own reviewer, and the MECHANICAL half (re-running
+    done-whens, parity scripts, source reads) is DELEGATED to a verifier whose written report flips
+    the line to `verified (owner part: <one sentence>)` — the owner's time goes to what only a human
+    can do. There the owner probes the same understanding proportionally: a delivery its author
+    cannot explain is REJECTED to `## Now` ("comprehension gap"). Binds work carrying
+    test/verification claims or changing product behavior (owner may waive trivia); applies to
+    EVERYONE, the owner included (their probe = the phase-review gate).
+42. **Parallel sessions — co-agents and agent teams** (mechanism + setup: docs/steering.md "Agent
+    teams", `/keel-agent-team-create|-start`; the roster is OWNER-only like all governance).
+    Extra Claude sessions in the same repo may work the board like teammates — unlike a sub-agent
+    they keep their own chat history, so the owner inspects and steers them mid-task. Each gets its
+    own lane (`### <name>` / `@<name>` in TASKS) + author folder (`reports/team/<name>/`, §10.40),
+    and runs INTERMEDIATE work only. FORBIDDEN to a worker/co-agent: rituals/skills (handover ·
+    distill · compact · phase-review · audit), commit/push, and rewriting anyone ELSE's lines.
+    Rituals, git, assignment, review ROUTING (§10.41) and memory curation belong to the MAIN session
+    / ORCHESTRATOR alone — which takes no work items itself and READS fresh worker writes
+    (`git status`/`git diff`) before curating anything away.
+    **Write-surface split — the race is closed by construction, not discipline:** humans on separate
+    machines are merged by GIT; same-machine sessions have NO merge layer, so every shared memory
+    file (TASKS · LESSONS · HANDOVER · reports index · PLAN) has exactly ONE writer — the
+    orchestrator. A worker writes only in its own folder: `reports/team/<name>/board.md` (lane mirror
+    refreshed read-only from TASKS · findings inbox on the §9.31 hot path · requests) plus its
+    spec/fix files; the orchestrator SYNCS boards into the shared files each work block with
+    `@<name>` attribution. Without this, two writers clobber each other SILENTLY (field case:
+    alice_v2 2026-08-12, fresh progress nearly overwritten twice during a cap pass). Deliveries land
+    in `## Review`; §10.41 + the §4.11 verify duty apply unchanged.
