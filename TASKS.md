@@ -26,10 +26,15 @@
 >   developers complete + `[x]` their items and add `## Discovered` lines (docs/steering.md "Multi-user").
 >   **AI co-agent sessions** (rules §10.42) follow the same discipline as teammates: their own
 >   `### <name>` lane, edits only INSIDE their own items (no rituals/git/curation), delivery via `## Review`.
->   **Owner review:** a developer does NOT delete their finished item — at their handover it MOVES to a
->   `## Review` section (created on first use; `- [x] T7 ... (@dev) — evidence: <done-when result>`).
->   The OWNER verifies the done-when, then accepts (delete → owner's HANDOVER (a) as "reviewed") or
->   rejects (back to `## Now` with one reason line). Single-user projects: no such section, delete-on-done as above.
+>   **Owner review (file-first, four states — rules §10.40/41):** a developer does NOT delete their
+>   finished item — at their handover it MOVES to a `## Review` section (created on first use), and the
+>   line NAMES its evidence FILE: `- [x] T7 <what> (@dev) — evidence: reports/team/<@dev>/<task>_fix_<date>.md`.
+>   A chat summary is not a delivery — the reground hook flags pathless lines and files missing on disk.
+>   Review ROUTING is the owner/orchestrator's call alone; the mechanical half is delegated (verifier
+>   subagent) and appends `— verified ✓ (owner part: <one sentence>)` to the line; the owner performs that
+>   named step, then accepts (delete → owner's HANDOVER (a); index line → `closed <date> accepted`) or
+>   rejects (back to `## Now` + one reason line; index back to `wip`). State chain + index format:
+>   `reports/team/README.md`. Single-user projects: no such section, delete-on-done as above.
 
 ## Now (max 3–5 — the only section to work from)
 - [ ] T1: <task> — done-when: <verifiable criterion>

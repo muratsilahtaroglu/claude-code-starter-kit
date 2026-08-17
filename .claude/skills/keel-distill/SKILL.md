@@ -59,7 +59,11 @@ For each block being rotated, triage by criticality — **content-aware, not age
   OWNER flips the status, never this ritual; a path-scoped rule whose constraint has been overtaken
   → propose rewrite or retirement the same way. Also verify each rule's `paths:` globs still match
   existing files (a glob matching nothing = the rule silently never loads — a dead rule), and the
-  ADR README index still mirrors the folder.
+  ADR README index still mirrors the folder. Same mirror check for `reports/team/README.md`: every
+  report file has exactly ONE index line (an orphan = unfindable evidence; a duplicate diverges —
+  field case: the same report indexed twice with two different status texts), and statuses use only
+  the controlled vocabulary (`wip · delivered · verified — owner part: <…> · closed <date>
+  accepted|rejected`, `[x]` only at closed).
 - Stale claims (files/commands/paths that no longer exist) — fix or mark superseded.
 - Stale cap HEADERS in the memory files themselves (e.g. a LESSONS.md header still quoting an old
   "~100"): correct to the current thresholds below — headers are prose, the SessionStart hook is the

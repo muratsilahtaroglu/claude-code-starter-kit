@@ -209,10 +209,16 @@
     LESSONS · TASKS · RULES · HANDOVER_BLOCKS) — owner-only, `/keel-update`-safe, never raised silently.
     `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + done-when; the detailed SPEC
     (requirements, manual test scripts) is an owner-approved SPEC file and every delivery ships a
-    SOLUTION NOTE (problem → root cause → fix + why → changed files → tests). Team reports file
+    SOLUTION NOTE (problem → root cause → fix + why → changed files → tests). **A delivery exists
+    only as its file:** a chat summary is NOT a delivery — an item may not move to `## Review`
+    without its note's path on the line (the reground hook flags pathless lines AND files missing on
+    disk), and each delivery walks ONE state chain: `wip → delivered → verified (owner part: <one
+    sentence>) → closed <date> accepted|rejected`. Team reports file
     per AUTHOR — `reports/team/<@tag>/<task>_spec.md` / `<task>_fix_<date>.md` (+ evidence subfolders;
-    **Markdown only**) — indexed in `reports/team/README.md` (one line per report: task · what ·
-    status; appended at delivery, flipped to closed at Review-accept). Reports are never deleted or
+    **Markdown only**) — indexed in `reports/team/README.md` (one line per report: file · task · what ·
+    status from the chain above, `[x]` only at closed — the index IS the team's review todolist:
+    "what's finished under @X" = the `[x]` lines in @X's section; the author appends `wip/delivered`,
+    the orchestrator flips `verified/closed`). Reports are never deleted or
     moved — they are the permanent artifacts other files cite (§ steering "Team reports");
     findability lives in the index. Every developer must be able to run the product LOCALLY:
     machine-local knobs (port, hosts, creds) live in their own `.env` (defaults documented in
@@ -231,7 +237,12 @@
     sessions/compacts resumes from the log; only genuinely new-scope questions are added). Work does
     not proceed until confirmed — the assignee advances KNOWING what they are doing, not
     rubber-stamping AI output.
-    At `## Review` the owner probes the same understanding proportionally — a delivery its author
+    At `## Review`, ROUTING is the orchestrator's alone (the owner's main session — or the leader
+    agent where an agent team runs, §10.42): a deliverer never picks their own reviewer, and the
+    MECHANICAL half of verification (re-running done-whens, parity scripts, source reads) is
+    DELEGATED — a verifier subagent/reviewer whose written report lands in `reports/team/` and flips
+    the line to `verified (owner part: <one sentence>)` — so the owner's time goes to the one part
+    only a human can do. There the owner probes the same understanding proportionally — a delivery its author
     cannot explain is REJECTED back to `## Now` ("comprehension gap"). Binds work carrying
     test/verification claims or changing product behavior (owner may waive for trivial items); applies
     to EVERYONE, the owner included (their probe = the phase-review gate).

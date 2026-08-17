@@ -193,6 +193,10 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ -f "$DIR/T
       rq=$(sed -n '/^## Review/,/^## /{/^## Review/d; /^## /d; p}' "$DIR/TASKS.md" 2>/dev/null | grep -c '^- \[')
       if [ "${rq:-0}" -gt 0 ]; then
         echo "[keel] ${rq} completed developer item(s) await YOUR review in TASKS.md '## Review' — verify each done-when (run/observe it; verifier agent when in doubt, rules.md §4.11) AND, where the work carries verification claims, the author's own understanding (§10.41 comprehension probe: can they explain it? no → reject 'comprehension gap'), then accept (delete → your HANDOVER (a) as 'reviewed') or reject (back to ## Now with one reason line)."
+        rv=$(sed -n '/^## Review/,/^## /{/^## Review/d; /^## /d; p}' "$DIR/TASKS.md" 2>/dev/null | grep -c 'owner part:')
+        if [ "${rv:-0}" -gt 0 ]; then
+          echo "[keel] ${rv} of them already read 'verified — owner part: …' (mechanical review done) — only the named human step remains; doing those first unblocks deliveries fastest."
+        fi
       fi
     fi
   fi
@@ -205,6 +209,19 @@ if [ -f "$DIR/TASKS.md" ]; then
   noev=$(sed -n '/^## Review/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -E '^- \[' | grep -cv 'evidence:')
   if [ "${noev:-0}" -gt 0 ]; then
     echo "[keel] ${noev} '## Review' item(s) carry NO 'evidence:' link — an unverifiable delivery; add the proof (reports/team/ solution note / test report) to the item line before the owner reviews."
+  fi
+fi
+
+# Evidence-FILE existence check (rules §10.40 file-first): a '## Review' line may cite a path that
+# doesn't exist on disk — a chat-only "delivery". Repo paths are space-free by convention, so plain
+# word-splitting over the extracted list is safe.
+if [ -f "$DIR/TASKS.md" ]; then
+  evp=$(sed -n '/^## Review/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -E '^- \[' \
+        | grep -oE 'reports/[A-Za-z0-9_./@-]+\.md' | sort -u)
+  evmiss=""
+  for p in $evp; do [ -f "$DIR/$p" ] || evmiss="$evmiss $p"; done
+  if [ -n "$evmiss" ]; then
+    echo "[keel] evidence file(s) cited in '## Review' but MISSING on disk:${evmiss} — a chat summary is not a delivery (rules §10.40): write the solution note into the author's reports/team/ folder (+ its 'delivered' index line) before review."
   fi
 fi
 

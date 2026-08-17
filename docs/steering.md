@@ -96,13 +96,21 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   foreign-owned items; the **`owner-guard` hook BLOCKS governance edits** (exit 2, propose-to-owner
   message). Ritual surfaces stay shared — a session that cannot write HANDOVER/LESSONS/TASKS cannot
   run the discipline at all.
-- **Review loop (owner verifies developer work)** — a developer's finished item is MOVED, not deleted,
-  to a TASKS `## Review` section at their handover (`- [x] ... (@dev) — evidence: <done-when result>`).
-  The owner's next session is nudged by the re-ground hook, verifies the `done-when` (run/observe it;
-  verifier agent for adversarial doubt, rules.md §4.11), then **accepts** (delete → owner's HANDOVER (a)
-  as "reviewed") or **rejects** (back to `## Now`, one reason line, still @-tagged). Phase grain needs no
-  extra machinery: PLAN.md is governance, so a developer cannot flip a phase — the owner flips it after
-  reviewing the gate evidence.
+- **Review loop (owner verifies developer work — file-first, four states, rules §10.40/41)** — a
+  developer's finished item is MOVED, not deleted, to a TASKS `## Review` section at their handover,
+  and the line NAMES its evidence file (`- [x] ... (@dev) — evidence:
+  reports/team/<@dev>/<task>_fix_<date>.md`). **A chat summary is not a delivery:** the re-ground hook
+  flags pathless lines AND files missing on disk. Each delivery walks `wip → delivered → verified
+  (owner part: <one sentence>) → closed <date> accepted|rejected`, mirrored in the
+  `reports/team/README.md` index — the team's review TODOLIST ("what's finished under @X" = the `[x]`
+  lines in their section). Review ROUTING is the orchestrator's alone (the owner's main session, or
+  the leader agent of an agent team): the deliverer never picks their own reviewer; the MECHANICAL
+  half (re-run the done-when, parity scripts, source reads) is delegated to a verifier
+  subagent/reviewer whose written report flips the line to `verified — owner part: <…>`; the owner
+  performs that one named human step (§10.41 probe included), then **accepts** (delete → owner's
+  HANDOVER (a); index `closed <date> accepted`) or **rejects** (back to `## Now`, one reason line,
+  index back to `wip`). Phase grain needs no extra machinery: PLAN.md is governance, so a developer
+  cannot flip a phase — the owner flips it after reviewing the gate evidence.
 - **Identity = `git config user.name`** — every ownership mechanism (tags, owner-guard, autopilot
   stop, handover headings) matches this ONE string. Onboarding rule: repo-local
   `git config user.name "<tag>"`, single token, byte-for-byte the repo's `@tag` spelling (it need
@@ -144,9 +152,12 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   `reports/team/` files into the AUTHOR's own folder — `reports/team/<@tag>/` for each developer, the
   owner, and every co-agent — with task-prefixed names inside (`<task>_spec.md`, `<task>_fix_<date>.md`;
   bulky/raw evidence as a `<task>_<what>/` subfolder), **Markdown only** (no .docx/binary docs).
-  `reports/team/README.md` is the single INDEX: one line per report — `file · task · what · status` —
-  appended at delivery (part of the solution-note step), status flipped to `closed <date>` when the
-  owner accepts the `## Review` item. Reports are NEVER deleted or moved: they are the permanent
+  `reports/team/README.md` is the single INDEX **and the review todolist**: one line per report —
+  `file · task · what · status` — appended at delivery (part of the solution-note step); statuses come
+  ONLY from the controlled vocabulary `wip · delivered · verified — owner part: <…> · closed <date>
+  accepted|rejected` (`[x]` only at closed; the author appends, the orchestrator flips — the format
+  and who-flips-what live in the template README itself, and the `/keel-distill` lint checks the
+  index mirrors the folders). Reports are NEVER deleted or moved: they are the permanent
   artifacts that Review evidence, LESSONS, ADRs, and path-scoped rules cite — moving dangles those
   references, and the trail costs zero always-on tokens (never `@`-imported); findability is the
   index's job. Adopting mid-project: leave existing flat files exactly where they are, back-fill

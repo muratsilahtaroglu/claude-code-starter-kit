@@ -23,12 +23,15 @@ Steps:
      TASKS.md items finished this session (then delete them from TASKS.md). **Multi-user exception**
      (`.claude/project-owner` exists and you are NOT the owner): do not delete your finished items —
      MOVE each to a TASKS `## Review` section (create it if missing) as
-     `- [x] <id> ... (@you) — evidence: <how the done-when was met>` — link the PROOF (solution note /
-     test report in YOUR author folder, `reports/team/<@you>/`, with its one-liner appended to the
-     `reports/team/README.md` index — rules.md §10.40); an evidence-less line is flagged at session
+     `- [x] <id> ... (@you) — evidence: reports/team/<@you>/<task>_fix_<date>.md`. **The evidence is a
+     FILE — verify it EXISTS before writing the line** (a chat summary is not a delivery, rules.md
+     §10.40): the solution note sits in YOUR author folder and its index line lands in
+     `reports/team/README.md` as `delivered`. Pathless lines and missing files are flagged at session
      start, and the owner's probe may also test your UNDERSTANDING of the delivery (rules.md §10.41).
-     The OWNER verifies and deletes on accept (their session is nudged), flipping the report's index
-     line to `closed <date>`. The owner's own items follow the normal delete flow.
+     Review ROUTING is then the owner/orchestrator's: mechanical verification is delegated and appends
+     `— verified ✓ (owner part: <one sentence>)` to the line; on accept the OWNER deletes the item and
+     flips the index line to `closed <date> accepted` (reject → back to `## Now` + one reason line,
+     index back to `wip`). The owner's own items follow the normal delete flow.
    - **(b) Tried, didn't work** — approaches that failed + the reason, so they aren't retried. This is
      the highest-value section — don't skip it.
    - **(c) Latest updates** — the most recent concrete changes.
