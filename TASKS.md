@@ -26,6 +26,8 @@
 >   developers complete + `[x]` their items and add `## Discovered` lines (docs/steering.md "Multi-user").
 >   **AI co-agent sessions** (rules §10.42) follow the same discipline as teammates: their own
 >   `### <name>` lane, edits only INSIDE their own items (no rituals/git/curation), delivery via `## Review`.
+>   Structured roster: `/keel-agent-team-create` (owner-only charters) + `/keel-agent-team-start`
+>   (per-chat identity, survives compaction via the session map).
 >   **Owner review (file-first, four states — rules §10.40/41):** a developer does NOT delete their
 >   finished item — at their handover it MOVES to a `## Review` section (created on first use), and the
 >   line NAMES its evidence FILE: `- [x] T7 <what> (@dev) — evidence: reports/team/<@dev>/<task>_fix_<date>.md`.

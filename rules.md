@@ -258,3 +258,11 @@
     SINGLE-WRITER surfaces, and two concurrent writers clobber each other silently (field case:
     alice_v2 2026-08-12 — fresh co-agent progress nearly overwritten twice during a cap pass). A
     co-agent delivery lands in `## Review` and §10.41 + the §4.11 verify duty apply unchanged.
+    **Agent teams (structured co-agents):** `/keel-agent-team-create` — OWNER-only, like all
+    governance — names a roster (ONE orchestrator + specialized workers; single-token English names
+    preferred) and writes an owner-approved charter per agent to `.claude/agents/team-<name>.md`
+    (owner-guard already walls the path). A chat adopts an identity ONCE via
+    `/keel-agent-team-start @<name>`; the session→agent map lives in git-ignored
+    `.claude/agent-team-sessions` and the reground hook re-injects the identity from DISK after
+    every compaction/`--resume` — never re-asked. The ORCHESTRATOR alone runs rituals/git/assignment
+    and routes reviews (§10.41), and takes NO work items; workers stay under this rule's FORBIDDEN list.

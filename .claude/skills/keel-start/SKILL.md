@@ -22,6 +22,9 @@ every compaction — they are ALREADY in context: do not re-Read them wholesale.
   edits are the surest marker of a half-finished item.
 - Multi-user (`.claude/project-owner` exists): note `git config user.name` — the brief scopes to
   YOUR `@tag` items; foreign-owned work is surfaced, never picked up (TASKS ownership).
+- Agent-team session (the reground hook injected "this session is @<agent>"): scope the brief to
+  that agent's `### <agent>` lane and charter paths; re-adopt the identity silently
+  (see `/keel-agent-team-start` — do not re-run it when the hook already named you).
 
 ## 2. Cross-check — the 60-second drift pass
 - HANDOVER top block vs `git log`: do its (c)/(d) lines still describe HEAD? A block that predates

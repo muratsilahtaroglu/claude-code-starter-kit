@@ -174,6 +174,28 @@ if [ -f "$DIR/.claude/project-owner" ]; then
   fi
 fi
 
+# Agent-team identity (rules §10.42, /keel-agent-team-*): when team charters exist, resolve THIS
+# session's adopted agent from .claude/agent-team-sessions (session_id → agent, written once per
+# chat by /keel-agent-team-start) and re-inject it — identity survives compaction/--resume from
+# DISK, never re-asked. The printed Session-id is what lets the start skill write the mapping.
+if ls "$DIR"/.claude/agents/team-*.md >/dev/null 2>&1; then
+  sid="$(printf '%s' "$payload" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  ag=""
+  if [ -n "$sid" ] && [ -f "$DIR/.claude/agent-team-sessions" ]; then
+    ag="$(grep -m1 "^${sid} " "$DIR/.claude/agent-team-sessions" 2>/dev/null | awk '{print $2}')"
+  fi
+  if [ -n "$ag" ] && [ -f "$DIR/.claude/agents/team-${ag}.md" ]; then
+    if grep -q '^Role: orchestrator' "$DIR/.claude/agents/team-${ag}.md" 2>/dev/null; then
+      echo "[keel] Agent identity (from disk): this session is @${ag} — the ORCHESTRATOR (charter: .claude/agents/team-${ag}.md). Duties: rituals · lane/@tag assignment · review ROUTING with the mechanical half DELEGATED (rules §10.41) · memory curation (read git diff for fresh worker writes first, §10.42) — and NO work items of your own. Session-id: ${sid}"
+    else
+      echo "[keel] Agent identity (from disk): this session is @${ag} (charter: .claude/agents/team-${ag}.md · lane: TASKS '### ${ag}' · author folder: reports/team/${ag}/). Re-adopt silently. FORBIDDEN: write-rituals, commit/push, anyone else's lines (rules §10.42). Session-id: ${sid}"
+    fi
+  elif [ -n "$sid" ]; then
+    roster="$(ls "$DIR"/.claude/agents/team-*.md 2>/dev/null | sed 's/.*team-//;s/\.md$//' | tr '\n' ' ')"
+    echo "[keel] Agent team exists (roster: ${roster}) but THIS session has adopted no identity — run /keel-agent-team-start @<name> once; it records session-id ${sid} into .claude/agent-team-sessions so the identity survives compaction."
+  fi
+fi
+
 # Ownership check (multi-user, rules: TASKS ## Now @owner tag): warn when open ## Now items are ALL
 # owned by others — so the AI doesn't do work assigned to someone else (the parallel-work collision the
 # tag exists to prevent). Silent when no @owner tags exist (single-user projects pay nothing). The tag

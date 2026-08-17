@@ -38,7 +38,7 @@ That gives you the **skills** (each `keel-`-prefixed, so under the plugin namesp
 `/keel:keel-distill` · `/keel:keel-phase-review` · `/keel:keel-research` · `/keel:keel-adopt` ·
 `/keel:keel-update` · `/keel:keel-audit` · `/keel:keel-plan` · `/keel:keel-compact` ·
 `/keel:keel-stats` · `/keel:keel-pilot` · `/keel:keel-autopilot` · `/keel:keel-tidy` ·
-`/keel:keel-start`), the `researcher` +
+`/keel:keel-start` · `/keel:keel-agent-team-create` · `/keel:keel-agent-team-start`), the `researcher` +
 `verifier` + `auditor` **subagents**, and the
 memory/safety **hooks** — across every repo. **A clone is a snapshot; the plugin is a subscription:**
 when the template improves, one `/plugin marketplace update keel` brings the new tooling to *all* your

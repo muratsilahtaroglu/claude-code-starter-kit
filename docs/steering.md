@@ -30,6 +30,9 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
 - **Procedures** → skills: `/keel-start` (active resume after a compact/cold start: cross-check the
   auto-loaded memory against PLAN.md + git → a "where you left off · in-flight · warnings · next step"
   brief; read-only, so even co-agents may run it),
+  `/keel-agent-team-create` + `/keel-agent-team-start` (same-machine agent team: owner-only
+  roster/charters · per-chat identity that survives compaction via the session map — see "Agent
+  teams" under Multi-user below),
   `/keel-handover`, `/keel-phase-review`, `/keel-research`, `/keel-adopt`, `/keel-distill`, `/keel-update`
   (pull the latest template with per-file approval), `/keel-audit` (rules-compliance spot-check when due),
   `/keel-plan` (phase map: status table + regenerated Mermaid DAG in `PLAN.md`), `/keel-compact`
@@ -187,6 +190,20 @@ someone else ASKS who the owner is, never assumes). Roles from then on:
   owner-guard cannot wall it — the rule is discipline, backed by the ritual gates it cannot pass
   (its `/compact` stalls at the compact-gate because HANDOVER is not its surface; the main session's
   handover clears it). Deliveries land in `## Review` like any teammate's (§10.41).
+- **Agent teams (structured co-agents — `/keel-agent-team-create` + `/keel-agent-team-start`):** the
+  owner names a roster (ONE **orchestrator** + specialized workers — `mechanic`, `frontend`, `test`,
+  `provider`…; English single tokens preferred) and each agent gets an owner-approved charter in
+  `.claude/agents/team-<name>.md` (mission · scope paths · lane · author folder · FORBIDDEN list; a
+  greppable `Role:` body line), plus a TASKS lane and a `reports/team/<name>/` folder. **Identity is
+  per-chat and survives compaction:** `/keel-agent-team-start @<name>` runs ONCE in a new chat and
+  records `session_id → agent` into git-ignored `.claude/agent-team-sessions`; the re-ground hook
+  reads its own session id on every start/compact/`--resume` and re-injects the identity from disk —
+  asked once, never again. The orchestrator runs rituals/assignment/review routing (mechanical half
+  delegated, §10.41) and holds no work items; workers inherit the co-agent FORBIDDEN list above.
+  Charters double as spawnable subagents ONLY on the orchestrator's explicit request (their
+  `description` says so). Enforcement honesty: these sessions all share the owner's git identity, so
+  owner-guard cannot tell them apart — the walls are the charter text, the create-skill's owner gate
+  (+ owner-guard on the charter files themselves), and the compact-gate workers cannot clear.
 - **Dev-local runs:** every developer runs the product on their OWN machine without editing tracked
   files — machine-local knobs (PORT, hosts, creds) come from their own `.env` (defaults documented in
   `.env.example`; Makefile targets accept `make run-x PORT=8135`-style overrides); scarce shared

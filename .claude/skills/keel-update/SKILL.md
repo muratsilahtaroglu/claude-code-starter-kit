@@ -28,7 +28,9 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   template and the folder `README.md` — those are TOOLING) · `CLAUDE.md` · `README.md` · `LICENSE` ·
   `config/` · `requirements/*.{txt,lock}` contents · `.env.example` values · `src/` · `tests/` ·
   `scratch/` · `research/` findings · `reports/` · `.claude/last-audit` · `.claude/project-owner` ·
-  `.claude/keel-caps` (project state: audit clock + governance owner + tuned caps).
+  `.claude/keel-caps` (project state: audit clock + governance owner + tuned caps) ·
+  `.claude/agents/team-*.md` (project agent-team charters, owner-authored — the kit ships none;
+  `.claude/agent-team-sessions` is git-ignored and never syncs).
 - **REVIEW — likely tailored; full diff, apply hunk-by-hunk with approval:** `rules.md` ·
   `.claude/settings.json` (permissions merge = union, keep the project's) · `.gitignore` ·
   `.pre-commit-config.yaml` · `pyproject.toml` · `Makefile` · `Dockerfile*` · `.dockerignore` ·

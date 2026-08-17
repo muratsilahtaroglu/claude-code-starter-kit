@@ -26,7 +26,7 @@ GROUPS = [
     (".claude/", "#1c7ed6", [
         ("settings.json", "permissions — deny secrets · ask before push"),
         ("hooks/", "deterministic guards — block-dangerous · nudges"),
-        ("skills/", "14 /keel-* workflows — start · handover · plan · pilot"),
+        ("skills/", "16 /keel-* workflows — start · agent-team · handover · plan"),
         ("agents/", "subagents — researcher · verifier · auditor"),
         ("rules/", "optional path-scoped rules"),
         ("snapshots/ · last-audit · ritual-log", "runtime state — appears as you work"),

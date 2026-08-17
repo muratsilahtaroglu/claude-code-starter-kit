@@ -54,6 +54,7 @@ reports/tests/*/
 .claude/settings.local.json
 .claude/snapshots/
 .claude/ritual-log*
+.claude/agent-team-sessions
 CLAUDE.local.md
 
 # === Research — commit findings.md; ignore raw/large downloads (rules.md §8) ===
