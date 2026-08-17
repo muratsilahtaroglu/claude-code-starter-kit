@@ -23,7 +23,8 @@ human lanes and agent lanes share the same TASKS board, and creation authority i
    `mechanic`, `frontend`, `test`, `provider`…); the owner's naming always wins. Exactly ONE agent
    carries the orchestrator role.
 2. **Each worker's domain** — mission (one line), scope paths (globs), anything it must NEVER touch.
-3. **Charter/prompt language** — EN or TR (the project's docs language usually decides).
+3. **Charter/prompt language** — EN or TR (the project's docs language usually decides). Note the
+   invariant either way: machine-memory writes (boards, HANDOVER/LESSONS input) are ENGLISH (§9.31).
 4. **Review routing notes** — the default is review-v2 (rules §10.41): the orchestrator routes every
    review and delegates the mechanical half to the `verifier` subagent; name any area that instead
    deserves a DEDICATED reviewer agent (rare — each extra agent is a chat window the owner must steer).
@@ -55,7 +56,8 @@ line is load-bearing: the reground hook greps it):
     - FORBIDDEN (worker, rules §10.42): WRITE-rituals (handover · distill · compact · phase-review ·
       audit · plan · update · tidy), commit/push, editing anyone else's lines, memory curation.
       Allowed read-only: /keel-start, /keel-agent-team-start.
-    - Language: <EN|TR>.
+    - Language: charter/chat <EN|TR>; your `board.md` findings + any HANDOVER/LESSONS input are
+      ENGLISH regardless (§9.31 — machine-read memory), human surfaces stay in the project language.
 
 The ORCHESTRATOR charter (`Role: orchestrator`) inverts the duties: it runs the rituals + git
 (commit; push stays ask-gated), assigns lanes/@tags, routes EVERY review (delegating the mechanical

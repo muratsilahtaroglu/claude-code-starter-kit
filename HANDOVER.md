@@ -8,6 +8,11 @@
 > and the raw block moves verbatim to `docs/handover-archive.md` (never imported — costs no context,
 > grep-able forever). Compaction is a curation step, not an information-loss event.
 
+> **Language: ENGLISH, on every project** (rules §9.31) — machine-read memory, `@`-imported every
+> session, so EN keeps the always-on token cost down. Human surfaces (TASKS/PLAN/reports/docs) follow
+> the project language; the user's verbatim words may stay quoted. Never bulk-translate an existing
+> file — blocks convert as they are rewritten/rotated.
+
 _Last updated: <YYYY-MM-DD> — <short status>._
 
 ---

@@ -6,7 +6,9 @@
 ## 0. Session start
 0. **(First session only) Bootstrap — fit the template to THIS project.** Before anything else, understand
    the project (goal, type, constraints, target platforms/hosts) and ask the **project language** (e.g.
-   Turkish or English) for docs. Then propose a tailoring plan and **apply it only after user approval** —
+   Turkish or English) for docs — that choice governs the HUMAN surfaces (docs, TASKS.md, PLAN.md,
+   `reports/team/*`); the MACHINE-memory files (HANDOVER.md · LESSONS.md · worker boards) are ALWAYS
+   English regardless (§9.31 language rule). Then propose a tailoring plan and **apply it only after user approval** —
    never silently keep, delete, add, or **overwrite**. First pick the mode:
 
    - **Mode A — New / greenfield project** (empty or near-empty repo): the template files are the starting
@@ -54,7 +56,7 @@
 4. **`HANDOVER.md` is updated BEFORE every compact/session end** (before a manual compact, the
    `/keel-compact` skill bundles this + the cap check, then hands off to `/compact`) — one dated **session block** (newest
    first) with (a) completed, (b) tried-and-failed (so they aren't retried), (c) latest updates,
-   (d) next steps. **Hard cap: max 3 blocks / ~150 lines** (it is `@`-imported into every session — bloat
+   (d) next steps — in ENGLISH (machine-read memory, §9.31). **Hard cap: max 3 blocks / ~150 lines** (it is `@`-imported into every session — bloat
    is a per-session token tax and an adherence tax). On overflow run **`/keel-distill`** (§9.33): oldest
    block's critical facts → `LESSONS.md`, raw block → `docs/handover-archive.md` verbatim. Default is a
    **single root** handover. On large multi-area projects the AI may create **per-area handovers**
@@ -164,7 +166,12 @@
     note this?"** and on approval appends an atomic, dated, tagged line (`[rule] [test] [fail] [gotcha]`)
     to `LESSONS.md` **immediately** — never "at compact time" (a session can die before compact runs).
     `LESSONS.md` differs from `rules.md`: rules = the constitution written at project start; lessons =
-    critical user↔AI knowledge **accumulated during** the project.
+    critical user↔AI knowledge **accumulated during** the project. **Machine-memory language =
+    ENGLISH:** HANDOVER/LESSONS/worker boards are read by sessions, not humans — EN costs fewer
+    tokens per always-imported line; write them in English on every project regardless of the
+    project language (the user's verbatim words may stay quoted in their language; human surfaces —
+    TASKS/PLAN/reports/docs — follow the project language; owner-facing questions are surfaced in
+    CHAT in the project language, the file line stays EN).
 32. **Task board (`TASKS.md`).** Cross-session tasks live in `TASKS.md` (built-in todos are session
     scratch only). Work ONLY from `## Now` (max 3–5); every item has a verifiable `done-when:`; a
     finished item is marked `[x]` immediately and **deleted at `/keel-handover`** as its one-liner lands in

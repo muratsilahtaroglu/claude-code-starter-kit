@@ -10,6 +10,13 @@
 > HERE immediately. Do NOT wait for session end or compaction: conversation-only agreements are exactly
 > what compaction destroys.
 >
+> **Language: ENGLISH, on every project** (rules §9.31) — this file and `HANDOVER.md` are read by
+> SESSIONS, not humans, and they are `@`-imported every time: EN costs fewer tokens per always-loaded
+> line. The user's verbatim words may stay quoted in their own language; human surfaces (TASKS.md,
+> PLAN.md, `reports/team/*`, docs) follow the PROJECT language, and anything needing the owner's
+> decision is raised in CHAT in that language — the line here stays EN. Adopting mid-project: never
+> bulk-translate; lines convert as `/keel-distill` rewrites them.
+>
 > **Format:** atomic one-line entries, dated + tagged, newest first within a tag group. Never silently
 > delete: mark superseded entries as `SUPERSEDED by <entry/date>` (or remove them during `/keel-distill` once
 > promoted to rules.md/a skill). **Cap: ~250 lines** (team override: `.claude/keel-caps`, rules §10.40)

@@ -6,7 +6,10 @@ description: Add this session's block to HANDOVER.md before ending or compacting
 # /keel-handover — write the session block
 
 Add a new **session block** to the TOP of `HANDOVER.md`'s "Session blocks" section (rules.md §1.4).
-Newest first; never edit past blocks.
+Newest first; never edit past blocks. **Write the block in ENGLISH** even on a non-English project
+(§9.31: HANDOVER/LESSONS are machine-read and `@`-imported every session — EN is the cheaper token
+surface); TASKS/PLAN/reports lines you touch stay in the project language, and the user's verbatim
+words may stay quoted as-is.
 
 Steps:
 1. Read the current `HANDOVER.md`. If it already has **3 blocks** (or exceeds ~150 lines), run

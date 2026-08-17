@@ -65,6 +65,9 @@ For each block being rotated, triage by criticality — **content-aware, not age
   the controlled vocabulary (`wip · delivered · verified — owner part: <…> · closed <date>
   accepted|rejected`, `[x]` only at closed).
 - Stale claims (files/commands/paths that no longer exist) — fix or mark superseded.
+- **Language drift (rules §9.31):** HANDOVER/LESSONS/worker boards are ENGLISH on every project.
+  Convert only the lines this run already rewrites/merges/rotates (gradual, no bulk-translation pass:
+  a mass rewrite risks meaning loss and buries the real diff) — quoted user wording stays as-is.
 - Stale cap HEADERS in the memory files themselves (e.g. a LESSONS.md header still quoting an old
   "~100"): correct to the current thresholds below — headers are prose, the SessionStart hook is the
   authority; they drift in adopted projects because `/keel-update` never touches PROTECTED memory files.

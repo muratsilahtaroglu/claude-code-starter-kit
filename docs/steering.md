@@ -55,6 +55,15 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
   colored Mermaid interval boxes + a counts table.
 - **File-local constraints** → optional `.claude/rules/` (see the example there).
 
+## Language: machine surfaces vs human surfaces (rules §9.31)
+Split by READER, not by project. `HANDOVER.md` · `LESSONS.md` · agent-team worker boards are read by
+SESSIONS and `@`-imported every time → **always English**, on every project, because every line is a
+permanent always-on token cost. `TASKS.md` · `PLAN.md` · `reports/team/*` · `docs/` are read by
+PEOPLE (the owner reviews and answers there) → the **project language**. Two carve-outs: the user's
+verbatim wording may stay quoted in their language inside an EN line, and anything needing an owner
+decision is raised in CHAT in the project language even though the file line is EN. Adopting this
+mid-project: never bulk-translate — `/keel-distill` converts lines as it rewrites them.
+
 ## Auto memory vs Keel memory
 Claude Code also keeps an **auto memory** per project (`~/.claude/projects/<project>/memory/` —
 `MEMORY.md` index + topic files, on by default): the assistant's own private notes. It is
