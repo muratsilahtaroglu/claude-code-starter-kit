@@ -11,8 +11,10 @@
 @TASKS.md
 
 ## Session protocol (rules.md §9)
-- **Start:** read the TOP block of `HANDOVER.md` + `LESSONS.md` + `TASKS.md ## Now` + recent `git log`;
-  pick ONE `## Now` item; verify tests pass before new work.
+- **Start:** run **`/keel-start`** (active resume: cross-checks the loaded memory against PLAN.md + git,
+  briefs "where you left off · in-flight · warnings · next step") — or by hand: read the TOP block of
+  `HANDOVER.md` + `LESSONS.md` + `TASKS.md ## Now` + recent `git log`; pick ONE `## Now` item;
+  verify tests pass before new work.
 - **During:** the moment a rule / must-run test / gotcha / failed approach is agreed or discovered — ask
   "shall I note this?" and append it to `LESSONS.md` immediately (don't wait for compaction).
 - **End (or before compact):** `/keel-handover` (new HANDOVER block) · delete done TASKS items · commit with

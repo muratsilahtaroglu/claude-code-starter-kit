@@ -27,7 +27,10 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
 
 ## How Keel maps onto this
 - **Always-on discipline** (`rules.md`, `HANDOVER.md`, `LESSONS.md`, `TASKS.md`) → `@`-imported by `CLAUDE.md`.
-- **Procedures** → skills: `/keel-handover`, `/keel-phase-review`, `/keel-research`, `/keel-adopt`, `/keel-distill`, `/keel-update`
+- **Procedures** → skills: `/keel-start` (active resume after a compact/cold start: cross-check the
+  auto-loaded memory against PLAN.md + git → a "where you left off · in-flight · warnings · next step"
+  brief; read-only, so even co-agents may run it),
+  `/keel-handover`, `/keel-phase-review`, `/keel-research`, `/keel-adopt`, `/keel-distill`, `/keel-update`
   (pull the latest template with per-file approval), `/keel-audit` (rules-compliance spot-check when due),
   `/keel-plan` (phase map: status table + regenerated Mermaid DAG in `PLAN.md`), `/keel-compact`
   (pre-compact bundle: refresh the disk via `/keel-handover`, verify freshness, hand off to `/compact`),
