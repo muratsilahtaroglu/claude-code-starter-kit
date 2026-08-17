@@ -47,7 +47,7 @@ source supplies is the enforcement RITUAL — that is the kit's slot.
   terminal states (succeeded/errored/canceled/expired); results unordered — match by custom_id |
   https://platform.claude.com/docs/en/docs/build-with-claude/batch-processing | high | retry &
   resume are per-request, which is what makes checkpointing workable.
-- OpenAI batch cookbook: try requests on the sync endpoint first; results unordered | 
+- OpenAI batch cookbook: try requests on the sync endpoint first; results unordered |
   https://developers.openai.com/cookbook/examples/batch_processing | high | honest negative:
   API docs do NOT supply QA methodology — the discipline must come from elsewhere.
 - Krippendorff α thresholds: **α ≥ 0.800 reliable; 0.667–0.800 tentative conclusions only** |
@@ -80,3 +80,67 @@ source supplies is the enforcement RITUAL — that is the kit's slot.
 Everything needed exists natively (PreToolUse gate + verifier subagent + Monitor + Stop hook).
 What is missing in every source is the non-optional RITUAL — a pilot gate with pre-declared
 thresholds. That is precisely the kind of gap Keel exists to fill.
+
+---
+
+# web/ findings — instruction-loading semantics across coding agents (2026-08-17)
+
+> Question: what EXACTLY loads when, and survives compaction, across Claude Code's memory mechanisms
+> and comparable products — the constraint set for a task-scoped LESSONS design. Distilled per §8.
+
+## Synthesis
+Every major agent converged on the same three tiers: always-on file → glob-scoped rule files →
+description-matched, body-on-demand units. Two findings change our design: (1) **skills also accept
+`paths:`** AND invoked skill bodies are the ONLY scoped mechanism **re-injected after compaction**;
+(2) shrinking context is an **accuracy** argument, not just a token one — a focused ~300-token
+context beat a 113k one containing the same facts, and a SINGLE distractor measurably degrades
+retrieval. No official doc of any product uses embeddings for rules/memory retrieval.
+
+## Findings (claim | source | confidence | note)
+- Compaction table — what survives: root `CLAUDE.md`, **unscoped** rules, auto memory → re-injected
+  from disk; **`paths:`-scoped rules → LOST until a matching file is read again**; nested CLAUDE.md →
+  lost until that subdir is read; **invoked SKILL bodies → re-injected (5,000 tok/skill, 25,000 tok
+  total, oldest dropped first)** | https://code.claude.com/docs/en/context-window | high | OFFICIAL; confirms our §9.33 caveat verbatim.
+- **Skills accept `paths:` frontmatter** ("same format as path-specific rules") + description-matched
+  activation; body loads on invoke and persists for the session; truncation keeps the START of the
+  file | https://code.claude.com/docs/en/skills | high | OFFICIAL, little-known — this is the missing graduation destination.
+- Official steering: for "task-specific instructions that don't need to be in context all the time,
+  use skills instead… loaded when you invoke them or when Claude determines they're relevant" |
+  https://code.claude.com/docs/en/memory | high | OFFICIAL endorsement of description-matched selection.
+- `@`-imports do NOT reduce context (all load at launch, depth max 4); "target under 200 lines per
+  CLAUDE.md — longer files consume more context and **reduce adherence**" | same | high | OFFICIAL adherence tax, stated by the vendor.
+- Auto-memory shape = **capped index + on-demand bodies**: `MEMORY.md` loaded every session but
+  TRUNCATED at 200 lines / 25KB; topic files are **not** loaded at startup, read on demand; a write
+  that overflows the index ERRORS and demands a rewrite | same | high | the pattern Anthropic ships AND enforces.
+- Path-glob failure modes are SILENT: brace expansion budget 1,000 patterns / 4 MiB (over-budget →
+  used unexpanded → matches nothing); a malformed `[` bracket matches nothing | same | high | extends our dead-glob lint.
+- `InstructionsLoaded` hook logs which instruction files loaded, when and why | same | high | observability: measure whether scoping actually fires before/after.
+- **Context rot (the key citation):** LongMemEval, 18 models — a ~300-token focused context beat the
+  ~113k context CONTAINING the same needed information, across all model families (largest gaps:
+  Claude Opus 4 / Sonnet 4); a SINGLE distractor degrades retrieval and the effect compounds |
+  https://www.trychroma.com/research/context-rot | high | independent, multi-model; the accuracy argument for pruning always-on lines.
+- Anthropic framing: context is "a finite resource with diminishing marginal returns"; prescribes
+  just-in-time retrieval via lightweight identifiers + progressive disclosure | https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents | high | OFFICIAL framing (no numbers of its own).
+- Vendor-measured: memory tool + context editing +39% over baseline (context editing alone +29%),
+  84% token reduction on a 100-turn eval | https://claude.com/blog/context-management | medium-high | vendor's own eval, magnitude unverified.
+- Comparable products' SELECTION mechanism: Cursor `.mdc` (alwaysApply / globs / **description-matched
+  "Apply Intelligently"** / manual; "keep rules under 500 lines") | https://cursor.com/docs/context/rules | high | OFFICIAL.
+- Copilot `.github/instructions/*.instructions.md` uses `applyTo:` globs; **not applied at all if
+  absent**; "keep instructions short and self-contained, each a single simple statement" | https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot | high | OFFICIAL; glob-only, no description tier.
+- Community failure data for glob selection: stale globs after a directory rename fail SILENTLY;
+  vague descriptions never match | https://forum.cursor.com/t/cursor-rules-globs-inconsistencies/116958 · https://forum.cursor.com/t/rules-not-being-applied-as-expected/144731 | medium | forum reports, version-dependent, but the CLASS is corroborated.
+- The anti-pattern, shipped: Cline Memory Bank — six fixed files, "I MUST read ALL memory bank files
+  at the start of EVERY task"; no scoping, token cost unquantified | https://docs.cline.bot/prompting/cline-memory-bank | high | where an unscoped LESSONS.md ends up.
+- No embeddings anywhere in official rule/memory retrieval; Claude Code reportedly dropped its early
+  vector index for agentic search (precision · freshness · no index to maintain) | https://vadim.blog/claude-code-no-indexing/ · https://cline.bot/blog/why-cline-doesnt-index-your-codebase-and-why-thats-a-good-thing | medium | community-reported vendor decisions; the NEGATIVE (no official doc uses vectors) is high confidence.
+- Agent-memory benchmarks are NOT citable: a LoCoMo audit reports ~6.4% of the answer key wrong and
+  the LLM judge accepting 63% of intentionally wrong answers; mem0-vs-Zep numbers are contested by
+  both vendors | https://penfieldlabs.substack.com/p/proposal-a-new-benchmark-for-long · https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/ | low-medium | report as contested, never as evidence.
+- A-MEM (NeurIPS 2025) is Zettelkasten-inspired agent memory (note + keywords + links, evolving) but
+  retrieves by embeddings | https://arxiv.org/abs/2502.12110 | high for existence, medium for transfer.
+
+## Conclusion (drives the design; decision → ADR)
+Keep grep + globs + descriptions (§9.35 now has citable support, not just assertion). Add the missing
+destination: a **`paths:`-scoped SKILL** for lesson clusters that must survive compaction mid-work.
+Copy auto-memory's shape: **capped index + on-demand bodies**. Extend the dead-glob lint to brace
+budget + bracket validity. Instrument with `InstructionsLoaded` before claiming any win.
