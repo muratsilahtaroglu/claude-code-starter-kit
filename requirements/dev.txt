@@ -3,7 +3,9 @@
 # After editing, refresh the dev lock:
 #   pip-compile --generate-hashes -o requirements/dev.lock requirements/dev.txt
 #
-# pytest==<exact.version>
+# pytest is UNCOMMENTED because the kit ships a test suite that needs it
+# (tests/unit/test_keel_hooks.py). Refresh dev.lock before `make setup-dev`.
+pytest==8.3.4
 # ruff==<exact.version>
 # pip-audit==<exact.version>
 # pip-tools==<exact.version>

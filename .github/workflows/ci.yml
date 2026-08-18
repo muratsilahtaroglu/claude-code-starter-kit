@@ -1,4 +1,4 @@
-name: security-ci
+name: ci
 
 on:
   pull_request:
@@ -52,3 +52,27 @@ jobs:
             echo "A tracked .env file was found — secrets must never be committed."
             exit 1
           fi
+
+  # The hooks are the only executable code the kit ships, and they are what enforces
+  # §5/§6 at the tool-call boundary. Every matrix that verified them used to be run
+  # by hand in a session and thrown away — three bypasses shipped that way
+  # (reports/2026-08-18-hook-audit.md). This job is what makes the matrix permanent.
+  hooks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Hook regression matrix
+        run: |
+          set -euo pipefail
+          if [ ! -f tests/unit/test_keel_hooks.py ]; then
+            echo "No hook matrix in this project — skipping (pruned at bootstrap?)."
+            exit 0
+          fi
+          pip install pytest==8.3.4
+          pytest tests/unit/test_keel_hooks.py -q

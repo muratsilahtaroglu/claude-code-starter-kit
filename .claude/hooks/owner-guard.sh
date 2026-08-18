@@ -49,8 +49,10 @@ if [ "$tool" = "Bash" ]; then
   # Examine each shell segment (split on |;&) that is a `git … push …` invocation.
   while IFS= read -r seg; do
     printf '%s' "$seg" | grep -Eq '(^|[^[:alnum:]_.])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+push([^[:alnum:]_-]|$)' || continue
-    # (a) explicit main/master anywhere in the remote/refspec part (origin main · HEAD:main · :main)
-    if printf '%s' "$seg" | grep -Eq '[[:space:]:/](main|master)([[:space:]:]|$)'; then
+    # (a) explicit main/master anywhere in the remote/refspec part (origin main · HEAD:main ·
+    #     :main · +main — the leading '+' is git's force form and was NOT in this class, so the
+    #     one refspec that both force-pushes AND targets main walked through, audit 2026-08-18)
+    if printf '%s' "$seg" | grep -Eq '[[:space:]:/+](main|master)([[:space:]:]|$)'; then
       hit="explicit main refspec"; break
     fi
     # (b) bare push (≤1 non-flag token after `push` = remote only, no refspec) while checked out on it
@@ -73,7 +75,16 @@ fi
 # Edit|Write|NotebookEdit (any call carrying a file_path): the governance wall.
 fp="$(field '.get("tool_input", {}).get("file_path", "")')"
 [ -z "$fp" ] && exit 0
-rel="${fp#"$DIR"/}"
+# NORMALISE before the syntactic match below. Prefix-stripping alone is not a path comparison:
+# './rules.md' and 'docs/../rules.md' name the same governance file and both walked straight
+# through the case-glob (audit 2026-08-18). Resolved textually (no symlink/realpath call) so a
+# path that does not exist yet — a Write creating a new ADR — is still matched.
+rel="$(printf '%s\n%s\n' "$DIR" "$fp" | python3 -c "import os, sys
+d, p = [l.rstrip('\n') for l in sys.stdin.readlines()[:2]]
+p = p if os.path.isabs(p) else os.path.join(d, p)
+print(os.path.relpath(os.path.normpath(p), os.path.normpath(d)))" 2>/dev/null)"
+# Fail-open to the raw form if python3 is unavailable (same trade-off as the JSON reader above).
+[ -n "$rel" ] || rel="${fp#"$DIR"/}"
 
 case "$rel" in
   PLAN.md|rules.md|CLAUDE.md|docs/architecture.md|docs/adr/*|.claude/settings.json|.claude/settings.local.json|.claude/hooks/*|.claude/skills/*|.claude/agents/*|.claude/rules/*|.claude/project-owner|.claude/keel-caps)

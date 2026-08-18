@@ -49,6 +49,9 @@ scratch/**/*.html
 
 # === Reports — raw test-run logs stay local; dated phase summaries are committed ===
 reports/tests/*/
+# Regenerated from .claude/ritual-log by /keel-stats — machine-local telemetry, not an artifact
+# (compact-gate already excludes it from its dirty-tree check; this keeps it out of git status).
+reports/ritual-stats.md
 
 # === Claude Code — commit settings.json/skills/hooks; ignore personal ===
 .claude/settings.local.json

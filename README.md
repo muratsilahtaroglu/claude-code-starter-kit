@@ -243,4 +243,4 @@ nothing in your `src/` moves. Keel is a **shell that wraps your project, not a s
   <img src="docs/assets/architecture.svg" alt="Keel repository structure — a colored tree on the left with matching callout cards on the right, grouping the repo into constitution + memory, .claude/, docs/, requirements/, and the project scaffold" width="960">
 </p>
 
-<sub>Diagram generated from [`docs/assets/gen_architecture_svg.py`](docs/assets/gen_architecture_svg.py) — edit the group list and re-run to regenerate. Every item's one-line role lives in the per-folder READMEs and `docs/architecture.md`.</sub>
+<sub>Diagram generated from [`docs/assets/gen_architecture_svg.py`](docs/assets/gen_architecture_svg.py) — edit the group list and re-run to regenerate. Every item's one-line role lives in the per-folder READMEs — [`.claude/hooks/`](.claude/hooks/README.md) and [`.claude/skills/`](.claude/skills/README.md) map the kit's own tooling; `docs/architecture.md` is the blank map YOUR project fills in.</sub>

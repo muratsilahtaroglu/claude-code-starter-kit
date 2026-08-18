@@ -16,21 +16,52 @@ block() {
   echo "BLOCKED by .claude/hooks/block-dangerous.sh: $1" >&2; exit 2
 }
 
-# 1) Recursive delete of root / home / cwd (allows rm -rf ./subdir and absolute project paths).
-#    ('rm' matched without \b — a GNU extension that silently never matches on BSD/macOS grep.)
-#    The `[/*]*` after the target catches trailing chars that would otherwise bypass the guard
-#    (rm -rf ~/  ·  ~/*  ·  //  ·  /*/  ·  $HOME/) while still allowing ~/proj, /abs/proj, ./subdir.
-if printf '%s' "$cmd" | grep -Eq '(^|[^[:alnum:]_])rm([^[:alnum:]_]|$)' \
-   && printf '%s' "$cmd" | grep -Eq '[[:space:]]-[a-zA-Z]*[rf][a-zA-Z]*[[:space:]]+(/|~|\$HOME|\.)[/*]*([[:space:]]|$)'; then
-  block "recursive delete of root/home/cwd"
-fi
+# 1) Recursive delete of root / home / cwd — including the whole-cwd GLOBS (rm -rf * / .* / .[!.]*).
+#    Flags and TARGET are matched INDEPENDENTLY: the old pattern required them adjacent, which is
+#    exactly what let `rm -rf -- /` and `rm -rf --no-preserve-root /` through (the separator/long
+#    flag sits between them) while `rm -rf *` never matched a target at all — three shipped
+#    bypasses, found 2026-08-18 (reports/2026-08-18-hook-audit.md).
+#    Scoped per shell SEGMENT (split on |;&) and only to what follows the `rm` token, so a target
+#    belonging to a DIFFERENT command is not attributed to rm: `rm -rf ./build && cd /` and
+#    `find . -exec rm -rf {} +` stay allowed.
+#    A catastrophic target is a STANDALONE token — / // /* ~ ~/ ~/* $HOME . ./ ./* * ** .* .[!.]*
+#    — never a scoped path (./build, /srv/app, ~/proj/x) nor a filtered glob (*.log, build/*).
+#    (No \b anywhere in this file — it is a GNU extension that silently never matches on
+#    BSD/macOS grep, i.e. a guard that quietly stops guarding on someone else's laptop.)
+#    Finally, `rm` must sit in COMMAND position — segment start, seeing through a wrapper and its
+#    flags (sudo -u root rm … is NOT covered — a wrapper flag that takes a VALUE hides the
+#    command; `xargs -0 rm …` and plain `sudo rm …` are). Stated rather than silently assumed.
+#    Matching an `rm` token ANYWHERE fires on everyday commands that merely contain one —
+#    `docker build --rm -f Dockerfile .` and `git rm -r --cached .` both tripped it during this
+#    fix, and a guard that nags on normal work gets disabled, which costs more than it saves.
+rm_flag='([[:space:]]-[a-zA-Z]*[rf][a-zA-Z]*([[:space:]]|$)|[[:space:]]--(recursive|force)([[:space:]]|$))'
+rm_target='(^|[[:space:]])(/|~|\$HOME|\.|\*|\.\[!\.\]\*)[/*]*([[:space:]]|$)'
+while IFS= read -r seg; do
+  seg="$(printf '%s' "$seg" | sed -E 's/^[[:space:]]*//; s/^(sudo|command|time|nohup|xargs)([[:space:]]+-[^[:space:]]+)*[[:space:]]+//')"
+  printf '%s' "$seg" | grep -Eq '^rm([[:space:]]|$)' || continue
+  args="$(printf '%s' "$seg" | sed -E 's/^rm//')"
+  printf '%s' "$args" | grep -Eq "$rm_flag" || continue
+  if printf '%s' "$args" | grep -Eq "$rm_target"; then
+    block "recursive delete of root/home/cwd (or a whole-cwd glob)"
+  fi
+done <<EOF
+$(printf '%s' "$cmd" | tr '|;&' '\n')
+EOF
 
-# 2) Force push (allow the safer --force-with-lease).
-if printf '%s' "$cmd" | grep -Eq 'git[[:space:]]+push' \
-   && printf '%s' "$cmd" | grep -Eq '(--force([[:space:]]|=|$)|[[:space:]]-f([[:space:]]|$))' \
-   && ! printf '%s' "$cmd" | grep -q 'force-with-lease'; then
+# 2) Force push (allow the safer --force-with-lease). A leading '+' on a refspec (git push
+#    origin +main) is git's OWN short form for --force and was slipping past both this rule and
+#    owner-guard's main-branch wall — one blind spot in two independent walls (audit 2026-08-18).
+#    Checked per SEGMENT like rule 1: scanning the whole command read `echo +done` in an
+#    unrelated segment as a force refspec.
+push_force='(--force([[:space:]]|=|$)|[[:space:]]-f([[:space:]]|$)|[[:space:]]\+[A-Za-z0-9_/.:^~-]+([[:space:]]|$))'
+while IFS= read -r seg; do
+  printf '%s' "$seg" | grep -Eq 'git[[:space:]]+push' || continue
+  printf '%s' "$seg" | grep -Eq "$push_force" || continue
+  printf '%s' "$seg" | grep -q 'force-with-lease' && continue
   block "git push --force — use --force-with-lease and get approval (rules.md §6)"
-fi
+done <<EOF
+$(printf '%s' "$cmd" | tr '|;&' '\n')
+EOF
 
 # 3) Staging a real .env — including variants (.env.production/.env.local/...) but not .env.example.
 #    The allowed name is STRIPPED first, so `git add .env .env.example` can't ride along on the

@@ -11,9 +11,16 @@ projects built *with* it (that discipline lives in `rules.md`).
   stays a placeholder or a reusable convention.
 - **Cross-reference consistently.** If you add / rename / remove a part, update every `.md` that mentions
   it (README contents list, `CLAUDE.md`, `docs/*`, `rules.md`) so nothing dangles.
-- **Verify what you touch.** The hooks have a runnable test pattern; the `.pth` CI scan must not
-  false-fail on legitimate `.pth` files (e.g. `distutils-precedence.pth`, `coloredlogs`). Test before PR.
-  When testing hooks, keep trigger strings OFF the command line — a payload containing e.g. a
+- **Verify what you touch — in a COMMITTED test, not a session.** Hook changes go in with a row in
+  `tests/unit/test_keel_hooks.py` (141 cases; `pytest tests/unit/test_keel_hooks.py -q`, also run by
+  CI). This is not ceremony: three security bypasses shipped while commit messages claimed "40-case
+  matrix green", because every one of those matrices was run by hand and thrown away
+  (`reports/2026-08-18-hook-audit.md`). An ad-hoc probe proves a moment; a committed case protects a
+  regression. Add BOTH directions — what must block, and the everyday command that must NOT (the fix
+  for those bypasses first blocked `docker build --rm -f Dockerfile .`, and only the matrix caught it).
+  The `.pth` CI scan must likewise not false-fail on legitimate `.pth` files (e.g.
+  `distutils-precedence.pth`, `coloredlogs`).
+  When testing hooks by hand, keep trigger strings OFF the command line — a payload containing e.g. a
   staging-a-dotenv command trips the session's own `block-dangerous` hook (it string-matches your Bash
   call, quotes included; seen in three real projects). Write payloads to files and pipe them:
   `bash hook.sh < payload.json`.

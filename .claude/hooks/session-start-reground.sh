@@ -7,6 +7,16 @@
 set -u
 DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
+# Extract ONE '## <name>' section body from a memory file. The terminator is "the next '## '
+# heading, whatever it is" — never a named one: TASKS.md section ORDER is not fixed ('## Review'
+# is created on first use and no document says where), so a hard-coded /^## Next/ silently ran to
+# EOF and swallowed every later section. Measured: 12 of the 24 possible orderings mis-parsed,
+# producing up to 3 phantom "no evidence" warnings (audit 2026-08-18,
+# reports/2026-08-18-hook-audit.md). '### <lane>' subheadings are kept — worker lanes live there.
+section() { # $1 = file · $2 = heading alternation, e.g. 'Now' or 'Now|Review'
+  sed -n "/^## \($2\)/,/^## /{/^## /d; p}" "$1" 2>/dev/null
+}
+
 # Claude Code pipes a JSON payload with the trigger "source" on stdin; read it (non-fatal if absent).
 payload="$(cat 2>/dev/null || true)"
 source="$(printf '%s' "$payload" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]*"\([a-zA-Z]*\)".*/\1/p')"
@@ -22,7 +32,7 @@ esac
 # Cap checks (rules.md §9.33): warn when a memory file needs /keel-distill. The numbers below are the
 # SOLO DEFAULTS — a team project tunes them in .claude/keel-caps (PROTECTED: /keel-update never touches
 # it; owner-only via owner-guard; rules.md §10.40), one KEY=NUMBER per line:
-#   HANDOVER=150  LESSONS=250  TASKS=300  RULES=300  HANDOVER_BLOCKS=3
+#   HANDOVER=150  LESSONS=250  TASKS=100  RULES=300  HANDOVER_BLOCKS=3
 # The AI PROPOSES a raise (headcount grew, board starves), the USER approves, the file pins it — never
 # raised silently. Skills (distill/compact) and template headers defer to this same file.
 cap_H=150; cap_L=250; cap_T=100; cap_R=300; cap_B=3
@@ -208,7 +218,7 @@ fi
 # value is the owner's `git config user.name`; a spaced user.name won't match a single-token tag.
 if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ -f "$DIR/TASKS.md" ]; then
   me=$(git -C "$DIR" config user.name 2>/dev/null)
-  owners=$(sed -n '/^## Now/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep '^- \[ \]' \
+  owners=$(section "$DIR/TASKS.md" 'Now' | grep '^- \[ \]' \
            | grep -oE '@[A-Za-z0-9_.-]+' | sed 's/^@//' | sort -u)
   if [ -n "$owners" ] && [ -n "$me" ] && ! printf '%s\n' "$owners" | grep -qixF "$me"; then
     echo "[keel] TASKS.md '## Now' is owned by others ($(printf '@%s ' $owners)) but you are '${me}' — don't do another owner's assigned work; take an unassigned/your-own item or hand back (TASKS ownership tag). If one of those tags IS you under another spelling, your git identity is MIS-WIRED and every ownership mechanism sees a stranger — fix: repo-local git config user.name '<your-@tag>' (identity invariant, docs/steering.md 'Multi-user')."
@@ -218,10 +228,10 @@ if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1 && [ -f "$DIR/T
   if [ -f "$DIR/.claude/project-owner" ] && [ -n "$me" ]; then
     own_r="$(head -n1 "$DIR/.claude/project-owner" 2>/dev/null | tr -d '\r' | sed 's/^ *//;s/ *$//')"
     if [ "$me" = "$own_r" ]; then
-      rq=$(sed -n '/^## Review/,/^## /{/^## Review/d; /^## /d; p}' "$DIR/TASKS.md" 2>/dev/null | grep -c '^- \[')
+      rq=$(section "$DIR/TASKS.md" 'Review' | grep -c '^- \[')
       if [ "${rq:-0}" -gt 0 ]; then
         echo "[keel] ${rq} completed developer item(s) await YOUR review in TASKS.md '## Review' — verify each done-when (run/observe it; verifier agent when in doubt, rules.md §4.11) AND, where the work carries verification claims, the author's own understanding (§10.41 comprehension probe: can they explain it? no → reject 'comprehension gap'), then accept (delete → your HANDOVER (a) as 'reviewed') or reject (back to ## Now with one reason line)."
-        rv=$(sed -n '/^## Review/,/^## /{/^## Review/d; /^## /d; p}' "$DIR/TASKS.md" 2>/dev/null | grep -c 'owner part:')
+        rv=$(section "$DIR/TASKS.md" 'Review' | grep -c 'owner part:')
         if [ "${rv:-0}" -gt 0 ]; then
           echo "[keel] ${rv} of them already read 'verified — owner part: …' (mechanical review done) — only the named human step remains; doing those first unblocks deliveries fastest."
         fi
@@ -234,7 +244,7 @@ fi
 # evidence-less claim can't be verified (rules.md §10.41; keel-handover Review flow). Deterministic
 # only: presence of the token, not its quality — quality is the owner's probe.
 if [ -f "$DIR/TASKS.md" ]; then
-  noev=$(sed -n '/^## Review/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -E '^- \[' | grep -cv 'evidence:')
+  noev=$(section "$DIR/TASKS.md" 'Review' | grep -E '^- \[' | grep -cv 'evidence:')
   if [ "${noev:-0}" -gt 0 ]; then
     echo "[keel] ${noev} '## Review' item(s) carry NO 'evidence:' link — an unverifiable delivery; add the proof (reports/team/ solution note / test report) to the item line before the owner reviews."
   fi
@@ -244,7 +254,7 @@ fi
 # a dead target hides lessons that still exist (index rot is the default failure of index systems).
 # Placeholder lines with <angle-bracket> blanks don't match the path regex, so templates stay quiet.
 if [ -f "$DIR/LESSONS.md" ]; then
-  lidx=$(sed -n '/^## Index/,/^## /p' "$DIR/LESSONS.md" 2>/dev/null | grep -E '^- ' \
+  lidx=$(section "$DIR/LESSONS.md" 'Index' | grep -E '^- ' \
          | grep -oE '(\.claude|docs|reports)/[A-Za-z0-9_./@-]+\.(md|yaml|yml)' | sort -u)
   lmiss=""
   for p in $lidx; do [ -f "$DIR/$p" ] || lmiss="$lmiss $p"; done
@@ -257,7 +267,7 @@ fi
 # doesn't exist on disk — a chat-only "delivery". Repo paths are space-free by convention, so plain
 # word-splitting over the extracted list is safe.
 if [ -f "$DIR/TASKS.md" ]; then
-  evp=$(sed -n '/^## Review/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -E '^- \[' \
+  evp=$(section "$DIR/TASKS.md" 'Review' | grep -E '^- \[' \
         | grep -oE 'reports/[A-Za-z0-9_./@-]+\.md' | sort -u)
   evmiss=""
   for p in $evp; do [ -f "$DIR/$p" ] || evmiss="$evmiss $p"; done
@@ -283,12 +293,13 @@ if [ -f "$DIR/TASKS.md" ]; then
   fi
 fi
 
-# Due-date nudge: open '## Now' (and an in-between '## Review') items may carry `due: YYYY-MM-DD`
-# (sprint targets, multi-user assignments — docs/steering.md "Multi-user"). Surface past dates at
+# Due-date nudge: open '## Now' and '## Review' items may carry `due: YYYY-MM-DD` (both are named
+# explicitly — the old range assumed Review sat BETWEEN Now and Next; sprint targets and
+# multi-user assignments, docs/steering.md "Multi-user"). Surface past dates at
 # session start; the fix is finishing, re-scoping, or re-dating WITH the owner — never silent rot.
 if [ -f "$DIR/TASKS.md" ]; then
   today=$(date +%F)
-  overdue=$(sed -n '/^## Now/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null | grep -E '^- \[.\]' \
+  overdue=$(section "$DIR/TASKS.md" 'Now|Review' | grep -E '^- \[.\]' \
             | grep -oE 'due: ?[0-9]{4}-[0-9]{2}-[0-9]{2}' | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' \
             | awk -v t="$today" '$0 < t' | sort -u)
   if [ -n "$overdue" ]; then

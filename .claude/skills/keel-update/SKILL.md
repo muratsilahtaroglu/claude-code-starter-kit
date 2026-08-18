@@ -25,7 +25,9 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
 - **PROTECTED — never touched (project-owned):** `HANDOVER.md` · `LESSONS.md` · `TASKS.md` · `PLAN.md` ·
   `docs/handover-archive.md` · `docs/architecture.md` · `docs/adr/*` (except the kit-owned `0000`
   template and the folder `README.md` — those are TOOLING) · `CLAUDE.md` · `README.md` · `LICENSE` ·
-  `config/` · `requirements/*.{txt,lock}` contents · `.env.example` values · `src/` · `tests/` ·
+  `config/` · `requirements/*.{txt,lock}` contents · `.env.example` values · `src/` · `tests/`
+  (except the kit-owned `tests/unit/test_keel_*.py` matrix — that is TOOLING, same carve-out as
+  the ADR `0000` template; never put project tests in a `test_keel_*.py` file) ·
   `scratch/` · `research/` findings · `reports/` · `.claude/last-audit` · `.claude/project-owner` ·
   `.claude/keel-caps` (project state: audit clock + governance owner + tuned caps) ·
   `.claude/agents/team-*.md` (project agent-team charters, owner-authored — the kit ships none;
@@ -37,7 +39,7 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   `docs/layouts.md` · `docs/user_manual.md`.
 - **TOOLING — template-owned; summarize changes, one approval for the batch:** `.claude/skills/**` ·
   `.claude/hooks/**` · `.claude/agents/{researcher,verifier,auditor,README}.md` · `.claude/rules/README.md`
-  (+ example) · `docs/security.md` · `docs/steering.md` ·
+  (+ example) · `tests/unit/test_keel_*.py` · `docs/security.md` · `docs/steering.md` ·
   `docs/adr/0000-adr-template.md` · `docs/adr/README.md` · `docs/assets/` · `CONTRIBUTING.md`
   (kit-meta by its own first line) · folder `README.md`s.
 
