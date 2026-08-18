@@ -1,6 +1,6 @@
 ---
 name: keel-tidy
-description: Layout-hygiene ritual — sweep stray/obsolete files (loose root scripts, dead code, logs, stale scratch), attach EVIDENCE to each (git age, references, test collection), then triage with approval — module-ize · delete (git is the archive; deletes are a separately-confirmed list, never inside a blanket yes) · scratch/archive/ · gitignore the class. Never touches memory files or the reports/ evidence trail.
+description: Layout-hygiene ritual — sweep stray/obsolete files (loose root scripts, dead code, logs, stale scratch), attach EVIDENCE to each (references incl. reports/ citations, test collection; age never decides alone), then triage with approval — module-ize · delete (git is the archive; deletes are a separately-confirmed list, never inside a blanket yes) · scratch/archive/ · gitignore the class. Never touches memory files or the reports/ evidence trail.
 ---
 
 # /keel-tidy — the §3.10 sweep: no file left unanswered
@@ -18,8 +18,13 @@ derail both.
   holds scaffold only; application code lives under `src/`.
 - **Runtime junk anywhere:** `*.log` · `*.tmp` · `__pycache__/` · `.pytest_cache/` · editor swap
   files · stray outputs sitting outside `reports/`.
-- **`scratch/` items** untouched for weeks (`git log -1 --format=%cs -- <f>`) or missing their 1-line
-  purpose comment.
+- **`scratch/` items NOTHING CITES.** The criterion is citation, NOT age: a probe named by a
+  `reports/` note, ADR or doc is that claim's permanent EVIDENCE (§10.40) and stays put however old it
+  is (field case: a probe untouched for 18 days was the independent measurement behind that week's
+  decision). Check BOTH directions — `grep -rl "scratch/<name>" reports/ docs/ *.md` for path
+  citations, then `grep -rl "<name>" reports/` for the report whose FILENAME carries the id; a
+  path-only check reported a live folder as dead on a real project. Also flag any scratch file
+  missing its 1-line purpose comment (§3.10) — that one IS a per-file check.
 - **Source files nothing references:** not imported (grep the module name across `src/` + `tests/`),
   absent from Makefile/CI, not collected by the test runner, no `docs/architecture.md` row.
 
@@ -28,9 +33,14 @@ derail both.
 `tests/fixtures/` golden sets (§10.39) · paths already git-ignored.
 
 ## 2. Evidence per candidate — never vibes
-One line each: last git touch · referenced-by (imports / Makefile / CI / docs) · test-collected? ·
-tracked or untracked. A test that LOOKS dead may be a regression fixture guarding a fixed bug —
-check `tests/fixtures/` and the tests-folder README why-lines before calling anything obsolete.
+One line each: referenced-by (imports / Makefile / CI / docs / **`reports/` citations**) ·
+test-collected? · tracked or untracked · last git touch — recorded LAST and never decisive on its own.
+A test that LOOKS dead may be a regression fixture guarding a fixed bug (check `tests/fixtures/` and
+the tests-folder README why-lines), and a scratch probe that looks abandoned may be a permanent
+report's evidence. **Watch the grep itself:** `\b` inside `grep -E` silently matches NOTHING on some
+platforms — a citation sweep using it returned a clean, plausible, entirely wrong "0 references"
+(reports/2026-08-18-scratch-layout-audit.md). A zero-reference result is a reason to re-check the
+instrument before it becomes a delete list (§10.37).
 
 ## 3. Triage table → user approval (nothing moves without it)
 - **Belongs in the tree** → move under `src/`/`tests/` + an `architecture.md` row (§1.6).

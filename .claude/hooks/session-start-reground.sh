@@ -32,10 +32,10 @@ esac
 # Cap checks (rules.md §9.33): warn when a memory file needs /keel-distill. The numbers below are the
 # SOLO DEFAULTS — a team project tunes them in .claude/keel-caps (PROTECTED: /keel-update never touches
 # it; owner-only via owner-guard; rules.md §10.40), one KEY=NUMBER per line:
-#   HANDOVER=150  LESSONS=250  TASKS=100  RULES=300  HANDOVER_BLOCKS=3
+#   HANDOVER=150  LESSONS=250  TASKS=100  RULES=400  HANDOVER_BLOCKS=3
 # The AI PROPOSES a raise (headcount grew, board starves), the USER approves, the file pins it — never
 # raised silently. Skills (distill/compact) and template headers defer to this same file.
-cap_H=150; cap_L=250; cap_T=100; cap_R=300; cap_B=3
+cap_H=150; cap_L=250; cap_T=100; cap_R=400; cap_B=3
 if [ -f "$DIR/.claude/keel-caps" ]; then
   while IFS='=' read -r k v; do
     k="$(printf '%s' "$k" | tr -d '[:space:]\r')"; v="$(printf '%s' "$v" | tr -cd '0-9')"

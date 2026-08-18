@@ -94,7 +94,8 @@ For each block being rotated, triage by criticality — **content-aware, not age
   authority; they drift in adopted projects because `/keel-update` never touches PROTECTED memory files.
 - Cap check (solo defaults — the project's `.claude/keel-caps` overrides them, rules §10.40):
   `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~250, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
-  `rules.md` ≤ ~300 (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
+  `rules.md` ≤ ~400 — of which the stock template is ~290, so the project's own rules get ~110
+  (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
 
 ## 5. Report → approve → commit
 Summarize: N blocks archived, M lessons added/merged/superseded/promoted, lint findings. On approval,

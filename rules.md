@@ -13,28 +13,20 @@
 
    - **Mode A — New / greenfield project** (empty or near-empty repo): the template files are the starting
      point. Go straight to the tailoring plan (a)–(e) below.
-   - **Mode B — Adopt into an EXISTING project** (brownfield): the project already has code + history; the
-     template is *overlaid, never dumped on top*. **Non-destructive is the hard rule.** Run the `/keel-adopt`
-     skill (`.claude/skills/keel-adopt/`), which before (a)–(e) additionally:
-     - **keeps their `.git`** — never re-init or wipe history (no `rm -rf .git`);
-     - **inventories & classifies** every template path vs. the repo — *missing* (safe to add), *present*
-       (project has its own: `README.md`, `pyproject.toml`, `.gitignore`, `CLAUDE.md`, ...), or
-       *conflicting* — and **adds only the missing; merges present/conflicting from a shown diff with
-       approval; never overwrites** (safe bulk-add: `rsync -av --ignore-existing <keel>/ ./ --exclude .git`);
-     - **back-fills the living docs from the real code** — reverse-engineers `docs/architecture.md` and
-       fills `HANDOVER.md` (a) with what already exists (not blank placeholders);
-     - **adopts security §7 as a migration** — freezes *currently-installed* versions into `==`, generates
-       the lock, `pip-audit`; doesn't break a working build to reach the ideal;
-     - **records the adoption in an ADR** (what was added / merged / deferred and why).
+   - **Mode B — Adopt into an EXISTING project** (brownfield): the project already has code + history;
+     the template is *overlaid, never dumped on top*. **Non-destructive is the hard rule** — their
+     `.git` is KEPT (never re-init, no `rm -rf .git`), only MISSING paths are added, and anything
+     present or conflicting is merged from a shown diff with approval, never overwritten. Run
+     **`/keel-adopt`**, which carries the procedure (inventory & classify · back-fill
+     `docs/architecture.md` + HANDOVER (a) from the REAL code, not placeholders · adopt §7 security as
+     a migration that doesn't break a working build · record the adoption as an ADR) before (a)–(e).
 
    The tailoring plan (both modes) covers:
    - **(a) Prune what's unneeded** — list template parts to remove *with reasons*, then **cascade the
      removal**: grep the removed part's name across every `.md` (README.md, CLAUDE.md, docs/* incl.
-     `docs/user_manual.md`, HANDOVER.md, folder READMEs) and **update or delete every reference** so no dangling
-     mention or architectural confusion remains. *Example:* project won't use GitHub → also remove
-     `.github/` (workflows + PULL_REQUEST_TEMPLATE.md), rewrite §6 for the real host (GitLab →
-     `.gitlab-ci.yml`; no remote → local-commits-only), and fix the README contents list + every
-     `.github`/GitHub mention.
+     `docs/user_manual.md`, HANDOVER.md, folder READMEs) and **update or delete every reference** so no
+     dangling mention or architectural confusion remains — dropping GitHub means `.github/` AND §6 AND
+     every README mention, in the same pass.
    - **(b) Add what's missing** — if the project needs files/folders the template lacks (a specific source
      layout, a service/worker dir, a data pipeline, etc.), propose them and create **only after approval**.
    - **(c) Instantiate a layout profile** from `docs/layouts.md` (ML, service/API, CLI, ...) or a mix.
@@ -90,8 +82,10 @@
     stays intact across sessions. Temporary/experimental/probe code goes **only** into the appropriate
     `scratch/` subfolder, with a **1-line purpose comment** at the top. No file of unclear purpose is left in the main source tree.
     At the end of a session, no file is left unanswered for "what is this file?": it is either moved into
-    a module (+architecture.md), moved to `scratch/archive/`, or deleted. If layout drifts, **tidy up
-    layout first** (`/keel-tidy`).
+    a module (+architecture.md), moved to `scratch/archive/`, or deleted — **unless a permanent artifact
+    CITES it**: a probe named by a `reports/` note, ADR or doc is that claim's EVIDENCE (§10.40), so it
+    stays put and its AGE is no argument (`/keel-tidy` sweeps by citation, never by date). If layout
+    drifts, **tidy up layout first** (`/keel-tidy`).
 
 ## 4. Sub-agent usage
 11. Use sub-agents for parallelizable work; but never accept their output blindly — as the main agent,
@@ -225,13 +219,14 @@
     is cleared — and say which side you checked. (Field: bit four times in one project; a probe's
     exclusive `< end` against a tool's inclusive end manufactured a suspiciously clean ratio, and a
     raw `count()` reference read ~17% high on unmerged row versions — the TOOL was right both times.)
-38. **Rule budget.** This file is capped like the memory files: **~60 rules / ~300 lines**, `.claude/keel-caps`-tunable (the
+38. **Rule budget.** Capped like the memory files: **~400 lines**, `.claude/keel-caps`-tunable (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
-    rule, retire one, or promote the behavior to a hook/permission (enforced beats written). A
-    constitution too long to hold in attention is decoration, not discipline. As a TEMPLATE this file
-    keeps headroom UNDER the cap on purpose — that room belongs to the project's own rules; a project
-    that genuinely outgrows it raises `RULES` in `.claude/keel-caps` (§10.40, owner-approved) instead
-    of thinning the discipline.
+    rule, retire one, or promote the behavior to a hook/permission (enforced beats written); a
+    constitution too long to hold in attention is decoration. The stock TEMPLATE is ~290 of those
+    lines, so **your project's own rules get ~110** — the budget line is drawn there, not at the
+    template. (It was ~300 total until 2026-08-18, which measured out as ~6 lines for the project and
+    forced every real project to raise the cap on day one — the default was wrong, not the projects.)
+    Template text that merely restates a skill is compressed to the invariant + the pointer.
 39. **Fix the class, not the instance.** When a fix targets one failing case (a query, a test, an input),
     find the mechanism-level cause and fix THERE — never hard-wire case-specific instructions into
     runtime prompts or code so one example passes. Verified = a **variant case the fix was not built on**
