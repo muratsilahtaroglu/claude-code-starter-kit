@@ -412,3 +412,22 @@ def test_cap_defaults_match_their_documentation():
         assert documented == actual, (
             f"documented default {key}={documented} != code {var}={actual}"
         )
+
+
+def test_every_unit_test_file_has_a_why_line():
+    """rules §2.8 / tests/unit/README.md: every test file carries a ONE-line reason in its
+    folder README, added with the file — "why did we even write this test?" must have an
+    answer months later. The rule was written and nothing checked it; this is that check.
+    (Scoped to tests/unit — the folder this file lives in.)"""
+    readme = Path(__file__).parent / "README.md"
+    if not readme.exists():
+        pytest.skip("no tests/unit/README.md in this project")
+    documented = readme.read_text()
+    undocumented = [
+        p.name for p in sorted(Path(__file__).parent.glob("test_*.py"))
+        if p.name not in documented
+    ]
+    assert not undocumented, (
+        f"test file(s) with no why-line in tests/unit/README.md: {undocumented} — add one line "
+        f"per file (what it guards + the phase/bug that produced it), rules.md §2.8."
+    )

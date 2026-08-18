@@ -13,7 +13,7 @@ subject: `.claude/hooks/block-dangerous.sh`, `owner-guard.sh`, `session-start-re
 | Rejected outright | 0 (one re-argued — see "dev.txt") |
 | Additional bypasses found in the same classes | **3** |
 | Committed hook tests before this audit | **0** |
-| Committed hook tests after | **141** |
+| Committed hook tests after | **142** |
 
 The root cause is a single sentence: **every hook matrix was run in a session and thrown away.**
 `git log --diff-filter=A -- 'tests/**'` returned only READMEs across 77+ commits, while eleven
@@ -114,13 +114,22 @@ section read (Now · Review · Index · Now|Review). `### <lane>` subheadings ar
 
 ```
 before fixes:  30 failed, 103 passed
-after fixes:   141 passed
+after fixes:   142 passed
 ```
 
 Every bypass row in `tests/unit/test_keel_hooks.py` is marked `AUDIT-2026-08-18` and failed before
 its fix. The suite also asserts the properties that let these ship: every hook file is registered
 in `settings.json`, every hook is executable and parses, no plugin-era registry exists, and the
 documented cap defaults equal the coded ones.
+
+## Postscript — the same failure mode, inside this batch
+
+The first version of this work added `tests/unit/test_keel_hooks.py` without the one-line entry
+`tests/unit/README.md` demands for every test file ("added the moment the file is added", rules
+§2.8). Written rule, nothing checking it, quietly skipped — the identical shape as the hook
+matrices. Both were fixed: the line was added, and `test_every_unit_test_file_has_a_why_line`
+now asserts it for every `tests/unit/test_*.py` (verified by dropping in a throwaway test file
+and watching it fail).
 
 ## What this changes about how the kit works
 

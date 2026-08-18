@@ -12,7 +12,7 @@ projects built *with* it (that discipline lives in `rules.md`).
 - **Cross-reference consistently.** If you add / rename / remove a part, update every `.md` that mentions
   it (README contents list, `CLAUDE.md`, `docs/*`, `rules.md`) so nothing dangles.
 - **Verify what you touch — in a COMMITTED test, not a session.** Hook changes go in with a row in
-  `tests/unit/test_keel_hooks.py` (141 cases; `pytest tests/unit/test_keel_hooks.py -q`, also run by
+  `tests/unit/test_keel_hooks.py` (142 cases; `pytest tests/unit/test_keel_hooks.py -q`, also run by
   CI). This is not ceremony: three security bypasses shipped while commit messages claimed "40-case
   matrix green", because every one of those matrices was run by hand and thrown away
   (`reports/2026-08-18-hook-audit.md`). An ad-hoc probe proves a moment; a committed case protects a
