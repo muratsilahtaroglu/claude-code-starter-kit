@@ -186,6 +186,10 @@
     finished item is marked `[x]` immediately and **deleted at `/keel-handover`** as its one-liner lands in
     the new HANDOVER block (a) — git is the archive; mid-session discoveries get one line in
     `## Discovered` immediately, triaged at session end.
+    **Ids are per-lane and stable** (`co1`,`fro2`): a lane's lowercase prefix is fixed when the
+    lane is born, numbers are allocated by the ORCHESTRATOR only, and an id is NEVER renamed or
+    reused — reports, `scratch/<id>/` and citations carry it (§10.40). Reassignment moves the id
+    WITH the work; per-agent throughput is counted from the author folder, not the prefix.
 33. **Consolidation (`/keel-distill`).** The caps are SOLO DEFAULTS — a team project tunes them in
     `.claude/keel-caps` (§10.40); the SessionStart hook reads that file, skills/headers follow it. Memory
     written but never reviewed degrades: when caps hit (defaults: HANDOVER > 3 blocks/~150 lines, LESSONS > ~250, TASKS >

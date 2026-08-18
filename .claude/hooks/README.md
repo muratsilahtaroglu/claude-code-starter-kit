@@ -27,7 +27,7 @@ tightening one.
 ## Changing a hook
 
 These are the kit's only executable code, and they enforce §5/§6 at the boundary — so they carry the
-kit's only regression suite: **`tests/unit/test_keel_hooks.py`** (142 cases). Run it before and after
+kit's only regression suite: **`tests/unit/test_keel_hooks.py`** (145 cases). Run it before and after
 any edit:
 
 ```bash

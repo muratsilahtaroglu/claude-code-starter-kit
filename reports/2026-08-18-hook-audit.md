@@ -13,7 +13,7 @@ subject: `.claude/hooks/block-dangerous.sh`, `owner-guard.sh`, `session-start-re
 | Rejected outright | 0 (one re-argued — see "dev.txt") |
 | Additional bypasses found in the same classes | **3** |
 | Committed hook tests before this audit | **0** |
-| Committed hook tests after | **142** |
+| Committed hook tests after | **145** |
 
 The root cause is a single sentence: **every hook matrix was run in a session and thrown away.**
 `git log --diff-filter=A -- 'tests/**'` returned only READMEs across 77+ commits, while eleven
@@ -114,7 +114,7 @@ section read (Now · Review · Index · Now|Review). `### <lane>` subheadings ar
 
 ```
 before fixes:  30 failed, 103 passed
-after fixes:   142 passed
+after fixes:   145 passed
 ```
 
 Every bypass row in `tests/unit/test_keel_hooks.py` is marked `AUDIT-2026-08-18` and failed before

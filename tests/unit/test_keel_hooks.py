@@ -431,3 +431,33 @@ def test_every_unit_test_file_has_a_why_line():
         f"test file(s) with no why-line in tests/unit/README.md: {undocumented} — add one line "
         f"per file (what it guards + the phase/bug that produced it), rules.md §2.8."
     )
+
+
+# --------------------------------------------------------------------------
+# Task-id integrity (rules §9.32) — ids name reports, scratch/<id>/ and citations
+# --------------------------------------------------------------------------
+
+DUP = "# TASKS.md\n\n## Now\n- [ ] co3: first — done-when: x\n- [ ] co3: second — done-when: y\n"
+CASE = "# TASKS.md\n\n## Now\n- [ ] co3: lower — done-when: x\n- [ ] CO3: upper — done-when: y\n"
+CLEAN = "# TASKS.md\n\n## Now\n- [ ] co3: a — done-when: x\n- [ ] co19: b — done-when: y\n- [ ] fro2: c — done-when: z\n"
+
+
+def test_duplicate_task_id_is_flagged(owner_project):
+    (owner_project / "TASKS.md").write_text(DUP)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
+    assert "DUPLICATE task id(s): co3" in out, out
+
+
+def test_case_split_task_id_is_flagged(owner_project):
+    (owner_project / "TASKS.md").write_text(CASE)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
+    assert "differ only by CASE" in out, out
+
+
+def test_clean_task_ids_are_silent(owner_project):
+    """co3 next to co19 is NOT a collision — the prefix-of relation is why counting
+    needs grep -w, but it must not trip the detector."""
+    (owner_project / "TASKS.md").write_text(CLEAN)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
+    assert "DUPLICATE task id" not in out, out
+    assert "differ only by CASE" not in out, out

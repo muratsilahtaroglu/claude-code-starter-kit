@@ -22,10 +22,17 @@ human lanes and agent lanes share the same TASKS board, and creation authority i
 1. **How many agents, and their names** — single English tokens preferred (`orchestrator`,
    `mechanic`, `frontend`, `test`, `provider`…); the owner's naming always wins. Exactly ONE agent
    carries the orchestrator role.
-2. **Each worker's domain** — mission (one line), scope paths (globs), anything it must NEVER touch.
-3. **Charter/prompt language** — EN or TR (the project's docs language usually decides). Note the
+2. **A task-id prefix per lane** — derived from the names, confirmed by the owner: `co-agent` → `co`,
+   `frontend` → `fro`, `provider` → `prv`; the orchestrator gets none (it takes no work items). That
+   lane's items then run `co1 · co2 · co3 …`, allocated by the orchestrator alone so two sessions
+   can't mint the same number. 2–4 lowercase letters, unique across BOTH the agent and the human
+   roster, never reused, **never renamed** — the id also names `reports/team/<name>/co3_*`,
+   `<id>_spec.md` and `scratch/co3/`, so renaming dangles permanent artifacts (§9.32, §10.40). One
+   case only: a series split across `r1` and `R28` makes every count wrong (field case).
+3. **Each worker's domain** — mission (one line), scope paths (globs), anything it must NEVER touch.
+4. **Charter/prompt language** — EN or TR (the project's docs language usually decides). Note the
    invariant either way: machine-memory writes (boards, HANDOVER/LESSONS input) are ENGLISH (§9.31).
-4. **Review routing notes** — the default is review-v2 (rules §10.41): the orchestrator routes every
+5. **Review routing notes** — the default is review-v2 (rules §10.41): the orchestrator routes every
    review and delegates the mechanical half to the `verifier` subagent; name any area that instead
    deserves a DEDICATED reviewer agent (rare — each extra agent is a chat window the owner must steer).
 
@@ -42,6 +49,9 @@ line is load-bearing: the reground hook greps it):
     # @<name> — <role title>
     - Mission: <one project-specific paragraph>
     - Scope (paths): <globs> — work ONLY here; out-of-scope needs are handed to the orchestrator, never done.
+    - Task ids: every item of yours is `<prefix><n>` (yours: `<prefix>`) — allocated by the
+      orchestrator, never renamed. Your reports, spec files and `scratch/<id>/` folders take the
+      SAME id, so the evidence for any task is findable from the id alone.
     - Lane: TASKS.md `### <name>` holds your ASSIGNMENTS and is READ-ONLY for you (§10.42
       write-surface split — same-machine sessions have no git merge layer, shared files get ONE writer):
       refresh your mirror from it at session start; NEVER edit TASKS/LESSONS/HANDOVER/the index.

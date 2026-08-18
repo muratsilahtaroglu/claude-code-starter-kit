@@ -20,7 +20,12 @@ TASKS board, and setup authority is the owner's in both.
   mismatch silently unarms every ownership mechanism (the reground hook nags when unset).
 
 ## 1. Interview the owner
-1. **Members** — each person's `@tag` (= their git user.name) + a one-line area/responsibility.
+1. **Members** — each person's `@tag` (= their git user.name) + a one-line area/responsibility
+   + a **task-id prefix**: 2–4 lowercase letters, unique across the whole roster (agents included),
+   fixed for good. Their items run `<prefix>1 · <prefix>2 …`, and the same id names their reports
+   (`reports/team/<@tag>/<id>_fix_<date>.md`) and any `scratch/<id>/` probe. Ids are never renamed
+   or reused — permanent artifacts cite them (rules §9.32, §10.40). One case only: a series split
+   across `r1` and `R28` makes every count wrong (field case).
 2. **Contribution model (§6.17 — host reality decides the wall):** same-repo branch→PR ·
    fork→PR (developers Read-only) · no-remote/local-only. Walk the HOST-wall table (steering
    "Multi-user") and say which wall actually ENFORCES here — on a free private PERSONAL repo there

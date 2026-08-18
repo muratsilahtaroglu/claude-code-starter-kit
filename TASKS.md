@@ -15,6 +15,15 @@
 >   `## Discovered` immediately — then return to your current task. Discovered is an INBOX, not
 >   storage: at `/keel-handover` every line converges OUT (→ `## Next` with a done-when · docs ·
 >   LESSONS · ADR · delete if resolved); the SessionStart hook flags lines older than ~a week.
+> - **Task ids are per-lane and STABLE.** Each lane (agent or person) owns a short lowercase prefix
+>   fixed when the lane is created — `co` for the co-agent, `fro` for frontend, `ke` for @kerem — and
+>   its items run `co1 · co2 · co3 …`, allocated by the ORCHESTRATOR (one writer, so two sessions
+>   can't mint the same number). Never reuse a number, never rename an id: `reports/team/<author>/co3_*`,
+>   `scratch/co3/` and every citation already carry it, and renaming dangles them (§10.40). If work is
+>   reassigned the id travels WITH it — the prefix says who it was OPENED for, the author folder says
+>   who delivered it. One case only (`co3`, never `CO3`), because a mixed-case series makes every count
+>   wrong; count with `grep -w` (`co1` is a prefix of `co19`). Unassigned backlog uses `T<n>` until a
+>   lane takes it.
 > - Optional inline tags: `blocked-by: T3` · `discovered-from: T1` · `due: YYYY-MM-DD` (sprint
 >   target — the SessionStart hook surfaces past-due dates) · `@owner` (see below).
 > - **Ownership (multi-user projects).** An item may carry `@owner` (the owner's `git config user.name`).

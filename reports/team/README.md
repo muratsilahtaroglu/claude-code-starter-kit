@@ -21,6 +21,12 @@
 > - `[x] closed <YYYY-MM-DD> accepted` · `[x] closed <YYYY-MM-DD> rejected` — owner decided; the
 >   line stays forever. "What's finished under @X?" = the `[x]` lines in @X's section.
 >
+> **Counting throughput** ("how many tasks did @X actually finish?"): the `[x] closed … accepted`
+> lines in @X's section — that is the delivery record. The task-id PREFIX (`co3`, `fro7`) says which
+> lane the work was OPENED for, which is usually the same person but is not the record: a reassigned
+> item keeps its original id (renaming would dangle every citation, §10.40). Count with `grep -w` —
+> `co1` is a prefix of `co19`, so a bare grep over-counts.
+>
 > **Who flips what:** the AUTHOR appends the line and advances it to `delivered`; the ORCHESTRATOR
 > (owner's main session / leader agent) flips `verified` and `closed` — one writer per transition.
 > Same-machine AGENT teams (rules §10.42 write-surface split): the ORCHESTRATOR writes ALL

@@ -276,6 +276,25 @@ if [ -f "$DIR/TASKS.md" ]; then
   fi
 fi
 
+# Task-id integrity (rules §9.32): ids are per-lane, stable and unique — they name the item, its
+# reports (reports/team/<author>/<id>_*.md), its scratch/<id>/ probes and every citation, so a
+# DUPLICATE silently merges two work streams' evidence and a CASE split (r1 vs R1) makes every count
+# wrong. Presence-only: this flags collisions, never invents or renames an id (that is the
+# orchestrator's call, and a renamed id dangles permanent artifacts, §10.40).
+if [ -f "$DIR/TASKS.md" ]; then
+  ids=$(grep -E '^- \[.\]' "$DIR/TASKS.md" 2>/dev/null \
+        | sed -nE 's/^- \[.\][[:space:]]*([A-Za-z]{1,6}[0-9]{1,4})([^A-Za-z0-9].*)?$/\1/p')
+  if [ -n "$ids" ]; then
+    dup=$(printf '%s\n' "$ids" | sort | uniq -d | tr '\n' ' ')
+    [ -n "$dup" ] && echo "[keel] TASKS.md has DUPLICATE task id(s): ${dup}— an id names its reports, its scratch/<id>/ probes and every citation, so two items sharing one merges their evidence trail. Give the newer item the next free number in its lane; never renumber the older one (rules §9.32)."
+    casedup=$(printf '%s\n' "$ids" | tr 'A-Z' 'a-z' | sort -u | while read -r low; do
+      n=$(printf '%s\n' "$ids" | grep -icx "$low"); v=$(printf '%s\n' "$ids" | grep -ix "$low" | sort -u | wc -l)
+      [ "${v:-1}" -gt 1 ] && printf '%s ' "$(printf '%s\n' "$ids" | grep -ix "$low" | sort -u | paste -sd/ -)"
+    done)
+    [ -n "$casedup" ] && echo "[keel] TASKS.md task id(s) differ only by CASE: ${casedup}— pick one casing for the whole series; a series split across two cases makes every case-sensitive count and grep wrong (field case: r1 alongside R28)."
+  fi
+fi
+
 # Discovered-inbox age check: '## Discovered*' sections are an INBOX — lines converge OUT at
 # handover/distill (keel-handover step 5, distill §3). Week-old dated lines mean it isn't draining:
 # they belong in ## Next / docs / LESSONS / an ADR — or deleted if resolved. Presence-only, no judgment.
