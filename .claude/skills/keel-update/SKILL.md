@@ -36,7 +36,11 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   `.claude/settings.json` (permissions merge = union, keep the project's) · `.gitignore` ·
   `.pre-commit-config.yaml` · `pyproject.toml` · `Makefile` · `Dockerfile*` · `.dockerignore` ·
   `docker-compose.yml` · `.editorconfig` · `.github/*` (workflows + PR template) ·
-  `docs/layouts.md` · `docs/user_manual.md`.
+  `docs/layouts.md` · `docs/user_manual.md` · **folder READMEs that carry KIT DOCTRINE inside a
+  PROTECTED tree** — `scratch/README.md`, `tests/README.md`, `tests/*/README.md`: the folder's
+  CONTENTS are the project's, but the README states the kit's rule for that folder and projects
+  tailor it, so it is diffed hunk-by-hunk rather than skipped with the tree (without this the
+  scratch-as-evidence rule of v0.8.25 could never reach an adopted project).
 - **TOOLING — template-owned; summarize changes, one approval for the batch:** `.claude/skills/**` ·
   `.claude/hooks/**` · `.claude/agents/{researcher,verifier,auditor,README}.md` · `.claude/rules/README.md`
   (+ example) · `tests/unit/test_keel_*.py` · `docs/security.md` · `docs/steering.md` ·
