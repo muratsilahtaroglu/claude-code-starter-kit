@@ -20,10 +20,11 @@ projects built *with* it (that discipline lives in `rules.md`).
   for those bypasses first blocked `docker build --rm -f Dockerfile .`, and only the matrix caught it).
   The `.pth` CI scan must likewise not false-fail on legitimate `.pth` files (e.g.
   `distutils-precedence.pth`, `coloredlogs`).
-  When testing hooks by hand, keep trigger strings OFF the command line — a payload containing e.g. a
-  staging-a-dotenv command trips the session's own `block-dangerous` hook (it string-matches your Bash
-  call, quotes included; seen in three real projects). Write payloads to files and pipe them:
-  `bash hook.sh < payload.json`.
+  Keep trigger strings OFF the command line — the guard string-matches your whole Bash call, quotes
+  included. This bites in two places: test payloads (write them to a file, `bash hook.sh <
+  payload.json`) and **commit messages that DESCRIBE a blocked pattern** — the v0.8.25 release message
+  contained the force-refspec example it had just closed, and `git commit -m` was refused. Use
+  `git commit -F <file>`. Four real occurrences and counting; it is the guard working, not a bug.
 
 ## How to propose a change
 1. Fork + branch.
