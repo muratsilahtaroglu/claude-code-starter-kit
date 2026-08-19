@@ -63,7 +63,25 @@ For each block being rotated, triage by criticality — **content-aware, not age
   line surviving TWO distills is in the wrong file — after this step the section holds only the
   current week's untriaged finds. Refill `## Now` (max 3–5, per person on teams).
 
-## 4. Lint the memory set (drift check)
+## 4. Sweep closed team reports to done/ (folder hygiene — orchestrator/owner only)
+A long-running author folder drowns its open work: dozens of spec/fix files, no visual way to tell
+finished from in-flight. The valve: a report whose task reached **`closed <date> accepted|rejected`**
+in the index moves to its author's **`reports/team/<@tag>/done/`** — the flat folder then holds only
+live work, and "what is @X still carrying?" becomes a directory listing again.
+
+- **Only `closed` moves.** `wip · delivered · verified` are in flight — on the board, cited from
+  `## Review` (the reground hook checks those paths against disk), never swept.
+- **A move is `git mv` + citation rewrite, one pass.** Before moving, grep the repo for BOTH the full
+  path and the bare filename; rewrite every hit (index line, LESSONS, ADRs, other reports) to the
+  `done/` path in the same commit. A move that breaks one citation is worse than the clutter —
+  this sweep is the ONE sanctioned exception to §10.40's "never moved", and the rewrite is what
+  keeps the exception honest. Evidence subfolders (`<task>_<what>/`) move with their report.
+- **Stays in the index, same section.** The `[x] closed` line keeps its status and history; only its
+  file path gains `done/`. Throughput counting is untouched — done/ is INSIDE the author's folder.
+- Same write authority as every shared-file transition: the ORCHESTRATOR/owner sweeps; workers never
+  move files out of their own delivered set (§10.42).
+
+## 5. Lint the memory set (drift check)
 - **Strip noise:** delete VCS/ritual bookkeeping ("pushed N commits", sha ranges, "ran /keel-distill")
   and conversational meta ("user asked if I saved", "don't rush") from HANDOVER — it's git-log /
   ritual-log-derivable, and it's usually what pushed the file over cap (keep decisions + their WHY).
@@ -92,9 +110,11 @@ For each block being rotated, triage by criticality — **content-aware, not age
   sessions whose trigger hasn't fired; a dead line hides lessons that still exist. (The reground
   hook flags dead targets at session start; the missing-line direction is checked here.) Same mirror check for `reports/team/README.md`: every
   report file has exactly ONE index line (an orphan = unfindable evidence; a duplicate diverges —
-  field case: the same report indexed twice with two different status texts), and statuses use only
+  field case: the same report indexed twice with two different status texts), statuses use only
   the controlled vocabulary (`wip · delivered · verified — owner part: <…> · closed <date>
-  accepted|rejected`, `[x]` only at closed).
+  accepted|rejected`, `[x]` only at closed), and the mirror counts `done/` files too — a `closed`
+  line whose path lacks `done/` is a §4 sweep candidate, a non-closed line pointing INTO `done/`
+  is a bug.
 - Stale claims (files/commands/paths that no longer exist) — fix or mark superseded. Resolve bare
   BASENAMES against the tree before flagging: field measurement found ~54% of citations are
   basename-only and DO resolve — a naive path check reports them as false staleness.
@@ -109,6 +129,6 @@ For each block being rotated, triage by criticality — **content-aware, not age
   `rules.md` ≤ ~400 — of which the stock template is ~290, so the project's own rules get ~110
   (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
 
-## 5. Report → approve → commit
+## 6. Report → approve → commit
 Summarize: N blocks archived, M lessons added/merged/superseded/promoted, lint findings. On approval,
 apply + propose a commit (rules.md §6.15). Never push without user approval.

@@ -257,9 +257,11 @@
     **Markdown only**) — each carrying ONE line in the `reports/team/README.md` index, which IS the
     team's review todolist ("what's finished under @X" = the `[x]` lines in their section; exact
     format, status vocabulary and who-flips-what live in that template — on same-machine agent teams
-    the orchestrator writes every transition, §10.42). Reports are never deleted or
-    moved — they are the permanent artifacts other files cite (§ steering "Team reports");
-    findability lives in the index. Every developer must be able to run the product LOCALLY from
+    the orchestrator writes every transition, §10.42). Reports are never deleted — they are the
+    permanent artifacts other files cite (§ steering "Team reports"); findability lives in the
+    index. ONE sanctioned move: at `/keel-distill`, a `closed` task's files sweep into the author's
+    `done/` subfolder WITH every citation rewritten in the same pass (the flat folder shows only
+    live work); nothing else moves them. Every developer must be able to run the product LOCALLY from
     their own `.env` + Makefile overrides (steering "Dev-local runs") — "runs only on the owner's
     machine" is a bootstrap bug, not a norm.
 41. **Human ownership (AI-assisted ≠ AI-verified).** The assignee OWNS their delivery: the human/manual

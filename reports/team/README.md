@@ -4,8 +4,11 @@
 > and every co-agent — task-prefixed names inside: `<task>_spec.md` (owner-approved spec + its
 > `## Comprehension log`), `<task>_fix_<date>.md` (solution note: problem → root cause → fix + why →
 > changed files → tests), bulky raw evidence as a `<task>_<what>/` subfolder. **Markdown only.**
-> Reports are PERMANENT — never deleted, never moved: Review evidence, LESSONS, ADRs and path-scoped
-> rules cite these paths (rules.md §10.40); findability lives here, in the index.
+> Reports are PERMANENT — never deleted: Review evidence, LESSONS, ADRs and path-scoped rules cite
+> these paths (rules.md §10.40); findability lives here, in the index. ONE sanctioned move exists:
+> when a task reaches `closed`, the `/keel-distill` sweep `git mv`s its files into the author's own
+> **`done/`** subfolder and rewrites every citation in the same pass — so the flat folder shows only
+> live work. Nothing else ever moves a report.
 >
 > **This README is the single index AND the team's review todolist** — one line per report,
 > `file · task · what · status`, grouped by author (sections mirror the folders; the `/keel-distill`
@@ -19,7 +22,9 @@
 > - `[ ] verified — owner part: <one sentence>` — mechanical review done (delegated verifier);
 >   ONLY the named human step remains
 > - `[x] closed <YYYY-MM-DD> accepted` · `[x] closed <YYYY-MM-DD> rejected` — owner decided; the
->   line stays forever. "What's finished under @X?" = the `[x]` lines in @X's section.
+>   line stays forever. "What's finished under @X?" = the `[x]` lines in @X's section. At the next
+>   `/keel-distill` the files behind a closed line move to `<@tag>/done/` (the line keeps its
+>   status; only its path changes).
 >
 > **Counting throughput** ("how many tasks did @X actually finish?"): the `[x] closed … accepted`
 > lines in @X's section — that is the delivery record. The task-id PREFIX (`co3`, `fro7`) says which

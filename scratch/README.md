@@ -17,9 +17,10 @@ Both may coexist. What matters is not the taxonomy — it is the distinction bel
 ## Disposable scratch vs. CITED EVIDENCE
 
 A probe stops being throwaway the moment a permanent artifact names it. `reports/` notes, ADRs and
-`docs/` are permanent by rules §10.40 — *"never deleted or moved; they are the artifacts other files
-cite"* — so a `reports/` note whose measurement says "probe: `scratch/co56/premise_check.py`" has made
-that probe part of a permanent claim. Archiving or deleting it dangles the citation.
+`docs/` are permanent by rules §10.40 — never deleted; the only sanctioned move is the
+`/keel-distill` sweep of a *closed* task's reports into `done/`, citations rewritten — so a
+`reports/` note whose measurement says "probe: `scratch/co56/premise_check.py`" has made that probe
+part of a permanent claim. Archiving or deleting it dangles the citation.
 
 **Rule:** a scratch folder is archived/deleted **only if nothing cites it**:
 

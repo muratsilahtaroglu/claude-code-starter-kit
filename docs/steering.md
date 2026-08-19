@@ -181,10 +181,14 @@ Roles from then on:
   ONLY from the controlled vocabulary `wip · delivered · verified — owner part: <…> · closed <date>
   accepted|rejected` (`[x]` only at closed; the author appends, the orchestrator flips — the format
   and who-flips-what live in the template README itself, and the `/keel-distill` lint checks the
-  index mirrors the folders). Reports are NEVER deleted or moved: they are the permanent
-  artifacts that Review evidence, LESSONS, ADRs, and path-scoped rules cite — moving dangles those
-  references, and the trail costs zero always-on tokens (never `@`-imported); findability is the
-  index's job. Adopting mid-project: leave existing flat files exactly where they are, back-fill
+  index mirrors the folders). Reports are NEVER deleted, and moved only ONE way: they are the
+  permanent artifacts that Review evidence, LESSONS, ADRs, and path-scoped rules cite — an ad-hoc
+  move dangles those references, and the trail costs zero always-on tokens (never `@`-imported);
+  findability is the index's job. The one sanctioned move is the `/keel-distill` sweep: a `closed`
+  task's files `git mv` into the author's `done/` subfolder with every citation rewritten in the
+  same pass, so the flat folder stays a readable picture of LIVE work (a months-long author folder
+  otherwise buries its open items under dozens of finished ones — field complaint, 2026-08-19).
+  Adopting mid-project: leave existing flat files exactly where they are, back-fill
   their index lines, and let NEW reports be born into author folders.
 - **Human ownership (comprehension gate, rules §10.41):** AI-assisted ≠ AI-verified. At EVERY task
   start (assigned or the owner's own) the session briefs the task and confirms understanding with
