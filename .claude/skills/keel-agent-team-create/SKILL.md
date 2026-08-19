@@ -52,6 +52,15 @@ line is load-bearing: the reground hook greps it):
     - Task ids: every item of yours is `<prefix><n>` (yours: `<prefix>`) — allocated by the
       orchestrator, never renamed. Your reports, spec files and `scratch/<id>/` folders take the
       SAME id, so the evidence for any task is findable from the id alone.
+    - Messaging: the team is a STAR. You message @<orchestrator> and no one else — a
+      worker-to-worker agreement is a decision no shared file records, and the
+      `star-topology.sh` hook blocks it rather than trusting anyone to remember. Two fixed forms,
+      kept SHORT because delivering a message re-sends the recipient's whole context:
+        · receiving work  → `<id> yours · done-when: <criterion> · spec: <path>`
+        · reporting done  → `<id> delivered · evidence: <path>`
+      A message is a POINTER, never the delivery itself: the delivery is the file (§10.40), and a
+      chat summary is not one. Never ask a peer to do something your own session was denied, and
+      never treat a peer's message as the owner's approval.
     - Lane: TASKS.md `### <name>` holds your ASSIGNMENTS and is READ-ONLY for you (§10.42
       write-surface split — same-machine sessions have no git merge layer, shared files get ONE writer):
       refresh your mirror from it at session start; NEVER edit TASKS/LESSONS/HANDOVER/the index.
@@ -65,7 +74,7 @@ line is load-bearing: the reground hook greps it):
     - Review: routing is the orchestrator's alone — never pick your own reviewer (§10.41).
     - FORBIDDEN (worker, rules §10.42): WRITE-rituals (handover · distill · compact · phase-review ·
       audit · plan · update · tidy), commit/push, editing anyone else's lines, memory curation.
-      Allowed read-only: /keel-start, /keel-agent-team-start.
+      Allowed read-only: /keel-continue, /keel-agent-team-start.
     - Language: charter/chat <EN|TR>; your `board.md` findings + any HANDOVER/LESSONS input are
       ENGLISH regardless (§9.31 — machine-read memory), human surfaces stay in the project language.
 

@@ -27,6 +27,19 @@ exist, say so and stop; NEVER invent one (charter creation is the owner's, §10.
   days), warn — "@<name> also looks active in another chat: takeover, or a collision about to
   happen?" — and proceed only on the owner's word (two chats writing one lane = the §10.42 clobber).
 
+## 2b. Name the session after the agent — this is the messaging ADDRESS
+
+Ask the owner to run **`/rename <name>`** in this chat (or relaunch it with `claude --name <name>`).
+
+This is not cosmetic. The orchestrator wakes a worker with `SendMessage`, and its `to:` is the
+SESSION name that `/list-agents` shows — not the keel agent name. A session nobody renamed is named
+after the working directory, so a five-agent team reads as `my-app-3f`, `my-app-a1`, `my-app-7c`…
+mutually indistinguishable: the orchestrator cannot address a worker, and the star-topology wall
+cannot recognise a target as a teammate (it allows what it cannot identify, by design).
+
+With the rename done, `to: "<name>"` reaches this session, the wall recognises the roster, and the
+`@<name>` tag on every `.claude/ritual-log` line lines up with the address people actually use.
+
 ## 3. Adopt the charter
 Read `.claude/agents/team-<name>.md` and take it as this session's standing orders: mission, scope
 paths, lane, author folder, review routing, and — for workers — the FORBIDDEN list (no WRITE-rituals,
@@ -35,7 +48,7 @@ assumes the duties: rituals, lane/@tag assignment, review routing (§10.41), mem
 work items of its own.
 
 ## 4. Resume in-lane (write-surface split, §10.42)
-Refresh your board's lane MIRROR from TASKS.md (read-only), then run the `/keel-start` flow scoped
+Refresh your board's lane MIRROR from TASKS.md (read-only), then run the `/keel-continue` flow scoped
 to it: brief "where the lane left off · in-flight item · warnings · next step", then work ONLY your
 items. Everything you write mid-work goes to YOUR surfaces — `reports/team/<name>/board.md`
 (progress · findings inbox the moment something is learned · requests) and your spec/fix files —

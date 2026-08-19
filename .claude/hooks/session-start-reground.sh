@@ -23,10 +23,10 @@ source="$(printf '%s' "$payload" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]*
 
 case "$source" in
   compact|resume|clear)
-    echo "[keel] Context was reset ($source) — re-read HANDOVER.md (TOP block = current state), LESSONS.md, TASKS.md '## Now', and PLAN.md (current focus) to recover state before continuing; resume from a '## Now' item (or run /keel-start: it does this actively and hands back a resume brief)."
+    echo "[keel] Context was reset ($source) — re-read HANDOVER.md (TOP block = current state), LESSONS.md, TASKS.md '## Now', and PLAN.md (current focus) to recover state before continuing; resume from a '## Now' item (or run /keel-continue: it does this actively and ends in one of resume / take the next assigned item / idle)."
     echo "[keel] Post-reset self-check (30s, inline — no sub-agent): does the in-flight work still respect rules.md §3 layout / §5 security / §2 tests? Catch drift at the reset point; /keel-audit is the deep pass when due." ;;
   *)
-    echo "[keel] Keel project — skim HANDOVER.md (top block) · LESSONS.md · TASKS.md '## Now' · PLAN.md (current focus) to get oriented (rules.md §1); /keel-start does this actively (cross-checks memory vs git, briefs 'where you left off')." ;;
+    echo "[keel] Keel project — skim HANDOVER.md (top block) · LESSONS.md · TASKS.md '## Now' · PLAN.md (current focus) to get oriented (rules.md §1); /keel-continue does this actively (cross-checks memory vs git, then resumes, takes the next assigned item, or reports idle)." ;;
 esac
 
 # Cap checks (rules.md §9.33): warn when a memory file needs /keel-distill. The numbers below are the

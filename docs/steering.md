@@ -28,7 +28,7 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
 
 ## How Keel maps onto this
 - **Always-on discipline** (`rules.md`, `HANDOVER.md`, `LESSONS.md`, `TASKS.md`) → `@`-imported by `CLAUDE.md`.
-- **Procedures** → skills: `/keel-start` (active resume after a compact/cold start: cross-check the
+- **Procedures** → skills: `/keel-continue` (decide and continue after a compact/cold start/wake: cross-check the
   auto-loaded memory against PLAN.md + git → a "where you left off · in-flight · warnings · next step"
   brief; read-only, so even co-agents may run it),
   `/keel-agent-team-create` + `/keel-agent-team-start` (same-machine agent team: owner-only
@@ -250,6 +250,90 @@ Enforcement honesty (layered): hooks stop the AI *drafting* foreign governance e
 the accidental collision. The wall for intentional human action is the HOST row above — a plain
 terminal bypasses any hook, and on a free private personal repo that wall DOES NOT EXIST: either move
 to a free org (Read + fork PRs) or accept discipline-only and say so in the project's team doc.
+
+## Agent teams: how a waiting agent gets woken
+
+An agent team spends most of its time with someone blocked on someone else. The question is what a
+session does while it has nothing to do — and the field has a settled answer that is worth adopting
+rather than re-deriving.
+
+### The vocabulary
+
+| Term | Means |
+|---|---|
+| **attended** | a human is present and starts the work (RPA's term; "human-in-the-loop" in agent frameworks) |
+| **unattended** | the agent is triggered by a schedule or an event, with no human at the keyboard |
+| **hybrid** | unattended by default, escalating to a human on anything outside its rules |
+| **idle** | a session with nothing to do — a legitimate state, not a failure |
+| **supervisor pattern** | one lead delegates to specialised workers who report only to the lead |
+
+Keel's agent teams are **hybrid**: workers run unattended between assignments and escalate to the
+orchestrator, which escalates to the owner. Every session stays an ordinary chat the owner can open
+and type into at any moment — the messaging rides on top of that, it does not replace it.
+
+### Event-driven, never polling
+
+The 2026 consensus across multi-agent frameworks is that idle workers should not poll; they should
+be activated by events. Claude Code implements exactly that, and it was **measured here** rather
+than assumed (2026-08-19, `reports/2026-08-19-agent-team-messaging.md`):
+
+- A message sent to an **idle** peer session **wakes it**, within seconds.
+- The wake arrives as the first turn of a fresh context and **fires `SessionStart`** — so the
+  reground hook re-injects the agent identity from `.claude/agent-team-sessions`, and CLAUDE.md's
+  `@`-imports come back from disk. A woken worker rebuilds itself before it does anything.
+
+So there is no sleep loop and no polling interval anywhere in Keel. `/keel-continue` ends in **IDLE**
+and stops; the next assignment wakes the session. Two consequences worth knowing:
+
+- **A closed chat cannot be woken.** `/list-agents` only lists live sessions — keeping the team's
+  chats open is an operating requirement, not a bug.
+- **A wake re-sends the woken session's whole context.** Keep messages short; they are pointers.
+
+### The star, and why it is a hook
+
+Everything goes through the centre: the orchestrator assigns, workers report back to it, no worker
+messages another worker. The reason is not tidiness — the shared memory files have exactly ONE
+writer, so a decision two workers reach between themselves is a decision no shared file records.
+
+`permissions.deny` cannot express this: it takes the bare tool name, so denying `SendMessage` would
+also cut the worker→orchestrator path the design runs on. `.claude/hooks/star-topology.sh` decides
+by TARGET instead — it blocks a worker addressing another roster worker and allows everything else
+(the orchestrator to anyone, anyone to the orchestrator, subagents, `main`, unrelated sessions, and
+any session that has adopted no identity).
+
+### Addressing: the session name IS the address
+
+`SendMessage`'s `to:` is the peer's **session name** from `/list-agents`, not the keel agent name. An
+unnamed session is named after its working directory, so a five-agent team reads as `my-app-3f`,
+`my-app-a1`… mutually indistinguishable. `/keel-agent-team-start` therefore has each chat run
+**`/rename <agent>`**; after that `to: "<agent>"` reaches it, the star wall recognises the roster,
+and the `@<agent>` tag on every ritual-log line matches the address people actually use.
+
+### The message protocol
+
+Two fixed forms, deliberately terse:
+
+```
+<id> yours     · done-when: <criterion> · spec: reports/team/<name>/<id>_spec.md
+<id> delivered · evidence: reports/team/<name>/<id>_fix_<date>.md
+```
+
+**A message is a pointer, never the delivery.** The delivery is the file (rules §10.40); a chat
+summary is not one, and the reground hook flags a `## Review` line whose evidence file is missing.
+Waking a worker does not start its work either: it lands at the §10.41 comprehension gate first.
+
+### Claude Code's own agent teams (optional accelerator)
+
+Claude Code ships an experimental agent-teams feature — a lead spawning teammates, a shared task
+list, a mailbox, idle notifications, and a `TeammateIdle` hook that can keep a teammate working by
+exiting 2. Where it is available it is a fine accelerator, and a keel charter doubles as a teammate
+definition (its body is appended to the teammate's system prompt).
+
+Keel does not depend on it, for two reasons. It is **disabled by default** and unavailable on some
+platforms and providers; and its documented limitation is precisely Keel's thesis — *"`/resume` and
+`/rewind` do not restore in-process teammates"*. Keel's session map plus the reground hook rebuild
+an identity from disk after any compaction or resume, which is the gap. File-based roster is the
+base; the built-in feature is the option.
 
 ## Distribution: clone-only (and the double-fire trap)
 Keel ships as a **clone**, one channel. The plugin/marketplace half was retired in v0.8.23 (it

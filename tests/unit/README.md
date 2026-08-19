@@ -14,3 +14,9 @@ probe isolation · Stop-hook traces · the duplicate detector's signal · /keel-
 silent event kind as an INSTRUMENT gap). Origin: a false "hooks are double-firing" warning that
 ran at every session start for two days, caused by test runs writing into the live telemetry
 (`reports/2026-08-19-observability-audit.md`). KIT-OWNED — `/keel-update` replaces `test_keel_*.py`.
+
+`test_keel_star_topology.py` — the star wall for agent teams (12 cases: worker→worker blocked
+incl. the `[ref]` disambiguator · worker→orchestrator and every off-roster target allowed · solo
+projects untouched · fails open · the block is logged with @attribution). Origin: the message-driven
+team design of 2026-08-19 — a permission rule cannot express "by target", so the topology had to
+become a hook (`reports/2026-08-19-agent-team-messaging.md`). KIT-OWNED.

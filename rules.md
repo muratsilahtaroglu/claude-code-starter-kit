@@ -297,5 +297,11 @@
     refreshed read-only from TASKS · findings inbox on the §9.31 hot path · requests) plus its
     spec/fix files; the orchestrator SYNCS boards into the shared files each work block with
     `@<name>` attribution. Without this, two writers clobber each other SILENTLY (field case:
-    alice_v2 2026-08-12, fresh progress nearly overwritten twice during a cap pass). Deliveries land
-    in `## Review`; §10.41 + the §4.11 verify duty apply unchanged.
+    alice_v2 2026-08-12, fresh progress nearly overwritten twice during a cap pass).
+    **Star, not mesh — and WOKEN, not polling:** the orchestrator assigns, workers report back to IT,
+    and worker→worker messaging is BLOCKED by a hook (a permission rule cannot decide by target; and
+    a decision two workers reach alone is one no shared file records). A message WAKES an idle peer
+    session and fires SessionStart, so identity and memory return from disk — hence no sleep loops
+    anywhere: `/keel-continue` ends in IDLE and stops. Each chat is `/rename`d to its agent, because
+    that name IS the messaging address. A message is a POINTER; the delivery is the file. Deliveries
+    land in `## Review`; §10.41 + the §4.11 verify duty apply unchanged.

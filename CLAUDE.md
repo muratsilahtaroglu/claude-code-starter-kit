@@ -11,8 +11,8 @@
 @TASKS.md
 
 ## Session protocol (rules.md §9)
-- **Start:** run **`/keel-start`** (active resume: cross-checks the loaded memory against PLAN.md + git,
-  briefs "where you left off · in-flight · warnings · next step") — or by hand: read the TOP block of
+- **Start:** run **`/keel-continue`** (cross-checks the loaded memory against PLAN.md + git, then RESUMES half-done
+  work, TAKES the lane's next assigned item via the comprehension gate, or reports IDLE) — or by hand: read the TOP block of
   `HANDOVER.md` + `LESSONS.md` + `TASKS.md ## Now` + recent `git log`; pick ONE `## Now` item;
   verify tests pass before new work.
 - **During:** the moment a rule / must-run test / gotcha / failed approach is agreed or discovered — ask

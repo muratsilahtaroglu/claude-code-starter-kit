@@ -17,6 +17,7 @@ tightening one.
 |---|---|---|
 | `block-dangerous.sh` | `PreToolUse` · Bash | **Blocks** recursive deletes of root/home/cwd (globs included), force pushes (`--force`, `-f`, `+refspec`), staging a real `.env`, and piping remote content into a shell. rules §5, §6 |
 | `owner-guard.sh` | `PreToolUse` · Bash + Edit/Write/NotebookEdit | Armed only when `.claude/project-owner` exists. **Blocks** non-owner writes to governance files (PLAN · rules · CLAUDE · architecture · ADRs · `.claude/**`) and non-owner pushes to main/master. AI-side wall only — the host is the real one. rules §6, §10.40 |
+| `star-topology.sh` | `PreToolUse` · SendMessage | **Blocks** a worker messaging another WORKER on the agent-team roster — everything goes through the orchestrator, because the shared memory files have one writer (rules §10.42). Allows the orchestrator to anyone, anyone to the orchestrator, subagents, `main`, off-roster targets, and unadopted sessions. A permission rule cannot express this: `deny` takes the bare tool name and would cut the delivery path too |
 | `session-start-reground.sh` | `SessionStart` | Speaks at every session start / compact / resume: re-read directive, memory-file cap warnings (`.claude/keel-caps`), rule-budget check, PLAN table↔diagram drift, ownership + due-date + review-queue + evidence-file checks, LESSONS `## Index` dead-target check, decorative-hook detection. rules §9 |
 | `compact-gate.sh` | `PreCompact` · manual | **Blocks** a manual `/compact` when the tree changed but `HANDOVER.md` didn't — the memory-loss event the whole kit exists to prevent. Bypass: `/compact keel-force`. rules §1.4 |
 | `pre-compact-snapshot.sh` | `PreCompact` | Writes a pre-compaction snapshot so state survives even an unclean compaction |
@@ -27,7 +28,8 @@ tightening one.
 ## Changing a hook
 
 These are the kit's only executable code, and they enforce §5/§6 at the boundary — so they carry the
-kit's only regression suite: **`tests/unit/test_keel_hooks.py`** (148 cases) and **`test_keel_telemetry.py`** (13). Run it before and after
+kit's only regression suite: **`tests/unit/test_keel_hooks.py`** (148), **`test_keel_telemetry.py`** (13) and
+**`test_keel_star_topology.py`** (12). Run it before and after
 any edit:
 
 ```bash

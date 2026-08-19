@@ -10,7 +10,7 @@ Which mechanism for what (skill vs. subagent vs. rule vs. hook vs. CLAUDE.md): `
 ## Session rhythm
 | Skill | When |
 |---|---|
-| `keel-start` | Resume after a compact, `--resume`, or cold start — cross-checks the auto-loaded memory against PLAN + git and hands back a "where you left off · in-flight · warnings · next step" brief. Read-only, so any session type may run it |
+| `keel-continue` | Decide what this session does next and do it — RESUME half-done work · TAKE the lane's next assigned item (through the comprehension gate) · or report IDLE. Role-aware; read-only, so any session type may run it |
 | `keel-handover` | Before ending a session: add the dated block (done / tried-failed / latest / next), drain `## Discovered`, move deliveries to `## Review` |
 | `keel-compact` | Before a manual `/compact`: runs the handover procedure, verifies freshness, then hands off to `/compact`. One command instead of several |
 | `keel-distill` | When a memory file hits its cap: rotate HANDOVER blocks to the archive, scope-triage and promote LESSONS entries, drain the inbox, lint for drift |
@@ -38,7 +38,7 @@ Which mechanism for what (skill vs. subagent vs. rule vs. hook vs. CLAUDE.md): `
 |---|---|
 | `keel-team` | Real humans on different machines: declare the owner (arms `owner-guard`), register `@tags`, size the caps, pick the §6 contribution model + host wall |
 | `keel-agent-team-create` | Same machine, several Claude sessions: name the roster (one orchestrator + specialized workers), generate the `.claude/agents/team-<name>.md` charters, seed lanes + author folders |
-| `keel-agent-team-start` | Run once in each new worker chat: adopt the charter and record the session→agent mapping, so the identity is re-injected from disk after every compaction |
+| `keel-agent-team-start` | Run once in each new worker chat: adopt the charter, `/rename` the session to the agent name (that name IS its messaging address), and record the session→agent mapping so the identity is re-injected from disk after every compaction |
 
 Setting up a team is governance — those three are gated to the project owner and land only with
 explicit approval, exactly like a rules change (rules §10.40, §10.42).
