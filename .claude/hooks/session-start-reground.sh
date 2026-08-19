@@ -276,6 +276,26 @@ if [ -f "$DIR/TASKS.md" ]; then
   fi
 fi
 
+# Memory-file HEADER hygiene (rules §9.33): a header states how the file WORKS — it is doctrine,
+# written once and frozen. State in a header (a date, a measurement, a pending decision, a cap NUMBER
+# copied out of .claude/keel-caps) never gets triaged: nobody reads a header as a todo, so it becomes
+# a permanent complaint, and a copied cap drifts from the file that actually sets it. Only the
+# blockquote (^>) doctrine block is examined, so HANDOVER's `_Last updated:` stamp is untouched, and
+# path-like tokens are stripped first so citing reports/2026-08-17-x.md is not a date.
+for hf in TASKS.md LESSONS.md HANDOVER.md PLAN.md; do
+  [ -f "$DIR/$hf" ] || continue
+  hdr=$(sed -n "1,/^## /p" "$DIR/$hf" 2>/dev/null | grep -E '^>' | sed -E 's#[^[:space:]]*/[^[:space:]]*##g')
+  [ -n "$hdr" ] || continue
+  hdate=$(printf '%s\n' "$hdr" | grep -cE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+  hcap=$(printf '%s\n' "$hdr" | grep -ciE 'cap[^0-9]{0,40}[0-9]{2,}')
+  if [ "${hdate:-0}" -gt 0 ] || [ "${hcap:-0}" -gt 0 ]; then
+    why=""
+    [ "${hdate:-0}" -gt 0 ] && why="${why} ${hdate} dated line(s)"
+    [ "${hcap:-0}" -gt 0 ] && why="${why} ${hcap} hard-coded cap number(s)"
+    echo "[keel] ${hf} header carries STATE, not doctrine —${why}. A header says how the file works and is frozen; move a measurement/debt to '## Discovered' (then a '## Next' item with a done-when), a pending decision to the board, and write 'cap: .claude/keel-caps' instead of copying the number (a copy drifts from the file that sets it). Detail belongs in docs/memory-files.md — rules §9.33."
+  fi
+done
+
 # Task-id integrity (rules §9.32): ids are per-lane, stable and unique — they name the item, its
 # reports (reports/team/<author>/<id>_*.md), its scratch/<id>/ probes and every citation, so a
 # DUPLICATE silently merges two work streams' evidence and a CASE split (r1 vs R1) makes every count

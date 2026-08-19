@@ -1,12 +1,15 @@
 # PLAN.md — phase map (TEMPLATE)
 
-> The **strategic** view: phases, gates, and the dependency graph — where the whole journey stands.
-> The **tactical** board is `TASKS.md` (`## Now` feeds from the wip phase's gate); never duplicate its
-> checkboxes here. Updated at **ritual points only**: `/keel-plan` creates/revises the map, `/keel-handover` flips
-> statuses + refreshes *Current focus*, `/keel-phase-review` turns a finished phase's gate green. The
-> SessionStart hook cross-checks table ↔ diagram ↔ TASKS and warns on drift. **Not `@`-imported**
-> (zero always-on context cost) — read it when orienting. **Cap ~150 lines / ~30 nodes** (split
-> per-phase diagrams beyond that).
+> The **strategic** view: phases, gates, dependency graph. `TASKS.md` is the tactical board (`## Now`
+> feeds from the wip phase's gate) — never duplicate its checkboxes here. Updated at **ritual points
+> only**: `/keel-plan` creates/revises, `/keel-handover` flips statuses + refreshes *Current focus*,
+> `/keel-phase-review` greens a finished gate. The SessionStart hook cross-checks table ↔ diagram ↔
+> TASKS. **Not `@`-imported** — zero always-on cost, so the pressure here is staleness, not tokens.
+> Cap: `.claude/keel-caps`. Full guide: **`docs/memory-files.md`**.
+>
+> *Current focus* is ONE line — the phase being pushed and its single blocker. It is a pointer, not a
+> status report: test counts, evidence lists and debts belong in HANDOVER (a) or a report. This header
+> is DOCTRINE; anything dated, measured, or awaiting a decision goes in the BODY.
 
 _Current focus: <p1_2 — one line on what is actively being pushed>_
 

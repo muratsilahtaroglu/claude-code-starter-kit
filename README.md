@@ -115,6 +115,13 @@ The context window is volatile RAM; the repo is durable disk. Every phase writes
 | `docs/handover-archive.md` | raw rotated blocks, verbatim | never `@`-imported → zero context cost, grep on demand |
 | `PLAN.md` | strategic phase map: status table + **colored Mermaid DAG** (renders live on GitHub/VSCode — watch nodes turn red→yellow→green) + post-completion fix log | not `@`-imported; statuses flip at rituals — a Stop hook nudges the moment a `wip` phase's tasks are all done but its status wasn't flipped (+ table↔diagram↔TASKS drift check) |
 
+Each file keeps a **short header** — its own contract plus a pointer — because a header in an
+`@`-imported file is paid in every session, forever: the full guide (tiers, promotion, ids, lanes,
+review states, per-area scaling) lives in [`docs/memory-files.md`](docs/memory-files.md), read at
+bootstrap. A header states how the file WORKS; anything dated, measured, or awaiting a decision is
+state and belongs in the body. Trimming the templates to that rule cut the three always-loaded
+headers from 110 lines to 55.
+
 No vector DB, no external memory service — grep-able markdown beats embeddings at this scale
 (Claude Code itself ships with agentic search and no index). `/keel-distill` is the consolidation ritual:
 rotate, dedup, promote 3×-applied lessons into rules/skills, lint for contradictions.

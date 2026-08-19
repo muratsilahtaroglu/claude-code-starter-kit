@@ -461,3 +461,51 @@ def test_clean_task_ids_are_silent(owner_project):
     _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
     assert "DUPLICATE task id" not in out, out
     assert "differ only by CASE" not in out, out
+
+
+# --------------------------------------------------------------------------
+# Memory-file header hygiene (rules §9.33) — headers are doctrine, not state
+# --------------------------------------------------------------------------
+
+STATEFUL_HEADER = (
+    "# TASKS.md — board\n\n"
+    "> Anti-bloat is the whole design (cap ~500 lines — owner 2026-08-18: 350 to 500,\n"
+    "> said in chat). This line is a changelog living in a live document.\n\n"
+    "## Now\n- [ ] t1: x — done-when: y\n"
+)
+CLEAN_HEADER = (
+    "# LESSONS.md\n\n"
+    "> Field audit: reports/2026-08-17-lessons-scope-audit.md — ~26% were always-relevant.\n"
+    "> Cap: `.claude/keel-caps`. Full guide: docs/memory-files.md.\n\n"
+    "## [rule]\n- 2026-08-01 — something\n"
+)
+STAMPED_HEADER = (
+    "# HANDOVER.md\n\n"
+    "> One dated block per session. Cap: `.claude/keel-caps`.\n\n"
+    "_Last updated: 2026-08-19 — mid-phase._\n\n"
+    "## Session blocks\n### 2026-08-19 — x\n- **(a) Completed:** y\n"
+)
+
+
+def test_stateful_header_is_flagged(owner_project):
+    (owner_project / "TASKS.md").write_text(STATEFUL_HEADER)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
+    assert "TASKS.md header carries STATE" in out, out
+    assert "dated line" in out and "cap number" in out, out
+
+
+def test_dates_inside_a_path_citation_are_not_state(owner_project):
+    """A header may cite a permanent artifact whose FILENAME carries a date; that is a
+    pointer, not a changelog. Path-like tokens are stripped before the date check."""
+    (owner_project / "TASKS.md").write_text("# TASKS.md\n\n## Now\n- [ ] t1: x — done-when: y\n")
+    (owner_project / "LESSONS.md").write_text(CLEAN_HEADER)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
+    assert "header carries STATE" not in out, out
+
+
+def test_handover_freshness_stamp_is_not_flagged(owner_project):
+    """`_Last updated:` sits OUTSIDE the doctrine blockquote and is meant to change."""
+    (owner_project / "TASKS.md").write_text("# TASKS.md\n\n## Now\n- [ ] t1: x — done-when: y\n")
+    (owner_project / "HANDOVER.md").write_text(STAMPED_HEADER)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
+    assert "header carries STATE" not in out, out

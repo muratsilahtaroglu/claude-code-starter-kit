@@ -67,6 +67,18 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - **Strip noise:** delete VCS/ritual bookkeeping ("pushed N commits", sha ranges, "ran /keel-distill")
   and conversational meta ("user asked if I saved", "don't rush") from HANDOVER — it's git-log /
   ritual-log-derivable, and it's usually what pushed the file over cap (keep decisions + their WHY).
+- **Header hygiene (every memory file, not just HANDOVER).** A header is DOCTRINE — how the file
+  works, written once, frozen. Move OUT anything that is state: a date or changelog line, a
+  measurement ("file is 202 lines"), a debt or pending decision (nobody triages a header, so it
+  becomes a permanent complaint — send it to `## Discovered`, then a `## Next` item with a
+  done-when), a cap NUMBER (write "cap: `.claude/keel-caps`" — a copy drifts from the file that sets
+  it, which is why the stale-cap-header lint below exists), a chat quote. Also collapse teaching
+  prose that merely restates `rules.md`: it is paid in every session by an `@`-imported file and the
+  two wordings drift — the detail lives in `docs/memory-files.md`. What EARNS a header line is a
+  timeless, non-obvious invariant (field example: *"this file is `@`-imported IN FULL — a lane
+  heading is a WRITE boundary, not a context boundary"*). Measured on the template itself: the three
+  imported files carried 110 header lines, 55 after this rule. (The SessionStart hook flags dated
+  lines and hard-coded caps in a header.)
 - Contradictions between `rules.md` / `LESSONS.md` / `CLAUDE.md` — flag, ask the user which wins.
 - **Decision/constraint drift (`docs/adr/` + `.claude/rules/`):** an *Accepted* ADR contradicted by a
   newer decision, a measurement, or the code as it now stands → PROPOSE `Superseded (by ...)` — the

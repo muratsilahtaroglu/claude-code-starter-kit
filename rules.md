@@ -199,6 +199,10 @@
     `paths:`-scoped `.claude/rules/` rule, or a `paths:`-scoped SKILL when the cluster must survive
     a mid-task compaction; **promotion DELETES the entry** — its one pointer is a router line in
     LESSONS `## Index`, never a "moved to X" stub), and lint for contradictions.
+    **A memory file's HEADER is doctrine, not state:** it says how the file works, is written once and
+    frozen, and carries no date, measurement, pending decision, cap NUMBER (`.claude/keel-caps` is the
+    authority — a copy drifts) or chat quote; those go in the BODY or the proper board. Detail that
+    merely restates these rules lives in `docs/memory-files.md`, not in a header paid every session.
 34. **Restorable compression.** Distillation never lossy-deletes: every distilled line points back to the
     raw record ("docs/handover-archive.md, block <date>"); the archive is never `@`-imported — grep it on demand.
 35. **No vector DB / RAG for memory (by default).** Grep-able markdown beats embeddings on freshness,
