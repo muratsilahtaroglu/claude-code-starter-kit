@@ -40,6 +40,14 @@ cannot recognise a target as a teammate (it allows what it cannot identify, by d
 With the rename done, `to: "<name>"` reaches this session, the wall recognises the roster, and the
 `@<name>` tag on every `.claude/ritual-log` line lines up with the address people actually use.
 
+**Re-run this after every client restart, even when the identity re-adopted silently.** Field case
+2026-08-19: a VS Code restart left the session id AND `.claude/agent-team-sessions` mapping exactly
+intact — the reground hook re-injected "@frontend" correctly — but `/list-agents` started showing
+this window under its directory-derived name again. The orchestrator read "name unreachable" as
+"session dead" and broadcast a needless re-identify. The mapping (identity) and the display name
+(addressing) are two different layers, and only one of them survives a client restart. `/rename
+<name>` is idempotent and cheap — run it any time addressing might have reset, not only once.
+
 ## 3. Adopt the charter
 Read `.claude/agents/team-<name>.md` and take it as this session's standing orders: mission, scope
 paths, lane, author folder, review routing, and — for workers — the FORBIDDEN list (no WRITE-rituals,

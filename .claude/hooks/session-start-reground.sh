@@ -195,6 +195,17 @@ if ls "$DIR"/.claude/agents/team-*.md >/dev/null 2>&1; then
     ag="$(grep -m1 "^${sid} " "$DIR/.claude/agent-team-sessions" 2>/dev/null | awk '{print $2}')"
   fi
   if [ -n "$ag" ] && [ -f "$DIR/.claude/agents/team-${ag}.md" ]; then
+    # LIVENESS HEARTBEAT (field case 2026-08-19): the mapping's date was write-once ("adopted on"),
+    # so a returning orchestrator had no way to tell a quiet-but-alive lane from a dead one and
+    # over-read "name unreachable" (client-side, resets on e.g. a VS Code restart) as "session
+    # gone". Touching this session's date to TODAY on every resolve turns it into a last-seen
+    # stamp `/keel-continue`'s ASSIGN step can check before declaring a lane free.
+    today="$(date '+%F')"
+    tmp="$DIR/.claude/agent-team-sessions.tmp.$$"
+    awk -v sid="$sid" -v ag="$ag" -v d="$today" \
+      '{ if ($1 == sid) print sid, ag, d; else print }' \
+      "$DIR/.claude/agent-team-sessions" > "$tmp" 2>/dev/null \
+      && mv "$tmp" "$DIR/.claude/agent-team-sessions" 2>/dev/null || rm -f "$tmp" 2>/dev/null
     if grep -q '^Role: orchestrator' "$DIR/.claude/agents/team-${ag}.md" 2>/dev/null; then
       echo "[keel] Agent identity (from disk): this session is @${ag} — the ORCHESTRATOR (charter: .claude/agents/team-${ag}.md). Duties: rituals · lane/@tag assignment · review ROUTING with the mechanical half DELEGATED (rules §10.41) · memory curation (read git diff for fresh worker writes first, §10.42) — and NO work items of your own. Session-id: ${sid}"
       # Sync nudge (§10.42 write-surface split): worker boards updated after TASKS.md last moved =

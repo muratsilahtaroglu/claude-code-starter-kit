@@ -20,3 +20,11 @@ incl. the `[ref]` disambiguator · worker→orchestrator and every off-roster ta
 projects untouched · fails open · the block is logged with @attribution). Origin: the message-driven
 team design of 2026-08-19 — a permission rule cannot express "by target", so the topology had to
 become a hook (`reports/2026-08-19-agent-team-messaging.md`). KIT-OWNED.
+
+`test_keel_agent_identity.py` — agent-team identity resolution in the reground hook (5 cases: the
+resolved session's mapping date touches to TODAY on every SessionStart · other lanes' dates are
+left alone · an unmapped session id never fabricates a row · the Session-id line still prints ·
+solo projects with no team are a silent no-op). Origin: a VS Code restart left the session id and
+mapping intact but reset `/list-agents`' display name, and the orchestrator misread "name
+unreachable" as "session dead" (`docs/steering.md` "Addressing: the session name IS the address").
+KIT-OWNED.

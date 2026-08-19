@@ -314,6 +314,27 @@ unnamed session is named after its working directory, so a five-agent team reads
 **`/rename <agent>`**; after that `to: "<agent>"` reaches it, the star wall recognises the roster,
 and the `@<agent>` tag on every ritual-log line matches the address people actually use.
 
+**Identity and addressing are two different layers, and only one survives a client restart.**
+Field case, 2026-08-19: closing and reopening VS Code left the session id and
+`.claude/agent-team-sessions` mapping completely intact (the reground hook re-injected "@frontend"
+correctly, confirmed by the worker itself) — but `/list-agents` went back to showing the window
+under its directory-derived name. The orchestrator read "the name I know is unreachable" as "the
+session is dead" and broadcast a needless re-identify to three live workers.
+
+**"Name unreachable" is never proof of death — diagnose in this order:**
+1. Check `.claude/agent-team-sessions` for the lane's agent. The date column is a **last-seen
+   heartbeat** (the reground hook touches it to today on every resolve, not just at first adopt).
+2. Recent heartbeat (~2 days) → the session is alive; the DISPLAY NAME reset, the identity did not.
+   Message the last-known name, or ask the owner to confirm the window before broadcasting anything.
+3. Only a stale-or-absent heartbeat is grounds to treat the lane as free.
+
+The same incident surfaced a second, rarer case worth watching for: two live windows resolving to
+the **same** `session_id` (a duplicated client connection, not a duplicated agent). The
+double-claim guard in `/keel-agent-team-start` (§2) catches the agent-level version of this — a
+second session adopting an already-recently-claimed name — but a session-id collision is a client
+bug, not something a hook can distinguish from normal reconnection; if it recurs, treat it as a
+signal to restart the client cleanly rather than to reassign the lane.
+
 ### The message protocol
 
 Two fixed forms, deliberately terse:

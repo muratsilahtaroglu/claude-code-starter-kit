@@ -64,6 +64,15 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    what only a human can do.
 3. **ASSIGN** — a lane is free and `## Next` has work for it: allocate the next id in that lane's
    series (§9.32) and tell the worker.
+   **Before calling a lane "free", check the MAPPING, not `/list-agents` names** (field case
+   2026-08-19): `.claude/agent-team-sessions`' date column is a last-seen heartbeat, touched by the
+   reground hook on every resolve — grep the lane's agent there. A line dated within ~2 days means
+   a session is quietly alive; `/list-agents` failing to show a reachable name for it is an
+   ADDRESSING problem (the client-side display name reset — e.g. a VS Code restart — while the
+   session and its identity mapping stayed intact), not proof the worker died. Message the lane's
+   last-known name first; only treat the lane as truly free once the heartbeat itself has gone
+   stale. Never assign the SAME lane to a second freshly-adopted session while its heartbeat is
+   recent — that is the double-ownership risk the start skill's double-claim guard exists for.
 4. **IDLE** — none of the above. Report the board state in one line and stop; a worker's delivery
    message will wake this session.
 
