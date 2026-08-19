@@ -368,7 +368,15 @@ fi
 # either a stale long-lived session that predates a settings change, or plugin + settings dual
 # registration (docs/steering.md). Detect only; NEVER auto-dedup the log (that masks the cause).
 if [ -f "$DIR/.claude/ritual-log" ]; then
-  dup=$(tail -40 "$DIR/.claude/ritual-log" 2>/dev/null | awk '$0==p&&$0!=""{n++} {p=$0} END{print n+0}')
+  # Only EVENT lines can prove double-firing: one session start, one compact boundary, one skill
+  # call must appear once. A repeated BLOCK line is normal behaviour — the same guard legitimately
+  # stops two commands of the same class in a row — and counting those made this detector cry
+  # "uninstall your plugin" for two days over a plugin that was not installed; 10 of its 11 hits
+  # were a test matrix writing into the live log (both halves fixed 2026-08-19). Timestamps differ
+  # between lines, so an identical line means the SAME event was recorded twice.
+  dup=$(tail -40 "$DIR/.claude/ritual-log" 2>/dev/null \
+        | grep -E ' (session-start|compact|skill|command) ' \
+        | awk '$0==p&&$0!=""{n++} {p=$0} END{print n+0}')
   if [ "${dup:-0}" -gt 2 ]; then
     echo "[keel] ritual-log has ${dup} back-to-back duplicate lines — hooks are double-firing (stale long-lived session, or a PLUGIN registering the same hooks on top of this clone's settings.json). Refresh the session; if it persists, disable/uninstall that plugin — a clone needs none (docs/steering.md 'Distribution')."
   fi

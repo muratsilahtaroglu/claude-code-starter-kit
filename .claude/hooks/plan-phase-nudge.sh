@@ -22,10 +22,20 @@ wip=$(awk -F'|' '$2 ~ /^ *[a-z][a-z0-9_]* *$/ && $4 ~ /^ *wip *$/ {gsub(/ /,"",$
 # Fire only when the current batch is FINISHED: zero open `[ ]` items AND at least one checked
 # `[x]` item (evidence work just completed — not merely an empty section between refills).
 [ -f "$DIR/TASKS.md" ] || exit 0
-now=$(sed -n '/^## Now/,/^## Next/p' "$DIR/TASKS.md" 2>/dev/null)
+# Stop at the NEXT '## ' heading, whatever it is — never a named one. TASKS.md section ORDER is
+# user-arranged ('## Review' is created on first use), so a hard-coded /^## Next/ runs to EOF and
+# counts other sections' checkboxes as this phase's (the class fixed in reground, 2026-08-18).
+now=$(sed -n '/^## Now/,/^## /{/^## /d; p}' "$DIR/TASKS.md" 2>/dev/null)
 nowopen=$(printf '%s\n' "$now" | grep -c '^- \[ \]')
 nowdone=$(printf '%s\n' "$now" | grep -cE '^- \[[xX]\]')
 if [ "${nowopen:-0}" -eq 0 ] && [ "${nowdone:-0}" -ge 1 ]; then
+
+  # Telemetry (rules §9 observability): record that the nudge actually FIRED. Without this line a
+  # Stop hook is invisible — "did the handover reminder ever appear?" cannot be answered from the
+  # ritual-log, which is the only durable record of what the enforcement layer did. Guarded on
+  # CLAUDE_PROJECT_DIR so an ad-hoc probe never writes into the live log.
+  [ -n "${CLAUDE_PROJECT_DIR:-}" ] && \
+    echo "$(date '+%F %T') nudge phase-review" >> "${CLAUDE_PROJECT_DIR}/.claude/ritual-log" 2>/dev/null || true
   printf '{"systemMessage":"[keel] Phase %s is still wip but every TASKS.md ## Now item is checked off — if the gate is met, run /keel-phase-review to flip it to done in PLAN.md (rules.md §2.7); otherwise refill ## Now from the gate."}\n' "$wip"
 fi
 exit 0

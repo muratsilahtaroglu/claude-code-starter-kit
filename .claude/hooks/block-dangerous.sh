@@ -12,7 +12,11 @@ cmd="$(python3 -c 'import sys, json; print(json.load(sys.stdin).get("tool_input"
 
 block() {
   # telemetry (best-effort): BLOCK events land in the ritual-log too
-  echo "$(date '+%F %T') block-dangerous BLOCK: $1" >> "${CLAUDE_PROJECT_DIR:-.}/.claude/ritual-log" 2>/dev/null || true
+  # Telemetry only from a REAL invocation: Claude Code exports CLAUDE_PROJECT_DIR to every hook,
+  # an ad-hoc probe does not. Defaulting to "." let probe runs pollute the live log (2026-08-19).
+  # The BLOCK itself never depends on this — the guard is below, unconditional.
+  [ -n "${CLAUDE_PROJECT_DIR:-}" ] && \
+    echo "$(date '+%F %T') block-dangerous BLOCK: $1" >> "${CLAUDE_PROJECT_DIR}/.claude/ritual-log" 2>/dev/null || true
   echo "BLOCKED by .claude/hooks/block-dangerous.sh: $1" >&2; exit 2
 }
 

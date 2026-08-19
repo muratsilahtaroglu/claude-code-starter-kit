@@ -22,12 +22,12 @@ tightening one.
 | `pre-compact-snapshot.sh` | `PreCompact` | Writes a pre-compaction snapshot so state survives even an unclean compaction |
 | `handover-reminder.sh` | `Stop` | Nudges when the session is ending with an out-of-date handover |
 | `plan-phase-nudge.sh` | `Stop` | Nudges when a `wip` phase's `## Now` items are all checked but its PLAN gate was never flipped. rules §2.7 |
-| `ritual-log.sh` | `PreToolUse`(Skill) · `UserPromptExpansion` · `SessionStart` · `PreCompact` | Telemetry: every skill call, user-typed command (built-ins included), session start and compact boundary → `.claude/ritual-log` (git-ignored, self-trimming). Rendered by `/keel-stats` |
+| `ritual-log.sh` | `PreToolUse`(Skill) · `UserPromptExpansion` · `SessionStart` · `PreCompact` | Telemetry: every skill call, user-typed command (built-ins included), session start and compact boundary → `.claude/ritual-log` (git-ignored, self-trimming), each line tagged with the writing session's `@agent`. Rendered by `/keel-stats` |
 
 ## Changing a hook
 
 These are the kit's only executable code, and they enforce §5/§6 at the boundary — so they carry the
-kit's only regression suite: **`tests/unit/test_keel_hooks.py`** (145 cases). Run it before and after
+kit's only regression suite: **`tests/unit/test_keel_hooks.py`** (148 cases) and **`test_keel_telemetry.py`** (13). Run it before and after
 any edit:
 
 ```bash
@@ -39,6 +39,15 @@ session and thrown away — the commit messages claimed "40-case matrix green" w
 `git log --diff-filter=A -- tests/` was empty (`reports/2026-08-18-hook-audit.md`). Add a row to the
 matrix in the same commit as the behaviour change; an ad-hoc probe proves a moment, a committed case
 protects a regression.
+
+**Two telemetry contracts** (both learned on 2026-08-19,
+`reports/2026-08-19-observability-audit.md`):
+- **A hook writes to `.claude/ritual-log` only when `CLAUDE_PROJECT_DIR` is set.** Claude Code exports
+  it to every real invocation; a hand-piped probe does not. Without this guard, test runs land in the
+  live log — which made the duplicate detector cry "uninstall your plugin" for two days on a machine
+  with no plugin. The *guard* never depends on it: losing the log must not lose the wall.
+- **Only event lines prove double-firing.** A repeated BLOCK line is normal — one guard legitimately
+  stops two commands of the same class in a row. The detector counts `session-start|compact|skill|command`.
 
 **Testing by hand:** pipe a payload *file*, never a command line — writing `rm -rf /` or a dotenv
 path into Bash trips this session's own guard (three real occurrences, see `CONTRIBUTING.md`).

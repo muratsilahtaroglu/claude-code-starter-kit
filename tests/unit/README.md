@@ -8,3 +8,9 @@ owner-guard · reground TASKS parsing + repo invariants). Origin: three security
 while eleven commit messages claimed a verified matrix — every one had been run in a session and
 thrown away (`reports/2026-08-18-hook-audit.md`). KIT-OWNED: `/keel-update` replaces
 `test_keel_*.py`, so never put your project's tests in that name.
+
+`test_keel_telemetry.py` — the kit's observability layer (13 cases: ritual-log agent tagging ·
+probe isolation · Stop-hook traces · the duplicate detector's signal · /keel-stats reporting a
+silent event kind as an INSTRUMENT gap). Origin: a false "hooks are double-firing" warning that
+ran at every session start for two days, caused by test runs writing into the live telemetry
+(`reports/2026-08-19-observability-audit.md`). KIT-OWNED — `/keel-update` replaces `test_keel_*.py`.

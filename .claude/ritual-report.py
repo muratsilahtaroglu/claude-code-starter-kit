@@ -15,11 +15,24 @@ LOG = os.path.join(ROOT, ".claude", "ritual-log")
 OUT = os.path.join(ROOT, "reports", "ritual-stats.md")
 MAX_DIAGRAM_INTERVALS = 12  # keep the diagram readable; the table shows more
 
-LINE_RE = re.compile(r"^(\d{4}-\d\d-\d\d) (\d\d:\d\d):\d\d (.+)$")
+# Lines are "<date> <time> [@agent ]<event text>" — the @agent tag is present only on sessions
+# that adopted an agent-team identity, so it is optional and captured separately.
+LINE_RE = re.compile(r"^(\d{4}-\d\d-\d\d) (\d\d:\d\d):\d\d (?:@(\S+) )?(.+)$")
+
+# What each event kind PROVES fired. A kind with zero records is reported as an instrument gap,
+# never silently as "nothing happened": reading an empty table as "no rituals ran" is the mistake
+# this file exists to prevent (rules §10.37 — a surprising measurement indicts the instrument).
+EVENT_KINDS = {
+    "session-start": "SessionStart",
+    "compact": "PreCompact",
+    "skill": "PreToolUse(Skill)",
+    "command": "UserPromptExpansion",
+    "nudge": "Stop (handover-reminder · plan-phase-nudge)",
+}
 
 
 def parse(path):
-    """Yield (date, hh:mm, event-text) tuples; silently skip malformed lines."""
+    """Yield (date, hh:mm, agent-or-None, event-text) tuples; skip malformed lines."""
     if not os.path.isfile(path):
         return []
     out = []
@@ -35,18 +48,23 @@ def build_intervals(entries):
     """Split the log at boundaries (session-start / compact). Each interval carries its
     boundary label + a Counter of the events that happened until the next boundary."""
     intervals = []
-    cur = {"kind": "start", "label": "(log start)", "date": "", "time": "", "events": Counter()}
-    for date, hhmm, text in entries:
+    cur = {"kind": "start", "label": "(log start)", "date": "", "time": "",
+           "agent": None, "events": Counter()}
+    for date, hhmm, agent, text in entries:
         if text.startswith("session-start"):
             intervals.append(cur)
-            cur = {"kind": "session", "label": text, "date": date, "time": hhmm, "events": Counter()}
+            cur = {"kind": "session", "label": text, "date": date, "time": hhmm,
+                   "agent": agent, "events": Counter()}
         elif text.startswith("compact"):
             intervals.append(cur)
             trig = text.split()[1] if len(text.split()) > 1 else "?"
-            cur = {"kind": f"compact-{trig}", "label": text, "date": date, "time": hhmm, "events": Counter()}
+            cur = {"kind": f"compact-{trig}", "label": text, "date": date, "time": hhmm,
+                   "agent": agent, "events": Counter()}
         else:
             # normalize: "skill keel-x" / "command code-review" / "<hook> BLOCK: reason"
             key = "BLOCK " + text.split(" BLOCK")[0] if " BLOCK" in text else text
+            if agent:
+                key = f"@{agent} {key}"
             cur["events"][key] += 1
     intervals.append(cur)
     # drop empty leading pseudo-interval
@@ -101,12 +119,26 @@ def main():
         for iv in ivs:
             totals.update(iv["events"])
         tot = " · ".join(f"{k} ×{v}" for k, v in totals.most_common(10)) or "—"
+        seen = {t.split()[0] for _, _, _, t in entries}
+        silent = [f"`{k}` ({EVENT_KINDS[k]})" for k in EVENT_KINDS if k not in seen]
+        agents = sorted({a for _, _, a, _ in entries if a})
+        cover = ""
+        if silent:
+            cover += ("\n> ⚠ **No record of: " + " · ".join(silent) + ".** That is a statement about the\n"
+                      "> INSTRUMENT, not about the project: either the event never fired here, or nothing\n"
+                      "> triggered it. Do not read it as \"these rituals never ran\" — check `/hooks` for the\n"
+                      "> registration first.\n")
+        if agents:
+            cover += "\n> Agents writing to this log: " + " · ".join("@" + a for a in agents) + ".\n"
+        elif os.path.isfile(os.path.join(ROOT, ".claude", "agent-team-sessions")):
+            cover += ("\n> ⚠ An agent-team roster exists but NO line carries an @agent tag — sessions are\n"
+                      "> writing unattributed, so \"which agent did this?\" cannot be answered.\n")
         body = (
             f"# Ritual stats — {stamp}\n\n"
             f"> Generated from `.claude/ritual-log` ({len(entries)} lines, machine-local) by\n"
             f"> `.claude/ritual-report.py` — re-run via `/keel-stats`. Boxes are the intervals between\n"
             f"> session starts (green) and compacts (amber=manual, red=auto); PLAN.md's palette.\n\n"
-            f"**Totals:** {tot}\n\n"
+            f"**Totals:** {tot}\n{cover}\n"
             f"## Timeline (last {MAX_DIAGRAM_INTERVALS} intervals)\n\n{mermaid(ivs)}\n\n"
             f"## All intervals\n\n{table(ivs)}\n"
         )

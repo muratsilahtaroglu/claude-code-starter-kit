@@ -6,10 +6,32 @@
 # compact-gate) also append their BLOCK events here. Self-trims to the last 1000 lines once per
 # session. Always exits 0 — telemetry must never break work (every write is best-effort).
 # One script, three registrations: PreToolUse(matcher Skill) + PreCompact + SessionStart.
+#
+# TWO CONTRACTS THIS FILE KEEPS (both learned the hard way, 2026-08-19):
+#  1. Telemetry is written ONLY when CLAUDE_PROJECT_DIR is set. Claude Code exports it to every
+#     hook, so a real invocation always has it; an ad-hoc probe piping a payload by hand does not.
+#     Defaulting to $(pwd) let test runs write into the LIVE log — the duplicate-line detector then
+#     cried "hooks are double-firing, uninstall your plugin" for two days over a plugin that was
+#     not installed. Measurement must never contaminate the thing it measures.
+#  2. Every line carries the writing session's @agent when one is adopted, resolved from
+#     .claude/agent-team-sessions (session_id -> agent, the same map the reground hook reads).
+#     Without it an agent team's sessions all write to one log with no attribution: "which agent
+#     compacted?" and "whose skill call was that?" become unanswerable exactly when a team makes
+#     them matter. Absent map or unadopted session -> no tag, never a failure.
 set -u
-DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+DIR="${CLAUDE_PROJECT_DIR:-}"
+[ -n "$DIR" ] || exit 0
 LOG="$DIR/.claude/ritual-log"
 payload="$(cat 2>/dev/null || true)"
+
+agent_tag() { # -> "@name " when this session adopted an agent identity, else ""
+  sid="$(printf '%s' "$payload" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  [ -n "$sid" ] || return 0
+  [ -f "$DIR/.claude/agent-team-sessions" ] || return 0
+  ag="$(grep -m1 "^${sid} " "$DIR/.claude/agent-team-sessions" 2>/dev/null | awk '{print $2}')"
+  [ -n "$ag" ] && printf '@%s ' "$ag"
+  return 0
+}
 get() { printf '%s' "$payload" | python3 -c "import sys,json;d=json.load(sys.stdin);print($1)" 2>/dev/null || true; }
 
 ev="$(get "d.get('hook_event_name','')")"
@@ -27,5 +49,5 @@ case "$ev" in
 esac
 
 mkdir -p "$DIR/.claude" 2>/dev/null || exit 0
-printf '%s %s\n' "$(date '+%F %T')" "$line" >> "$LOG" 2>/dev/null || true
+printf '%s %s%s\n' "$(date '+%F %T')" "$(agent_tag)" "$line" >> "$LOG" 2>/dev/null || true
 exit 0
