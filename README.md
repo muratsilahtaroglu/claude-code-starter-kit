@@ -74,7 +74,7 @@ mechanism that closes it:
 | **Plan-free drift.** Phases skipped, five things in flight, "done" claimed without proof. | **Gated phase map + single-task flow.** `PLAN.md` DAG with verifiable gates; work only from `TASKS ## Now` (max 3–5); `done` flips only via `/keel-phase-review` — a Stop hook catches skipped flips. |
 | **Person-dependent knowledge.** The project lives in one head / one machine; a departure resets it. | **Memory in the repo.** It travels through git; a new person or session loads the same five files and is oriented in minutes — even with **no AI access at all** (see the human-handover section). |
 | **No trail.** "Why did we build it this way?" has no answer; there is nothing to audit. | **Audit-ready trail.** Every decision an ADR, every session a HANDOVER block, every phase in `PLAN.md` + its fix log. |
-| **Unmeasurable discipline.** Rules exist on paper; nobody knows whether they actually run. | **Enforce + measure.** Telemetry logs every skill/command/compact/BLOCK; `/keel-stats` renders it visually; `/keel-audit` samples commit ranges against the rules. |
+| **Unmeasurable discipline.** Rules exist on paper; nobody knows whether they actually run. | **Enforce + measure.** Telemetry logs every skill call, typed command (built-ins included), compact boundary, Stop-hook nudge and hook BLOCK; `/keel-stats` renders it visually; `/keel-audit` samples commit ranges against the rules. |
 | **One-size-fits-all templates.** Starter kits dump their full structure onto every project. | **Prune-to-fit bootstrap.** The first session tailors the kit to THIS project (remove · add · layout) with approval; `/keel-adopt` overlays existing projects non-destructively. |
 
 </details>
@@ -87,7 +87,9 @@ is true:
   machine-local and never shared);
 - **open source / CI** — enforced permissions + hooks, supply-chain checks, PR discipline;
 - **a months-long project with tens of compactions** — block-rotated memory, an always-loaded lessons
-  database, a cross-session task board.
+  database, a cross-session task board;
+- **several Claude sessions working one repo** — a star-topology crew with durable identities and one
+  auditable board (see [Teams](#teams-several-claude-sessions-as-one-crew)).
 
 And even then, you don't take all of it: the bootstrap prunes whatever *this* project doesn't need.
 
@@ -113,7 +115,7 @@ The context window is volatile RAM; the repo is durable disk. Every phase writes
 | `LESSONS.md` | critical knowledge written **the moment it appears** (rules, must-run tests, gotchas, failures) — with your approval | ~250-line cap; graduate 3×-applied lessons out (→ rules/skill/ADR/docs); dedup/merge; `SUPERSEDED`, never silently deleted |
 | `TASKS.md` | cross-session task board (`Now` (max 3–5) · `Next` · `Discovered`), each item with a verifiable `done-when:` | ~100-line cap; **delete on done** — git is the archive |
 | `docs/handover-archive.md` | raw rotated blocks, verbatim | never `@`-imported → zero context cost, grep on demand |
-| `PLAN.md` | strategic phase map: status table + **colored Mermaid DAG** (renders live on GitHub/VSCode — watch nodes turn red→yellow→green) + post-completion fix log | not `@`-imported; statuses flip at rituals — a Stop hook nudges the moment a `wip` phase's tasks are all done but its status wasn't flipped (+ table↔diagram↔TASKS drift check) |
+| `PLAN.md` | strategic phase map (`/keel-plan`): status table + **colored Mermaid DAG** (renders live on GitHub/VSCode — watch nodes turn red→yellow→green) + post-completion fix log | not `@`-imported; statuses flip at rituals — a Stop hook nudges the moment a `wip` phase's tasks are all done but its status wasn't flipped (+ table↔diagram↔TASKS drift check) |
 
 Each file keeps a **short header** — its own contract plus a pointer — because a header in an
 `@`-imported file is paid in every session, forever: the full guide (tiers, promotion, ids, lanes,
@@ -175,6 +177,83 @@ and the caps keep every file short enough to actually read. Worst case you lose 
 interrupted session — and the hot-path rule (critical facts go to `LESSONS.md` the moment they appear)
 shrinks even that.
 
+## Teams: several Claude sessions as one crew
+
+A long project outgrows one chat. Keel lets you run **several Claude Code sessions in the same repo**
+as a structured crew — one **orchestrator** plus specialised workers (`mechanic`, `frontend`, `test`,
+`provider`…), each an ordinary chat window you can open and talk to.
+
+```mermaid
+flowchart TB
+    You([👤 you — may talk to any session directly])
+    You --- Orch
+    Orch["🧭 orchestrator<br/>assigns · routes reviews · sole writer of shared memory"]
+    Orch -->|assign| W1["⚙️ mechanic<br/>lane: me1, me2…"]
+    Orch -->|assign| W2["🎨 frontend<br/>lane: fro1, fro2…"]
+    Orch -->|assign| W3["🧪 test<br/>lane: tst1, tst2…"]
+    W1 -.->|deliver| Orch
+    W2 -.->|deliver| Orch
+    W3 -.->|deliver| Orch
+    W1 -.->|"✗ worker-to-worker: blocked by a hook"| W2
+```
+
+**What it actually buys you.** Three things that a single long session cannot give:
+
+- **Specialisation that survives.** Each session has a charter (`.claude/agents/team-<name>.md`) with a
+  mission and **scope paths** it may touch. The frontend session doesn't drift into migrations, and it
+  doesn't spend context on them either — each keeps a smaller, sharper working set than one generalist chat.
+- **Traceable throughput.** Every lane owns a stable task-id prefix (`fro1`, `fro2`…). The id also names
+  the report, the spec and the `scratch/` folder, so at the end of the project *"what did the frontend
+  lane actually ship?"* is a directory listing, not a memory exercise.
+- **A review chain with a human in it.** Work moves `wip → delivered → verified → closed`; the
+  orchestrator routes every review (nobody picks their own reviewer), the mechanical half is delegated
+  to the `verifier` subagent, and the owner's time goes to the part only a human can do.
+
+**How the sessions wake each other.** No polling, no `sleep` loops. A message to an **idle** session
+wakes it within seconds, and the wake fires `SessionStart` — so the reground hook re-injects that
+session's identity **from disk** before it acts. `/keel-continue` therefore ends in `IDLE` and simply
+stops; the next assignment starts it again. (Measured, not assumed:
+[`reports/2026-08-19-agent-team-messaging.md`](reports/2026-08-19-agent-team-messaging.md).)
+
+**Why a star and not a mesh.** Workers message the orchestrator and nobody else — enforced by
+`.claude/hooks/star-topology.sh`, not by asking people to remember. The reason is the memory model:
+the shared files (`TASKS`/`LESSONS`/`HANDOVER`/the reports index) have exactly **one writer**, so two
+workers agreeing something privately is a decision no file records — and on one machine there is no
+git merge layer to save you. (A permission rule can't express this: `deny: SendMessage` takes the bare
+tool name and would also cut the delivery path, so the wall has to be a hook that decides by target.)
+
+**Setup, once:** `/keel-agent-team-create` (owner-only — names the roster, writes the charters, seeds
+the lanes) → then in each new chat `/keel-agent-team-start @<name>`, which adopts the charter,
+`/rename`s the session (**the session name is its messaging address**) and records the session→agent
+map that survives every compaction. Real humans on different machines are `/keel-team`'s job; the two
+coexist on one board.
+
+### How this differs from Claude Code's built-in agent teams
+
+Claude Code ships its own [agent teams](https://code.claude.com/docs/en/agent-teams.md) feature
+(experimental, off by default, v2.1.178+): a lead spawns teammates, with a shared task list, a
+mailbox, direct human steering and `TeammateIdle`/`TaskCreated`/`TaskCompleted` hooks. **It is good at
+runtime coordination.** Keel solves a different job — *durable governance* — and the two compose: a
+keel charter doubles as a teammate definition.
+
+| | Built-in agent teams | Keel agent teams |
+|---|---|---|
+| **Topology** | **Mesh** — "any teammate can message any other by that name"; no documented way to restrict who talks to whom | **Star, enforced by hook** — worker→worker blocked, so every decision passes the centre and gets recorded |
+| **Where the roster lives** | `~/.claude/teams/<session-derived>/` — machine-local, never uploaded, **removed when the session ends** | `.claude/agents/team-*.md` in **your repo** — git-tracked, reviewed like code, outlives every session |
+| **Surviving `/resume` + compaction** | documented limitation: *"`/resume` and `/rewind` do not restore in-process teammates"* | identity is a **file**; `SessionStart` re-injects it after any compaction, resume or crash |
+| **The task board** | `~/.claude/tasks/` — local, not shareable; docs note teammates *"sometimes fail to mark tasks complete, blocking dependents"* | `TASKS.md` in the repo — travels through git, visible in review; a delivery is only real when its **evidence file path** is on the line, and a hook flags a missing file |
+| **Who may write what** | not modelled | single-writer rule: the orchestrator owns the shared files, each worker writes only its own folder |
+| **Humans on the same board** | AI teammates only | human `@tags` and agent lanes share one board, one id scheme, one review chain |
+| **Availability** | experimental flag, v2.1.178+, interactive only (no headless) | plain chat sessions — no flag; needs only cross-session messaging |
+| **Setup cost** | low — the lead spawns them | higher — a wizard, charters, one chat per agent, kept open |
+
+Honest scoping: if you want a handful of parallel workers *for one afternoon's task*, the built-in
+feature is less ceremony and you should use it. Keel's version earns its setup when the crew runs for
+**weeks across many compactions**, when the trail must be auditable in git, and when it matters that a
+decision cannot be made in a side-channel nobody recorded. Where both are available, run them
+together: the built-in for spawning and runtime coordination, Keel for the identity, the board and the
+walls.
+
 ## Two layers: guidance + enforcement
 Rules alone can be ignored; Keel also wires the discipline into Claude Code's **native, deterministic** layer.
 
@@ -184,6 +263,7 @@ Rules alone can be ignored; Keel also wires the discipline into Claude Code's **
 | **Always in context** | `CLAUDE.md` `@`-imports `rules.md` + `HANDOVER.md` + `LESSONS.md` + `TASKS.md` | auto-loaded every session, re-injected after compaction |
 | **Permissions** | `.claude/settings.json` | denies reading `.env`/secrets · asks before `git push` |
 | **Hooks** | `.claude/hooks/` | blocks `rm -rf` · force-push · staging `.env` · pipe-to-shell |
+| **Governance walls** | `owner-guard` · `star-topology` hooks | on a team: only the owner edits `rules.md`/`PLAN.md` or pushes to `main`; a worker session cannot message another worker (decisions must pass the centre) |
 | **Compaction safety** | SessionStart + PreCompact hooks | snapshot memory files before compact · re-ground ("re-read HANDOVER/LESSONS/TASKS") + cap warnings after |
 
 ## How to use

@@ -62,6 +62,9 @@ CLAUDE.local.md
 
 # === Research — commit findings.md; ignore raw/large downloads (rules.md §8) ===
 research/**/downloads/
+# local/ = notes kept on THIS machine only — working material the owner has not (yet) promoted
+# into the tracked findings.md. Same idea as downloads/, for prose instead of files.
+research/**/local/
 
 # === OS / editor ===
 .DS_Store
