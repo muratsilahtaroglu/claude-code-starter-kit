@@ -23,7 +23,7 @@ tightening one.
 | `pre-compact-snapshot.sh` | `PreCompact` | Writes a pre-compaction snapshot so state survives even an unclean compaction |
 | `handover-reminder.sh` | `Stop` | Nudges when the session is ending with an out-of-date handover |
 | `plan-phase-nudge.sh` | `Stop` | Nudges when a `wip` phase's `## Now` items are all checked but its PLAN gate was never flipped. rules §2.7 |
-| `ritual-log.sh` | `PreToolUse`(Skill) · `UserPromptExpansion` · `SessionStart` · `PreCompact` | Telemetry: every skill call, user-typed command (built-ins included), session start and compact boundary → `.claude/ritual-log` (git-ignored, self-trimming), each line tagged with the writing session's `@agent`. Rendered by `/keel-stats` |
+| `ritual-log.sh` | `PreToolUse`(Skill) · `UserPromptSubmit` · `UserPromptExpansion` · `SessionStart` · `PreCompact` | Telemetry: every skill call, user-typed command (custom = `command …`; built-ins like `/compact` = `typed /…` via UserPromptSubmit — first token only, prose NEVER logged), session start and compact boundary → `.claude/ritual-log` (git-ignored, self-trimming), each line tagged with the writing session's `@agent`. Rendered by `/keel-stats` |
 
 ## Changing a hook
 

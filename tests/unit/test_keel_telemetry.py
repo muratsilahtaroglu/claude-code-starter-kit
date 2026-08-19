@@ -96,6 +96,36 @@ def test_ritual_log_untagged_on_a_solo_project(project):
 
 
 # --------------------------------------------------------------------------
+# A6 — user-typed BUILT-IN commands are visible (UserPromptSubmit), privately
+# --------------------------------------------------------------------------
+# /compact, /model, /hooks… never reach UserPromptExpansion (custom commands only, per docs);
+# UserPromptSubmit is the one event that sees them. The flip side is that it sees EVERY prompt,
+# so the privacy contract is load-bearing: prose is never logged, arguments are cut.
+
+@pytest.mark.parametrize("prompt,expect", [
+    ("/compact", "typed /compact"),
+    ("/model claude-fable-5[1m]", "typed /model"),      # argument stripped — may carry secrets
+    ("/keel-compact", "typed /keel-compact"),           # custom command: typed + command lines pair up
+])
+def test_typed_slash_commands_are_logged_first_token_only(project, prompt, expect):
+    run_hook("ritual-log.sh",
+             {"hook_event_name": "UserPromptSubmit", "prompt": prompt, "session_id": SID},
+             project)
+    assert log_lines(project)[-1].endswith(expect), log_lines(project)
+
+
+def test_user_prose_is_never_logged(project):
+    """UserPromptSubmit sees every prompt; only slash commands may leave a trace."""
+    run_hook("ritual-log.sh",
+             {"hook_event_name": "UserPromptSubmit",
+              "prompt": "fix the login bug, password is hunter2", "session_id": SID},
+             project)
+    assert not (project / ".claude" / "ritual-log").exists(), (
+        "a non-command prompt was written to telemetry — the log must never hold user prose"
+    )
+
+
+# --------------------------------------------------------------------------
 # A4 — telemetry never written from a probe run
 # --------------------------------------------------------------------------
 
@@ -195,6 +225,7 @@ ALL_KINDS = (
     "2026-08-19 10:00:00 session-start startup\n"
     "2026-08-19 10:01:00 skill keel-handover\n"
     "2026-08-19 10:02:00 command keel-compact\n"
+    "2026-08-19 10:02:30 typed /keel-compact\n"
     "2026-08-19 10:03:00 nudge handover\n"
     "2026-08-19 10:04:00 compact manual\n"
 )
@@ -204,7 +235,7 @@ def test_report_flags_event_kinds_that_never_arrived(tmp_path):
     out = _render(tmp_path, "2026-08-19 10:00:00 session-start startup\n"
                             "2026-08-19 10:04:00 compact manual\n")
     assert "No record of:" in out
-    assert "`skill`" in out and "`command`" in out and "`nudge`" in out
+    assert "`skill`" in out and "`command`" in out and "`nudge`" in out and "`typed`" in out
     assert "statement about the" in out and "INSTRUMENT" in out
 
 

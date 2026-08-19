@@ -27,6 +27,7 @@ EVENT_KINDS = {
     "compact": "PreCompact",
     "skill": "PreToolUse(Skill)",
     "command": "UserPromptExpansion",
+    "typed": "UserPromptSubmit (slash commands only — built-ins included)",
     "nudge": "Stop (handover-reminder · plan-phase-nudge)",
 }
 

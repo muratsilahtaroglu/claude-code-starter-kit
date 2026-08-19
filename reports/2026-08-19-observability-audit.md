@@ -91,6 +91,20 @@ and warns when a roster exists but no line is tagged.
 assumption fixed in reground on 2026-08-18. With `## Review` placed between them it counted another
 section's checkboxes as the phase's. Now stops at the next `## ` heading, whatever it is.
 
+## Defect 5 (owner-caught, post-release) — built-in commands were invisible
+
+The owner typed `/compact` and `/model` and asked why neither appeared as a `command` line. The
+docs comment claimed `UserPromptExpansion` covers "built-ins included" — **it does not**: per the
+official hooks reference it fires only when a CUSTOM command expands, while built-ins are visible
+to exactly one event, `UserPromptSubmit`, which sees *every* prompt. Live proof: this session's
+`/compact` produced `compact manual` (PreCompact) but no `command` line.
+
+**Fix:** a fifth registration. `UserPromptSubmit` logs `typed /<first-token>` — and ONLY that:
+a prompt that is not a slash command is never written (the log must never hold user prose), and
+a slash command's arguments are cut (they may carry secrets). A custom command now pairs up
+(`typed /keel-compact` + `command keel-compact`); a built-in gets its `typed` line. Four new
+matrix cases, including the privacy contract as a permanent test.
+
 ## The instrument again
 
 This audit's own first conclusion was wrong, in exactly the way the kit keeps writing rules about.

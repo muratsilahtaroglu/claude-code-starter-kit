@@ -50,7 +50,8 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
   `owner-guard` (multi-user: blocks non-owner governance edits AND non-owner `git push` to main,
   armed by `.claude/project-owner`)) +
   `settings.json` permissions. Plus `ritual-log` telemetry: every Skill-tool invocation, every
-  user-typed command (built-ins included, via `UserPromptExpansion`), compact boundary
+  user-typed command (custom via `UserPromptExpansion`; built-ins like `/compact`/`/model` only
+  via `UserPromptSubmit` — first token only, prose never logged), compact boundary
   (manual/auto), session start and hook BLOCK is appended to `.claude/ritual-log` (git-ignored,
   self-trimmed). **`/keel-stats`** renders it into `reports/ritual-stats.md` — PLAN.md-style
   colored Mermaid interval boxes + a counts table.

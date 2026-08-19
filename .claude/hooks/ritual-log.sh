@@ -5,7 +5,8 @@
 # file; compact/session lines are the interval boundaries. The blocking hooks (block-dangerous,
 # compact-gate) also append their BLOCK events here. Self-trims to the last 1000 lines once per
 # session. Always exits 0 — telemetry must never break work (every write is best-effort).
-# One script, three registrations: PreToolUse(matcher Skill) + PreCompact + SessionStart.
+# One script, five registrations: PreToolUse(matcher Skill) + UserPromptSubmit +
+# UserPromptExpansion + PreCompact + SessionStart.
 #
 # TWO CONTRACTS THIS FILE KEEPS (both learned the hard way, 2026-08-19):
 #  1. Telemetry is written ONLY when CLAUDE_PROJECT_DIR is set. Claude Code exports it to every
@@ -38,9 +39,20 @@ ev="$(get "d.get('hook_event_name','')")"
 case "$ev" in
   PreToolUse)   line="skill $(get "d.get('tool_input',{}).get('skill','?')")" ;;
   UserPromptExpansion)
-                # user-TYPED commands, built-ins included (/compact, /code-review, /keel-*) —
-                # the gap the Skill-tool matcher can't see (it only fires on agent-side calls)
+                # a user-typed CUSTOM command expanding into its prompt (/keel-*, /code-review) —
+                # the gap the Skill-tool matcher can't see (it only fires on agent-side calls).
+                # Built-ins never reach this event; they are the UserPromptSubmit case below.
                 line="command $(get "d.get('command_name', d.get('command','?'))")" ;;
+  UserPromptSubmit)
+                # the ONLY event that sees BUILT-IN commands the user types (/compact, /model,
+                # /hooks…) — per docs UserPromptExpansion fires for custom commands only.
+                # PRIVACY CONTRACT: a prompt that is not a slash command is NEVER logged, and of
+                # a slash command only the FIRST token is kept — arguments may carry secrets.
+                p="$(get "d.get('prompt','')")"
+                case "$p" in
+                  /*) line="typed ${p%%[[:space:]]*}" ;;
+                  *)  exit 0 ;;
+                esac ;;
   PreCompact)   line="compact $(get "d.get('trigger','?')")" ;;
   SessionStart) line="session-start $(get "d.get('source','?')")"
                 # trim once per session — keep the last 1000 lines

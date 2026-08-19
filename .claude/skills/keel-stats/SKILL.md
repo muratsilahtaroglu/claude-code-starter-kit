@@ -5,9 +5,10 @@ description: Render the ritual telemetry visually — turns .claude/ritual-log i
 
 # /keel-stats — see what ran, when, how often
 
-The `ritual-log` hook records every Skill-tool call, user-typed command (built-ins included),
-compact boundary, session start and hook BLOCK into `.claude/ritual-log` (machine-local,
-git-ignored, self-trimmed). This skill renders it for humans.
+The `ritual-log` hook records every Skill-tool call, user-typed command (custom = `command …`
+via UserPromptExpansion; built-ins like `/compact` = `typed /…` via UserPromptSubmit — first
+token only, user prose never logged), compact boundary, session start and hook BLOCK into
+`.claude/ritual-log` (machine-local, git-ignored, self-trimmed). This skill renders it for humans.
 
 1. Run the deterministic generator — never parse the log by hand:
    ```bash
