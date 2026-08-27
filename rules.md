@@ -223,7 +223,11 @@
     **Proportionality:** skip for trivial one-sentence diffs or things already verified this session.
     **A surprising measurement indicts your own INSTRUMENT first.** Before reporting "the system is
     wrong", re-derive the reference: assumed window/argument semantics, invented parameters, defaults
-    that don't match, raw vs. deduplicated counting. Report the discrepancy only once the instrument
+    that don't match, raw vs. deduplicated counting, output ORDER, and a matcher's AXIS — basename and
+    path are different keys and mixing them fails BOTH ways: an exemption keyed by basename spares every
+    same-named file (one `README.md` entry exempted 25), a check matching only paths calls basename-only
+    references dead (~54% false staleness). Exempt by PATH, resolve by BASENAME. Report the discrepancy
+    only once the instrument
     is cleared — and say which side you checked. (Field: bit four times in one project; a probe's
     exclusive `< end` against a tool's inclusive end manufactured a suspiciously clean ratio, and a
     raw `count()` reference read ~17% high on unmerged row versions — the TOOL was right both times.)

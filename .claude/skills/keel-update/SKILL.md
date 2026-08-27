@@ -51,6 +51,16 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
 **If a path matches two buckets, the more protective one wins: PROTECTED > REVIEW > TOOLING**
 (e.g. `config/README.md` is a folder README, but `config/` is PROTECTED → protected).
 
+**A TOOLING file the project has COMMITTED to is no longer template-owned — check before copying.**
+For every TOOLING path about to be applied, run `git log --oneline -- <path> | wc -l` IN THE PROJECT:
+non-zero means the project edited it, so it moves to **REVIEW** (hunk-by-hunk), never a blind
+overwrite. These files carry kit doctrine in their HEADER but project DATA in their BODY — the same
+split the memory files use — and the batch approval only ever covered the doctrine. Field case
+(2026-08-27): one blind TOOLING batch reset a 12-row ADR index to the template's empty
+`Next number: 0001`, deleted a project agent's registration, deleted a 27-line pip-audit runbook, and
+inverted a project note. The file with the MOST local commits (13) was exactly the one destroyed —
+the signal was there and nothing read it.
+
 **Respect the bootstrap prune (rules.md §0e):** files the tailoring removed on purpose (recorded in the
 first HANDOVER block / tailoring ADR) are **not re-added** — list them as "pruned, skipped" unless the
 user explicitly asks for them back.
@@ -62,6 +72,18 @@ files that obviously changed" is how a hook lands while the skill it references 
 update leaves the hooks ahead of the skills (e.g. an owner-review nudge with no `## Review` write logic).
 Then one table — **new · changed · pruned-skipped · protected** — one line per file with what/why, and the
 diffs per §2 buckets. Apply only what was approved; never resolve a conflict silently.
+
+**When the kit and the project both implement ONE function, decide per FUNCTION — not per file set.**
+Compare the two feature by feature and keep the SUPERSET; either side may be it, and the answer can
+differ within a single update, so a blanket "adopt the kit's tools" is the wrong unit of decision.
+Field case (2026-08-27): of two such pairs, the kit's address resolver was the superset (same
+detections plus the fix instruction in every line) while the PROJECT's LESSONS entry-budget was — it
+had already absorbed the kit's fix and its docstring carried the owner's decision rationale, which a
+pointer would have demoted. **Whichever loses is REMOVED — its file and its test — and listed as a
+conscious skip**, so exactly one implementation survives: keeping both and disabling one leaves a
+second codebase that drifts (measured in that same case — the two copies had already diverged by one
+fix). If something permanent cites the retired file (an archive block, a report), leave a one-line
+pointer to the survivor instead of deleting it, so no citation dangles.
 
 ## 4. Verify + record
 - **Consistency re-diff:** after applying, `diff -q` the TOOLING paths against the template again — none
