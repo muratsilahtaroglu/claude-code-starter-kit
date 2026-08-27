@@ -22,7 +22,7 @@ Which mechanism for what (skill vs. subagent vs. rule vs. hook vs. CLAUDE.md): `
 | `keel-adopt` | Overlay the kit onto an EXISTING project (brownfield). Non-destructive: inventory, merge from a shown diff, back-fill docs from the real code |
 | `keel-update` | Pull later kit improvements into a project that cloned it earlier. Tooling in one reviewed batch, tailored files hunk-by-hunk |
 | `keel-phase-review` | The phase gate: working product, tests, docs, ADRs, handover — then flip the PLAN status |
-| `keel-autopilot` | Gated autonomy for one session: advance phases back-to-back, stopping at every gate FAIL, uncertain decision, or security-adjacent change. Push is never automatic |
+| `keel-autopilot` | Gated autonomy for one session: advance phases back-to-back, stopping at every gate FAIL, uncertain decision, or security-adjacent change. Push is never automatic. Solo sessions or an agent team's ORCHESTRATOR only — it runs phase-review and commits, both §10.42-forbidden to a worker |
 
 ## Quality gates
 | Skill | When |
