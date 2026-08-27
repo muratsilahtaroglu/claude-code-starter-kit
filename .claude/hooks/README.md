@@ -23,6 +23,7 @@ tightening one.
 | `pre-compact-snapshot.sh` | `PreCompact` | Writes a pre-compaction snapshot so state survives even an unclean compaction |
 | `handover-reminder.sh` | `Stop` | Nudges when the session is ending with an out-of-date handover |
 | `plan-phase-nudge.sh` | `Stop` | Nudges when a `wip` phase's `## Now` items are all checked but its PLAN gate was never flipped. rules §2.7 |
+| `lessons-entry-budget.py` | `PreToolUse`(Edit\|Write) · `SessionStart`(--check) | Per-ENTRY line budget for LESSONS.md (default 8, `LESSONS_ENTRY` in keel-caps): blocks a write that makes any entry newly oversized or grows an oversized one — simulating the post-edit FILE, so folding material into an existing entry is caught too. --check keeps a monotone backlog baseline (auto-lowers, never auto-raises). Measured origin: raising the file cap "was never enough" — entries were growing, not multiplying |
 | `ritual-log.sh` | `PreToolUse`(Skill) · `UserPromptSubmit` · `UserPromptExpansion` · `SessionStart` · `PreCompact` | Telemetry: every skill call, user-typed command (custom = `command …`; built-ins like `/compact` = `typed /…` via UserPromptSubmit — first token only, prose NEVER logged), session start and compact boundary → `.claude/ritual-log` (git-ignored, self-trimming), each line tagged with the writing session's `@agent`. Rendered by `/keel-stats` |
 
 ## Changing a hook

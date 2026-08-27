@@ -21,6 +21,19 @@ projects untouched · fails open · the block is logged with @attribution). Orig
 team design of 2026-08-19 — a permission rule cannot express "by target", so the topology had to
 become a hook (`reports/2026-08-19-agent-team-messaging.md`). KIT-OWNED.
 
+`test_keel_team_addresses.py` — the identity→address resolver (10 cases: healthy lane · closed
+window · reverted display name flagged as NAME_MISMATCH not death · one session-id in two windows ·
+unregistered live session · per-identity aggregation so a stale dead row beside a live one stays
+quiet). Origin: the 2026-08-19 "name unreachable ≠ session dead" incident; resolver backported from
+alice_v2's `scripts/team_addresses.py`. KIT-OWNED.
+
+`test_keel_lessons_budget.py` — the LESSONS per-entry line budget (12 cases: oversized new entry
+blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
+· shrinking always passes · pre-existing backlog never blocks unrelated edits · `LESSONS_ENTRY` cap
+tunable via keel-caps · --check baseline auto-lowers and never auto-raises). Origin: a live project
+measured 450→1039 lines in five days from entries GROWING, not multiplying — raising the file cap
+"was never enough". KIT-OWNED.
+
 `test_keel_agent_identity.py` — agent-team identity resolution in the reground hook (5 cases: the
 resolved session's mapping date touches to TODAY on every SessionStart · other lanes' dates are
 left alone · an unmapped session id never fabricates a row · the Session-id line still prints ·

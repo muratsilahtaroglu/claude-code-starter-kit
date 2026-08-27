@@ -270,7 +270,12 @@
     starts on EVERY task** (assigned or not, the owner's own included): the session briefs it and
     confirms understanding with 2–3 questions that are SPECIFIC to this task's spec/done-when (one
     that would fit any task is a violation) and SELF-EXPLANATORY (they carry their own context and
-    ask why/consequence — a bare yes/no teaches nothing). Q&A lands dated in the task's spec
+    ask why/consequence — a bare yes/no teaches nothing). The spec also carries **`## Required
+    reading`** — 3–5 targeted artifacts (the relevant ADRs, doc sections, scoped rules), written by
+    whoever writes the spec: the assignee reads THOSE, never the whole `docs/adr/` tree or every
+    rule "to be safe", and the gate's questions draw on that list. Task-time knowledge is ROUTED,
+    not bulk-loaded — the routers are this list, LESSONS `## Index`, and the ADR README's `when:`
+    column. Q&A lands dated in the task's spec
     (`reports/team/<@tag>/<task>_spec.md` "## Comprehension log"), which makes the gate IDEMPOTENT:
     READ the log first — an answered question is NEVER re-asked, so a task spanning sessions/compacts
     resumes from it. Work waits for confirmation; the assignee advances KNOWING what they do.

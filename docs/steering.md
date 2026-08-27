@@ -196,7 +196,11 @@ Roles from then on:
   it names the concrete file, metric, threshold, or risk; a question that would fit any task is a
   violation; (2) is self-explanatory — it carries its own context ("X works via Y; why not Z?" — the
   assignee learns while answering), never a bare yes/no; (3) targets why · how-it-will-be-verified ·
-  what-breaks — the three things a reviewer must know. Q&A is appended DATED to the task's spec file
+  what-breaks — the three things a reviewer must know. The questions draw on the spec's
+  **`## Required reading`** list — 3–5 targeted artifacts (relevant ADRs · doc sections · scoped
+  rules) written at assignment, so the assignee reads exactly those instead of sweeping the whole
+  `docs/adr/` tree "to be safe"; the list lives in the SPEC (read only when working that task),
+  never in TASKS.md (paid by every session, every line). Q&A is appended DATED to the task's spec file
   (`reports/team/<@tag>/<task>_spec.md` **`## Comprehension log`**), and the gate is IDEMPOTENT: the
   session reads the log before asking and never re-asks an answered question — a task spanning
   sessions/compacts resumes from the log; only genuinely new-scope questions are added. Work doesn't
@@ -334,6 +338,21 @@ double-claim guard in `/keel-agent-team-start` (§2) catches the agent-level ver
 second session adopting an already-recently-claimed name — but a session-id collision is a client
 bug, not something a hook can distinguish from normal reconnection; if it recurs, treat it as a
 signal to restart the client cleanly rather than to reassign the lane.
+
+**The resolver: `python3 .claude/team-addresses.py`** (backported from a live team, 2026-08-24)
+turns each registered identity into its CURRENT message name by reading the process-local session
+files, and flags all four failure shapes: closed window (NO_PROCESS) · reverted display name
+(NAME_MISMATCH, with the `/rename` fix named) · one identity driven from two windows (the
+silent-clobber shape) · an unregistered live session working the repo with no charter. Its
+`--hook` mode runs at SessionStart — one line when healthy, warnings only when something is off.
+An address is never remembered, it is resolved.
+
+**A lost lane is never re-spawned as a subagent.** When a worker cannot be reached by name, ask
+the owner — do NOT `Agent`-spawn its charter as a subagent "to keep things moving": the spawn is a
+history-less copy, invisible in the owner's dialog list, and it silently duplicates whatever the
+real session had in flight (measured on a live team: ~40 min / ~360k tokens of doubled work,
+twice). Subagents are for the orchestrator's own side-work and delegated verification, never for
+impersonating a lane.
 
 ### The message protocol
 

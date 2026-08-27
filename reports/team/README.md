@@ -2,7 +2,9 @@
 
 > Every report lives in its AUTHOR's folder — `reports/team/<@tag>/` for each developer, the owner,
 > and every co-agent — task-prefixed names inside: `<task>_spec.md` (owner-approved spec + its
-> `## Comprehension log`), `<task>_fix_<date>.md` (solution note: problem → root cause → fix + why →
+> `## Required reading` — 3–5 targeted artifacts the task needs: relevant ADRs, doc sections,
+> scoped rules; the assignee reads THOSE, never the whole tree — + its `## Comprehension log`),
+> `<task>_fix_<date>.md` (solution note: problem → root cause → fix + why →
 > changed files → tests), bulky raw evidence as a `<task>_<what>/` subfolder. **Markdown only.**
 > Reports are PERMANENT — never deleted: Review evidence, LESSONS, ADRs and path-scoped rules cite
 > these paths (rules.md §10.40); findability lives here, in the index. ONE sanctioned move exists:

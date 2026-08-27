@@ -29,7 +29,8 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   (except the kit-owned `tests/unit/test_keel_*.py` matrix — that is TOOLING, same carve-out as
   the ADR `0000` template; never put project tests in a `test_keel_*.py` file) ·
   `scratch/` · `research/` findings · `reports/` · `.claude/last-audit` · `.claude/project-owner` ·
-  `.claude/keel-caps` (project state: audit clock + governance owner + tuned caps) ·
+  `.claude/keel-caps` · `.claude/lessons-backlog` (project state: audit clock + governance owner +
+  tuned caps + entry-budget baseline) ·
   `.claude/agents/team-*.md` (project agent-team charters, owner-authored — the kit ships none;
   `.claude/agent-team-sessions` is git-ignored and never syncs).
 - **REVIEW — likely tailored; full diff, apply hunk-by-hunk with approval:** `rules.md` ·

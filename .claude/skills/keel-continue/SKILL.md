@@ -45,9 +45,12 @@ Take them in order; the FIRST that matches wins.
 1. **RESUME** — uncommitted work, or an open `## Now` item that is yours and already started.
    Continue it. Name the next micro-step from the actual diff, not from memory.
 2. **TAKE** — nothing in flight, but your lane has an assigned, unblocked item. Do NOT open the
-   editor: go to the §10.41 **comprehension gate** first — read the spec's `## Comprehension log`
-   (an answered question is never re-asked), then brief the task and answer 2–3 questions that are
-   specific to THIS task's done-when. Work starts after that, not before.
+   editor: go to the §10.41 **comprehension gate** first — read the spec's `## Required reading`
+   (the 3–5 artifacts THIS task needs: relevant ADRs, doc sections, scoped rules — read those,
+   never the whole `docs/adr/` tree "to be safe"; no spec? route via `LESSONS.md ## Index` + the
+   ADR README's `when:` column) and its `## Comprehension log` (an answered question is never
+   re-asked), then brief the task and answer 2–3 questions that are specific to THIS task's
+   done-when. Work starts after that, not before.
 3. **IDLE** — nothing in flight and nothing assigned. Say so plainly and STOP. Do not invent work,
    do not poll in a loop, do not sleep: on an agent team the orchestrator wakes this session with a
    message when there is something to do, and that wake re-runs SessionStart, so the identity and
