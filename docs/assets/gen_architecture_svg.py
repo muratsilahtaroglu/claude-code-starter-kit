@@ -41,6 +41,7 @@ GROUPS = [
         ("security.md", "supply-chain: pin · hash · non-root · CI"),
         ("layouts.md · steering.md", "layout profiles · mechanism guide"),
         ("memory-files.md", "how HANDOVER/LESSONS/TASKS/PLAN work (headers stay short)"),
+        ("handover-archive.md · lessons-retired.md", "never-imported archives — rotated blocks · lessons proven wrong"),
         ("adr/", "architecture decision records"),
     ]),
     ("requirements/", "#e8590c", [

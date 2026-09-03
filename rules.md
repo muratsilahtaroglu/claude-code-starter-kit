@@ -194,8 +194,12 @@
     `.claude/keel-caps` (§10.40); the SessionStart hook reads that file, skills/headers follow it. Memory
     written but never reviewed degrades: when caps hit (defaults: HANDOVER > 3 blocks/~150 lines, LESSONS > ~250, TASKS >
     ~100 lines) or every ~5 sessions, run `/keel-distill` — rotate old blocks (critical → LESSONS,
-    raw → `docs/handover-archive.md` **verbatim**), dedup/merge lessons (mark `SUPERSEDED`, never
-    silently delete), promote 3×-applied lessons into rules/skills/ADRs (file-scoped ones → a
+    raw → `docs/handover-archive.md` **verbatim**), dedup/merge lessons, and work BOTH exits — the
+    file has an inflow valve (the per-entry budget) and fills to its cap whenever these idle: a lesson
+    proven WRONG is **retired** (moved verbatim to `docs/lessons-retired.md` with its refutation;
+    ONE corrective line stays here — never silently deleted, never left as a `SUPERSEDED` stub paying
+    rent in an always-loaded file); a lesson still TRUE after ~3 applications is **promoted** into
+    rules (conduct) / skills (procedure) / ADRs (decision) / docs (domain fact) (file-scoped ones → a
     `paths:`-scoped `.claude/rules/` rule, or a `paths:`-scoped SKILL when the cluster must survive
     a mid-task compaction; **promotion DELETES the entry** — its one pointer is a router line in
     LESSONS `## Index`, never a "moved to X" stub), and lint for contradictions.

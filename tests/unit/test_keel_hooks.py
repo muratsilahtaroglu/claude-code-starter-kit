@@ -623,3 +623,74 @@ def test_uncommitted_evidence_has_no_age_yet(tmp_path):
     rc, out = run_hook("session-start-reground.sh", {"source": "startup"},
                        _review_world(tmp_path, days_old=9, commit=False))
     assert rc == 0 and "waiting" not in out
+
+
+# --------------------------------------------------------------------------
+# session-start-reground.sh — retirement candidates (LESSONS) and orphan decisions (ADR)
+# --------------------------------------------------------------------------
+# LESSONS has an inflow valve (entry-budget.py) and two outflows on paper — promote, retire — with
+# no signal for either, so neither runs. Measured 2026-09-03: /keel-distill ran three times in four
+# days and the entry count still rose 123 -> 129; nothing was older than the project itself. The hook
+# does not judge staleness; it names the oldest unpromoted entries so the ritual has a queue.
+
+LESSON_BODY = "".join("- 2026-0%d-1%d — [gotcha] lesson number %d\n  detail\n" % (m, m, m) for m in range(1, 5))
+
+
+def _lessons_world(tmp_path, cap, distill_on=None):
+    proj = tmp_path / "proj"
+    (proj / ".claude").mkdir(parents=True)
+    (proj / "LESSONS.md").write_text("# LESSONS\n\n## Index\n\n## [gotcha]\n" + LESSON_BODY)
+    (proj / ".claude" / "keel-caps").write_text("LESSONS=%d\n" % cap)
+    if distill_on:
+        (proj / ".claude" / "ritual-log").write_text(
+            "%s 10:00:00 @orchestrator skill keel-distill\n" % distill_on)
+    git("init", "-q", ".", cwd=proj)
+    return proj
+
+
+def test_near_cap_lessons_names_the_oldest_unpromoted_entries(tmp_path):
+    proj = _lessons_world(tmp_path, cap=16, distill_on="2026-02-15")   # 13 lines >= 70% of 16
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
+    assert "nothing LEAVES" in out and "4 entries" in out
+    assert "lesson number 1" in out and "lesson number 3" in out, "oldest three, in date order"
+    assert "lesson number 4" not in out
+    assert "+2 dated after the last /keel-distill, 2026-02-15" in out
+    assert "docs/lessons-retired.md" in out, "the exit must be named, not just the debt"
+
+
+def test_lessons_well_under_cap_is_silent(tmp_path):
+    proj = _lessons_world(tmp_path, cap=100)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
+    assert "nothing LEAVES" not in out
+
+
+def _adr_world(tmp_path, status="Accepted", cite=False):
+    proj = tmp_path / "proj"
+    (proj / "docs" / "adr").mkdir(parents=True)
+    (proj / "docs" / "adr" / "0000-adr-template.md").write_text(
+        "# ADR-0000\n**Status:** Proposed | Accepted | Rejected | Superseded (by ADR-YYYY)\n")
+    (proj / "docs" / "adr" / "0007-use-postgres.md").write_text(
+        "# ADR-0007 use postgres\n**Status:** %s (Date: 2026-01-01)\n" % status)
+    if cite:
+        (proj / "CLAUDE.md").write_text("## Key decisions\n- ADR-0007: postgres over sqlite\n")
+    git("init", "-q", ".", cwd=proj)
+    return proj
+
+
+def test_accepted_adr_nobody_cites_is_named(tmp_path):
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, _adr_world(tmp_path))
+    assert "Accepted ADR(s) cited by NOTHING" in out and "ADR-0007" in out
+    assert "ADR-0000" not in out, "the template's status alternation is not an Accepted decision"
+
+
+def test_adr_cited_from_claude_md_is_silent(tmp_path):
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"},
+                      _adr_world(tmp_path, cite=True))
+    assert "cited by NOTHING" not in out
+
+
+def test_proposed_adr_is_not_an_orphan(tmp_path):
+    """Only an ACCEPTED decision can be overtaken; a proposal nobody cites yet is just a proposal."""
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"},
+                      _adr_world(tmp_path, status="Proposed"))
+    assert "cited by NOTHING" not in out

@@ -70,8 +70,9 @@ approaches. Different from `rules.md`, which is the constitution written at proj
   **language-specific domain fact** (morphology, a locale's casing/collation trap) whose example
   would be destroyed by translation.
 - **Format:** atomic **one-line** entries, dated and tagged (`[rule] [test] [fail] [gotcha]`), newest
-  first within a tag group. A contradicted-but-instructive entry is marked `SUPERSEDED by <entry>` —
-  visible, never silently removed.
+  first within a tag group. A lesson later proven WRONG is retired: the entry moves verbatim to
+  `docs/lessons-retired.md` (never imported) with its refutation, and ONE corrective line stays —
+  never silently removed, never a `SUPERSEDED` stub paying rent every session for false knowledge.
 
 ### Scope triage — the file holds ALWAYS-relevant lessons only
 

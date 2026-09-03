@@ -23,7 +23,7 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
 
 ## 2. Classify every template path into three buckets
 - **PROTECTED — never touched (project-owned):** `HANDOVER.md` · `LESSONS.md` · `TASKS.md` · `PLAN.md` ·
-  `docs/handover-archive.md` · `docs/architecture.md` · `docs/adr/*` (except the kit-owned `0000`
+  `docs/handover-archive.md` · `docs/lessons-retired.md` · `docs/architecture.md` · `docs/adr/*` (except the kit-owned `0000`
   template and the folder `README.md` — those are TOOLING) · `CLAUDE.md` · `README.md` · `LICENSE` ·
   `config/` · `requirements/*.{txt,lock}` contents · `.env.example` values · `src/` · `tests/`
   (except the kit-owned `tests/unit/test_keel_*.py` matrix — that is TOOLING, same carve-out as

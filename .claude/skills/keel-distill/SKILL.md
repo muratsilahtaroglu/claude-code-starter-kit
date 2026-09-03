@@ -24,14 +24,23 @@ For each block being rotated, triage by criticality — **content-aware, not age
 - Then move the WHOLE block **verbatim** to the TOP of `docs/handover-archive.md` (prepend, newest
   first — restorable compression: the distilled lines keep pointers back to it).
 
-## 2. Consolidate LESSONS.md (write-policy: add / update / supersede / promote-and-delete — never LOSSY delete)
+## 2. Consolidate LESSONS.md (write-policy: add / update / retire / promote-and-delete — never LOSSY delete)
 - **Scope-triage every entry first (A/B/C/D — the LESSONS header defines the tiers):** always-relevant
   stays; file-scoped graduates (below); a permanent domain fact → docs; superseded/closed/already-
   promoted → DELETE. Field measurement behind the triage: in a mature file ~52% of entries were
   file-scoped and any one task needed ~15% of the file — the always-on core is the minority
   (`reports/2026-08-17-lessons-scope-audit.md`).
 - Merge duplicates and near-duplicates into the stronger phrasing (keep the earliest date).
-- A contradicted-but-instructive entry is marked `SUPERSEDED by <entry/date>` — visible, dated.
+- **Start where the SessionStart hook pointed:** above 70% of the cap it names the OLDEST unpromoted
+  entries and the inflow since the last distill. Those are the triage queue — ask of each: still
+  true → promote (below) · proven wrong → retire · resolved → delete. A file with an inflow valve
+  and no worked exit sits at its cap forever (measured: three distills in four days, count still
+  rising 123 → 129, not one entry ever retired).
+- **Retire what proved WRONG** — move the entry VERBATIM to the top of `docs/lessons-retired.md`
+  with a `RETIRED <date>: <what refuted it · what is true instead · evidence path>` line, and leave
+  ONE corrective line here ("believed X — measured Y → retired"). Never a `SUPERSEDED` stub: the
+  original text keeps paying rent in an always-loaded file for knowledge known to be false, while
+  the one-line correction is what stops a session re-learning it.
 - **Promote what has graduated:** a lesson applied 3+ times is no longer a lesson — move it into
   `rules.md` (conduct), a `.claude/skills/` skill (procedure), an ADR (decision), or — for a permanent
   DOMAIN fact (a data quirk, an API contract) — the relevant **docs** (`docs/architecture.md` "known

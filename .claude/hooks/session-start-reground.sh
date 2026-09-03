@@ -314,6 +314,57 @@ if [ -f "$DIR/TASKS.md" ] && [ -d "$DIR/.git" ]; then
   fi
 fi
 
+# Retirement-candidate signal (rules §9.33). LESSONS has an INFLOW valve (entry-budget.py holds
+# lines per entry) and, on paper, two OUTFLOWS — promote what is still true, retire what proved
+# wrong — and NEITHER has a signal: nothing says which entry is a candidate, so neither happens.
+# Measured 2026-09-03 on a live project: /keel-distill ran three times in four days and the entry
+# count still rose 123 -> 129; the per-entry budget had done its job (10.6 -> 7.8 lines/entry) while
+# the count climbed 60 -> 129 in 15 days and the Index grew by 3. Not one entry was older than the
+# project itself — nothing had ever been retired. A file whose only exit has no trigger sits at its
+# cap forever, and raising the cap cannot fix that (it was frozen there for that reason).
+# This line does not JUDGE staleness (a gate that guesses trains people to walk past it); it names
+# the oldest unpromoted entries so the next /keel-distill has something to ask about. Fires only
+# above 70% of the cap — outflow matters exactly then, and a line paid every session must earn it.
+if [ -f "$DIR/LESSONS.md" ]; then
+  llines=$(wc -l < "$DIR/LESSONS.md")
+  if [ "$llines" -ge $(( cap_L * 7 / 10 )) ]; then
+    lentries=$(grep -cE '^- 20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$DIR/LESSONS.md")
+    since=""
+    ldist=$(grep -E ' (skill|command) keel-distill' "$DIR/.claude/ritual-log" 2>/dev/null | tail -1 | cut -d' ' -f1)
+    if [ -n "$ldist" ]; then
+      newer=$(grep -oE '^- 20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$DIR/LESSONS.md" | cut -c3- | awk -v d="$ldist" '$1 > d' | wc -l)
+      since=" (+${newer} dated after the last /keel-distill, ${ldist})"
+    fi
+    oldest=$(grep -E '^- 20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$DIR/LESSONS.md" | sort | head -3 | cut -c3-72 | paste -sd '|' | sed 's/|/ · /g')
+    if [ "${lentries:-0}" -gt 0 ]; then
+      echo "[keel] LESSONS.md at ${llines}/${cap_L} lines, ${lentries} entries${since} — the entry budget holds LINES, but nothing LEAVES: promotion and retirement are the only exits (rules §9.33) and no signal names a candidate. Oldest three, still unpromoted: ${oldest}. At the next /keel-distill ask of each: still true → promote (rules/skill/ADR/docs) and delete here · proven wrong → retire to docs/lessons-retired.md, keep ONE corrective line · resolved → delete."
+    fi
+  fi
+fi
+
+# ADR orphan check (same disease, decision layer): an Accepted ADR that NO permanent record outside
+# docs/adr/ cites — not CLAUDE.md "Key decisions", not a rule, not a report, not LESSONS — is either
+# foundational and unlinked, or overtaken and never marked Superseded. /keel-distill PROPOSES the
+# status flip and the owner makes it (docs/steering.md); this only names the candidates. The ADR is
+# matched by its filename OR its `ADR-<nnnn>` number, the two forms records actually use. The
+# handover archive is excluded: it is frozen verbatim and cites everything that ever existed.
+if [ -d "$DIR/docs/adr" ]; then
+  orph=""
+  for f in "$DIR"/docs/adr/[0-9][0-9][0-9][0-9]-*.md; do
+    [ -f "$f" ] || continue
+    b=$(basename "$f"); num=${b%%-*}
+    case "$num" in 0000) continue ;; esac
+    grep -qE '^\*\*Status:\*\* *Accepted' "$f" 2>/dev/null || continue
+    n=$(grep -rl --include='*.md' --exclude-dir=.git --exclude-dir=node_modules \
+          -e "$b" -e "ADR-${num}" "$DIR" 2>/dev/null \
+        | grep -v "/docs/adr/" | grep -v "handover-archive.md" | grep -v "lessons-retired.md" | wc -l)
+    [ "$n" -eq 0 ] && orph="$orph ADR-${num}"
+  done
+  if [ -n "$orph" ]; then
+    echo "[keel] Accepted ADR(s) cited by NOTHING outside docs/adr/:${orph} — a decision no record, rule or CLAUDE.md 'Key decisions' line points at is either foundational and unlinked (add the pointer) or overtaken and never marked Superseded (owner flips the status; /keel-distill proposes it, rules §9.33)."
+  fi
+fi
+
 # Memory-file HEADER hygiene (rules §9.33): a header states how the file WORKS — it is doctrine,
 # written once and frozen. State in a header (a date, a measurement, a pending decision, a cap NUMBER
 # copied out of .claude/keel-caps) never gets triaged: nobody reads a header as a todo, so it becomes

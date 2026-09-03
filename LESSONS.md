@@ -9,11 +9,12 @@
 >   belongs? Here — misfiled beats lost.
 > - **English** (rules §9.31). Exceptions: quoted owner wording, and a language-specific domain fact
 >   whose example translation would destroy.
-> - **Format:** atomic ONE-LINE entries, dated + tagged, newest first in each group. A contradicted
->   but instructive entry is marked `SUPERSEDED by <entry>`, never silently deleted.
+> - **Format:** atomic ONE-LINE entries, dated + tagged, newest first in each group. A lesson proven
+>   WRONG is retired: the entry moves verbatim to `docs/lessons-retired.md` with its refutation and
+>   ONE corrective line stays here — never silently deleted, never a stub paying rent every session.
 > - **Keep only ALWAYS-relevant lessons.** File-scoped → a `paths:`-scoped rule (or SKILL, if it must
->   survive a mid-task compaction) · permanent domain fact → `docs/` · superseded or promoted →
->   DELETED. **Promotion deletes the entry**; its one pointer is the `## Index` line below.
+>   survive a mid-task compaction) · permanent domain fact → `docs/` · retired or promoted →
+>   DELETED here. **Promotion deletes the entry**; its one pointer is the `## Index` line below.
 >
 > This header is DOCTRINE. Anything dated, measured, or awaiting a decision goes in the BODY.
 
