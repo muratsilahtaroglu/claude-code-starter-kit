@@ -11,8 +11,23 @@ compaction behavior. Put each instruction in the RIGHT one instead of piling eve
 | **`.claude/skills/`** | **Procedures** you want to watch/steer in the main thread (deploy, handover, review) | name+desc always · body when invoked | ✅ invoked bodies re-injected (to a budget) | guidance |
 | **`.claude/agents/`** | **Side tasks** whose intermediate output would clutter the thread (deep research, audits, verification) | name+desc always · body only when called | isolated context — bypasses main compaction | guidance |
 | **`.claude/hooks/`** | Things that must happen **deterministically** (block a command, snapshot, re-ground) | on lifecycle events | ✅ runs outside the context window | **enforced** |
-| **`.claude/settings.json` permissions** | Hard **allow/deny/ask** on tools (deny reading secrets, ask before push) | always | ✅ | **enforced** |
+| **`.claude/settings.json` permissions** | Hard **allow/deny/ask** on tools (deny reading secrets, ask before push) | always — but see the trust note below | ✅ (deny/ask); allow needs trust | **enforced** |
 | **`.mcp.json`** (repo root) | **External tool bridges** (MCP servers: DB, browser, internal APIs) — project-level, git-tracked | approved servers at session start | ✅ config on disk | tool access |
+
+**An `allow` rule is INERT until the workspace is trusted — and nothing tells you.** A project's
+`permissions.allow` GRANTS capability, so Claude Code withholds those rules until the workspace trust
+dialog has been accepted for that folder ("Is this a project you created or trust?"); `deny` and `ask`
+are unaffected, because they only restrict. The trust is keyed on the **git repository root** and does
+NOT reach into a nested repository: trusting `~/work` does nothing for the clone at `~/work/app`, which
+must be trusted on its own. The symptom is silent and easy to misread — every command still prompts, so
+people answer "allow for this session" instead, which works until the process restarts and then all of
+it is gone at once. Field case 2026-09-03: a five-agent project had 31 allow rules and
+`hasTrustDialogAccepted: false`; the rules had never once applied, and the day every window was reopened
+the crew started asking for permission on everything.
+
+Check it before blaming the rules: `python3 -c "import json,os;d=json.load(open(os.path.expanduser('~/.claude.json')));print(d['projects'].get(os.getcwd(),{}).get('hasTrustDialogAccepted'))"`.
+`false` or `None` means your allow list is decoration. Accept the dialog in an interactive session
+started in that repo. (Docs: "Project allow rules and workspace trust".)
 
 ## Rules of thumb (from the Anthropic guidance)
 - **"Every time X, always do Y"** or **"never do X"** → a **hook** or a **permission**, not a `CLAUDE.md`
