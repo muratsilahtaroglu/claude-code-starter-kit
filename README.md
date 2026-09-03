@@ -54,7 +54,7 @@ The whole kit in one picture — left, what goes wrong in long AI-assisted proje
 mechanism that closes it:
 
 <p align="center">
-  <img src="docs/assets/what-keel-fixes.svg" alt="What Keel fixes: twelve problem-to-mechanism pairs — volatile memory, repeated mistakes, a free-handed agent, dependency chaos, file sprawl, scattered throwaway code, unproven claims, plan-free drift, person-dependent knowledge, no trail, unmeasurable discipline, one-size-fits-all templates — each paired with the Keel mechanism that closes it" width="960">
+  <img src="docs/assets/what-keel-fixes.svg" alt="What Keel fixes: thirteen problem-to-mechanism pairs — volatile memory, repeated mistakes, a free-handed agent, dependency chaos, file sprawl, scattered throwaway code, unproven claims, plan-free drift, colliding parallel sessions, person-dependent knowledge, no trail, unmeasurable discipline, one-size-fits-all templates — each paired with the Keel mechanism that closes it" width="960">
 </p>
 
 <sub>Generated from [`docs/assets/gen_architecture_svg.py`](docs/assets/gen_architecture_svg.py) (the `FIXES` list) — same data-driven pipeline as the structure maps.</sub>
@@ -72,6 +72,7 @@ mechanism that closes it:
 | **Scattered throwaway code & prompts.** Experiments and one-off scripts leak into the main tree; the same prompt is improvised again and again. | **Quarantine + promotion.** Experiments live only in `scratch/` (1-line purpose header); runtime prompts are versioned files under `src/`; the SECOND similar ad-hoc prompt is promoted to a skill. |
 | **Unproven "it works".** Tests postponed, claims not backed by a run, bulk outputs shipped blind. | **Layered test contract + pilot gate.** Tests written + run per change; e2e evidence at phase gates; bulk jobs pass `/keel-pilot` (smoke → gold set → staged ramp → acceptance sample). |
 | **Plan-free drift.** Phases skipped, five things in flight, "done" claimed without proof. | **Gated phase map + single-task flow.** `PLAN.md` DAG with verifiable gates; work only from `TASKS ## Now` (max 3–5); `done` flips only via `/keel-phase-review` — a Stop hook catches skipped flips. |
+| **Parallel sessions collide.** Several chats in one repo have no merge layer: two writers clobber shared memory silently, a reopened window loses the address peers reach it by, and two workers settle things no file records. | **A star-topology crew.** One writer per shared file (the orchestrator); worker→worker messaging blocked by a hook; identity kept on disk and the messaging address restored automatically on every resume by the launch wrapper (see [Teams](#teams-several-claude-sessions-as-one-crew)). |
 | **Person-dependent knowledge.** The project lives in one head / one machine; a departure resets it. | **Memory in the repo.** It travels through git; a new person or session loads the same five files and is oriented in minutes — even with **no AI access at all** (see the human-handover section). |
 | **No trail.** "Why did we build it this way?" has no answer; there is nothing to audit. | **Audit-ready trail.** Every decision an ADR, every session a HANDOVER block, every phase in `PLAN.md` + its fix log. |
 | **Unmeasurable discipline.** Rules exist on paper; nobody knows whether they actually run. | **Enforce + measure.** Telemetry logs every skill call, typed command (built-ins included), compact boundary, Stop-hook nudge and hook BLOCK; `/keel-stats` renders it visually; `/keel-audit` samples commit ranges against the rules. |
@@ -224,8 +225,10 @@ tool name and would also cut the delivery path, so the wall has to be a hook tha
 
 **Setup, once:** `/keel-agent-team-create` (owner-only — names the roster, writes the charters, seeds
 the lanes) → then in each new chat `/keel-agent-team-start @<name>`, which adopts the charter,
-`/rename`s the session (**the session name is its messaging address**) and records the session→agent
-map that survives every compaction. Real humans on different machines are `/keel-team`'s job; the two
+names the session (**the session name is its messaging address**) and records the session→agent map that
+survives every compaction. Install `.claude/claude-launch-wrapper.sh` once per machine and that name
+also survives every reopen and Remote-SSH reconnect — measured: a `--resume`d process otherwise comes
+up unnamed, which is why agents used to go silently unreachable. Real humans on different machines are `/keel-team`'s job; the two
 coexist on one board.
 
 ### How this differs from Claude Code's built-in agent teams
