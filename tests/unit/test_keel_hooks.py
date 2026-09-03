@@ -38,9 +38,9 @@ ALLOW = 0
 DOTENV = ".env"  # the real secret file; .env.example is the tracked, empty twin
 
 
-def run_hook(script, payload, project_dir):
+def run_hook(script, payload, project_dir, env_extra=None):
     """Run a hook with a JSON payload on stdin; return (exit_code, stderr+stdout)."""
-    env = dict(os.environ, CLAUDE_PROJECT_DIR=str(project_dir))
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=str(project_dir), **(env_extra or {}))
     proc = subprocess.run(
         ["bash", str(HOOKS / script)],
         input=json.dumps(payload),
@@ -509,3 +509,57 @@ def test_handover_freshness_stamp_is_not_flagged(owner_project):
     (owner_project / "HANDOVER.md").write_text(STAMPED_HEADER)
     _, out = run_hook("session-start-reground.sh", {"source": "startup"}, owner_project)
     assert "header carries STATE" not in out, out
+
+
+# --------------------------------------------------------------------------
+# session-start-reground.sh — workspace trust (allow rules that were never in effect)
+# --------------------------------------------------------------------------
+# permissions.allow GRANTS capability, so Claude Code withholds those rules until the workspace
+# trust dialog is accepted; deny/ask are unaffected. The failure is silent and self-hiding: every
+# command keeps prompting, people answer "allow for this session", and the whole grant set dies at
+# the next restart. Field case 2026-09-03 — a five-agent project with 31 allow rules that had never
+# once applied, discovered only when every window was reopened on the same morning.
+
+def _trust_world(tmp_path, allow, trusted):
+    """A git project with an allow list, plus an isolated CLAUDE_CONFIG_DIR holding the trust state."""
+    proj = tmp_path / "proj"
+    (proj / ".claude").mkdir(parents=True)
+    git("init", "-q", ".", cwd=proj)
+    (proj / ".claude" / "settings.json").write_text(
+        json.dumps({"permissions": {"allow": allow, "deny": ["Read(./.env)"]}}))
+    cfg = tmp_path / "cfg"
+    cfg.mkdir()
+    root = subprocess.run(["git", "-C", str(proj), "rev-parse", "--show-toplevel"],
+                          capture_output=True, text=True).stdout.strip()
+    (cfg / ".claude.json").write_text(
+        json.dumps({"projects": {root: {"hasTrustDialogAccepted": trusted}}}))
+    return proj, {"CLAUDE_CONFIG_DIR": str(cfg)}
+
+
+def test_untrusted_workspace_names_the_allow_rules_that_never_applied(tmp_path):
+    proj, env = _trust_world(tmp_path, ["Bash(*)", "Edit(*)"], trusted=False)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj, env)
+    assert "2 permissions.allow rule(s)" in out
+    assert "has not been trusted" in out
+    assert "deny/ask still apply" in out, "the owner must not think their secret guards are off too"
+
+
+def test_trusted_workspace_is_silent(tmp_path):
+    proj, env = _trust_world(tmp_path, ["Bash(*)"], trusted=True)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj, env)
+    assert "has not been trusted" not in out
+
+
+def test_no_allow_rules_means_nothing_to_lose(tmp_path):
+    """A deny-only project is fully enforced without trust — warning there would be noise."""
+    proj, env = _trust_world(tmp_path, [], trusted=False)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj, env)
+    assert "has not been trusted" not in out
+
+
+def test_trust_check_fails_open_when_the_config_is_missing(tmp_path):
+    proj, env = _trust_world(tmp_path, ["Bash(*)"], trusted=False)
+    (tmp_path / "cfg" / ".claude.json").unlink()
+    rc, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj,
+                       dict(env, HOME=str(tmp_path)))
+    assert rc == 0 and "has not been trusted" not in out

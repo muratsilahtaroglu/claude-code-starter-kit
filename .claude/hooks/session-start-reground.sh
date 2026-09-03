@@ -392,4 +392,49 @@ if [ -f "$DIR/.claude/ritual-log" ]; then
     echo "[keel] ritual-log has ${dup} back-to-back duplicate lines — hooks are double-firing (stale long-lived session, or a PLUGIN registering the same hooks on top of this clone's settings.json). Refresh the session; if it persists, disable/uninstall that plugin — a clone needs none (docs/steering.md 'Distribution')."
   fi
 fi
+# Workspace-trust check: a project's permissions.allow rules GRANT capability, so Claude Code withholds
+# them until the workspace trust dialog has been accepted for this folder — deny/ask are unaffected
+# (they only restrict). The trust is keyed on the GIT REPO ROOT and does not reach into a nested
+# repository, so trusting the directory that holds your clones does nothing for a clone inside it.
+# The failure is silent: every command keeps prompting, people answer "allow for this session", and
+# that works until the process restarts and the whole grant set dies at once ("it worked yesterday").
+# Field case 2026-09-03: a five-agent project ran with 31 allow rules that had never applied.
+# Fires only when there ARE allow rules to lose. Fail-open: any error prints nothing.
+if [ -f "$DIR/.claude/settings.json" ]; then
+  trust_msg=$(python3 - "$DIR" <<'TRUSTPY' 2>/dev/null || true
+import json, os, subprocess, sys
+d = sys.argv[1]
+try:
+    allow = (json.load(open(os.path.join(d, ".claude", "settings.json")))
+             .get("permissions", {}).get("allow") or [])
+except Exception:
+    sys.exit(0)
+if not allow:
+    sys.exit(0)
+try:
+    root = subprocess.run(["git", "-C", d, "rev-parse", "--show-toplevel"],
+                          capture_output=True, text=True, timeout=5).stdout.strip() or d
+except Exception:
+    root = d
+cfg = os.path.join(os.environ.get("CLAUDE_CONFIG_DIR") or os.path.expanduser("~/.claude"), ".claude.json")
+if not os.path.exists(cfg):
+    cfg = os.path.expanduser("~/.claude.json")
+try:
+    projects = json.load(open(cfg)).get("projects", {})
+except Exception:
+    sys.exit(0)
+entry = projects.get(root) or projects.get(d) or {}
+if entry.get("hasTrustDialogAccepted"):
+    sys.exit(0)
+print("[keel] %d permissions.allow rule(s) in .claude/settings.json are NOT in effect: this workspace "
+      "(%s) has not been trusted, and allow rules GRANT capability so they are withheld until the trust "
+      "dialog is accepted (deny/ask still apply). Symptom: everything keeps asking for approval, and "
+      "\"allow for this session\" hides it until the next restart. Fix: accept the trust prompt in an "
+      "interactive session started in this repo. Trust is keyed on the repo root and does NOT inherit "
+      "from a parent directory (docs/steering.md 'Rules of thumb')." % (len(allow), root))
+TRUSTPY
+)
+  [ -n "$trust_msg" ] && echo "$trust_msg"
+fi
+
 exit 0
