@@ -54,6 +54,17 @@ Take them in order; the FIRST that matches wins.
    ADR README's `when:` column) and its `## Comprehension log` (an answered question is never
    re-asked), then brief the task and answer 2–3 questions that are specific to THIS task's
    done-when. Work starts after that, not before.
+   **Then measure the PREMISE — the gate proved you understood the task, not that it is TRUE.**
+   Before the first line of code, run the cheapest READ-ONLY check of the claim the task rests on
+   (grep the file that supposedly lacks the field, run the test that supposedly fails, read the
+   endpoint that supposedly returns TR). Three outcomes: it holds → build; it is already done → the
+   delivery is that measurement, `closed refuted`; it holds elsewhere → say WHERE and stop, do not
+   silently retarget the task. Whoever assigned it is not the authority on the premise — the
+   measurement is. Record it in the spec's `## Premise`.
+   **A CLASS-shaped task (§10.39) starts with a SURFACE SEARCH instead:** if the done-when is a
+   property that must hold everywhere (a language, a permission, a unit), grep for every surface that
+   carries it, list them in the spec, and make that list the done-when — otherwise you will fix one
+   surface per round and the owner will find the next one by testing.
 3. **IDLE** — nothing in flight and nothing assigned. Say so plainly and STOP. Do not invent work,
    do not poll in a loop, do not sleep: on an agent team the orchestrator wakes this session with a
    message when there is something to do, and that wake re-runs SessionStart, so the identity and
@@ -74,6 +85,11 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    unnamed), then `SendMessage` with `to:` set to that NAME. The message is a POINTER — id, spec
    path, done-when, `## Required reading` — the delivery itself is the file (§10.40); a wake with no
    file behind it gives the worker nothing to resume from after its next compaction.
+   **Write the task's PREMISE and say where it came from** — "owner said X" · "RV12 measured X" ·
+   "I inferred X from Y". That attribution is the whole point: an inference of yours is the assignee's
+   FIRST thing to measure, and a premise you cannot source you have probably invented. Field: 26
+   deliveries in one project refuted their assignment's premise, some after a full lane round spent
+   reproducing an invented one. A refuted premise costs one cheap read; an invented one costs a round.
    **Before calling a lane "free", check the MAPPING, not `/list-agents` names** (field case
    2026-08-19): `.claude/agent-team-sessions`' date column is a last-seen heartbeat, touched by the
    reground hook on every resolve — grep the lane's agent there. A line dated within ~2 days means

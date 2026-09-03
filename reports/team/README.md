@@ -3,7 +3,10 @@
 > Every report lives in its AUTHOR's folder — `reports/team/<@tag>/` for each developer, the owner,
 > and every co-agent — task-prefixed names inside: `<task>_spec.md` (owner-approved spec + its
 > `## Required reading` — 3–5 targeted artifacts the task needs: relevant ADRs, doc sections,
-> scoped rules; the assignee reads THOSE, never the whole tree — + its `## Comprehension log`),
+> scoped rules; the assignee reads THOSE, never the whole tree — + its `## Comprehension log`
+> — + its **`## Premise`**: the claim the task rests on, in one line, and how it was MEASURED before
+> any code was written; a CLASS-shaped task (a property that must hold everywhere) instead lists the
+> SURFACES it covers, found by a search — that list is the done-when, rules §10.39/§10.41),
 > `<task>_fix_<date>.md` (solution note: problem → root cause → fix + why →
 > changed files → tests), bulky raw evidence as a `<task>_<what>/` subfolder. **Markdown only.**
 > Reports are PERMANENT — never deleted: Review evidence, LESSONS, ADRs and path-scoped rules cite
@@ -23,6 +26,9 @@
 > - `[ ] delivered` — solution note written; the item sits in TASKS `## Review`
 > - `[ ] verified — owner part: <one sentence>` — mechanical review done (delegated verifier);
 >   ONLY the named human step remains
+> - `[x] closed <YYYY-MM-DD> refuted` — the premise did not hold and the measurement says so; the
+>   delivery IS the refutation note (zero product lines). A RESULT, not a failure — it closes the
+>   task and the assigner's claim is corrected, never quietly re-assigned (rules §10.41).
 > - `[x] closed <YYYY-MM-DD> accepted` · `[x] closed <YYYY-MM-DD> rejected` — owner decided; the
 >   line stays forever. "What's finished under @X?" = the `[x]` lines in @X's section. At the next
 >   `/keel-distill` the files behind a closed line move to `<@tag>/done/` (the line keeps its

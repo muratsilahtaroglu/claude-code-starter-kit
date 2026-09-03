@@ -244,6 +244,11 @@
     runtime prompts or code so one example passes. Verified = a **variant case the fix was not built on**
     also passes + the original failing case joins the regression/golden set (§2.8, `tests/fixtures/`).
     A deliberate point-fix is OK only when **declared**: "point fix — generalize later" in TASKS/LESSONS.
+    **A CLASS-shaped task names its SURFACES first.** When the done-when is a property that must hold
+    EVERYWHERE (a language, a permission, a unit, a date format), the spec enumerates the surfaces —
+    found by a SEARCH, not from memory — and that list IS the done-when. Skip it and the property is
+    fixed one surface per round, each next one discovered only when the owner tests again: field case,
+    one product's English support took 28 deliveries across 4 lanes over 20 days, every one correct.
     Proving a fix by REMOVING it (revert-sensitivity) has a mandatory order: fix → tests green →
     **COMMIT** → remove → show the break → restore (on an UNCOMMITTED fix the `git checkout` ending
     the probe deletes the fix too); remove in file+suite order — a cached loader hides it otherwise.
@@ -283,6 +288,14 @@
     (`reports/team/<@tag>/<task>_spec.md` "## Comprehension log"), which makes the gate IDEMPOTENT:
     READ the log first — an answered question is NEVER re-asked, so a task spanning sessions/compacts
     resumes from it. Work waits for confirmation; the assignee advances KNOWING what they do.
+    **Then measure the PREMISE — the gate proves you understood the task, never that the task is
+    TRUE.** A premise can survive the relay intact and still be false: the work was already done, the
+    file already said it, the defect was one layer over. So step one of the work is a cheap READ-ONLY
+    check of the claim the task rests on; if it does not hold, the delivery IS the refutation — a
+    measurement note with zero product lines, which CLOSES the task as a result, not a failure. The
+    assigner is not the authority on the premise; the measurement is. (Field: 26 of one project's
+    deliveries refuted their own assignment's premise, several after a full lane round spent
+    reproducing one the assigner had invented.)
     At `## Review`, ROUTING is the orchestrator's alone (owner's main session, or the leader agent
     under §10.42): a deliverer never picks their own reviewer, and the MECHANICAL half (re-running
     done-whens, parity scripts, source reads) is DELEGATED to a verifier whose written report flips
