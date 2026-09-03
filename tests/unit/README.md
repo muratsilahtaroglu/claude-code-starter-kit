@@ -42,6 +42,15 @@ Origin: measured 2026-09-03 — `/rename` lands in the transcript but a `--resum
 `nameSource=derived`, so the agent name vanished on every reopen; the fix was then confirmed
 through the real IDE (three reopened tabs came up `nameSource=user`). KIT-OWNED.
 
+`test_keel_citation_gate.py` — the provenance gate (9 cases: a committed citation is clean · a
+note on disk but not in HEAD is a GHOST and the finding names who cites it · a report swept into
+`done/` still resolves · `..` is normalised before git is asked · a gitignored path is a THIRD class,
+listed not counted · a foreign path's TAIL never matches as a local path · an unresolvable path is
+counted, never dropped · the allowlist silences a deliberate absence · a non-repo is a silent no-op).
+Origin: `git commit -- <path>` skips an untracked file WITHOUT erroring, so a record keeps a
+reference the artefact never earned; measured on a live project where the class repeated three times
+in one day under a written rule, which is why §6.18 became a gate (§10.38). KIT-OWNED.
+
 `test_keel_entry_budget.py` — the per-entry line budget for the always-imported boards (17 cases: oversized new entry
 blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
 · shrinking always passes · pre-existing backlog never blocks unrelated edits · per-file caps tunable via
