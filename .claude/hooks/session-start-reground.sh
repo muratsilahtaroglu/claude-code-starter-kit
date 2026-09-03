@@ -95,14 +95,28 @@ fi
 
 # Audit-due nudge (/keel-audit): deterministic detection ONLY — the hook never spawns the auditor itself.
 # Marker: .claude/last-audit (the audited HEAD sha, written by /keel-audit; committed, so the whole team
-# shares one clock). Threshold: 25 commits (~5 sessions); tune freely. A missing/invalid marker counts
-# from the beginning of history — right for brownfield adopts, quiet on young repos.
+# shares one clock). Threshold: 25 commits (~5 sessions); tune freely. No marker = count from the
+# beginning of history — right for brownfield adopts, quiet on young repos.
+# ⚠ Read the FIRST TOKEN of the FIRST LINE, and nothing else. The original scraped hex characters out
+# of the WHOLE file (`tr -cd '0-9a-fA-F'`), so any prose after the sha donated its a-f letters: a
+# marker written short was silently topped up from the comment below it into a sha that exists
+# nowhere (field case 2026-09-02 — the hook then reported 1190 commits, i.e. all of history). A
+# downstream project had to defend itself with a warning comment in the marker file; the parser is
+# the thing that should be strict, not the file.
+# And an INVALID marker no longer looks like a missing one: counting from the root is the honest
+# answer for a repo that was never audited, but for a corrupt marker it hides the corruption behind a
+# number that merely looks alarming — the two need different sentences.
 if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  base=""
-  [ -f "$DIR/.claude/last-audit" ] && base="$(tr -cd '0-9a-fA-F' < "$DIR/.claude/last-audit" | head -c 40)"
+  base=""; marker=0
+  if [ -f "$DIR/.claude/last-audit" ]; then
+    marker=1
+    base="$(head -n 1 "$DIR/.claude/last-audit" 2>/dev/null | awk '{print $1}' | tr -cd '0-9a-fA-F')"
+    case "${#base}" in 7|8|9|1[0-9]|2[0-9]|3[0-9]|40) ;; *) base="" ;; esac
+  fi
   if [ -n "$base" ] && git -C "$DIR" cat-file -e "${base}^{commit}" 2>/dev/null; then
     n=$(git -C "$DIR" rev-list --count "${base}..HEAD" 2>/dev/null || true)
   else
+    [ "$marker" -eq 1 ] && echo "[keel] .claude/last-audit does not start with a commit sha this repo knows — the audit clock is UNREADABLE, not merely old. Its first line must be the audited sha and nothing else (put any note on later lines); re-run /keel-audit or write the correct sha."
     n=$(git -C "$DIR" rev-list --count HEAD 2>/dev/null || true)
   fi
   n=${n:-0}

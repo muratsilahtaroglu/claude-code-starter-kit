@@ -694,3 +694,63 @@ def test_proposed_adr_is_not_an_orphan(tmp_path):
     _, out = run_hook("session-start-reground.sh", {"source": "startup"},
                       _adr_world(tmp_path, status="Proposed"))
     assert "cited by NOTHING" not in out
+
+
+# --------------------------------------------------------------------------
+# session-start-reground.sh — the audit clock's marker parser
+# --------------------------------------------------------------------------
+# The original scraped hex characters out of the WHOLE marker file, so prose after the sha donated
+# its a-f letters. Field case 2026-09-02: a marker written short was topped up from the comment
+# below it into a sha that exists nowhere, the lookup failed, and the silent fallback counted all of
+# history — the hook announced 1190 commits. A downstream project defended itself with a warning
+# comment INSIDE the marker; the parser is what should be strict.
+
+def _audit_world(tmp_path, marker=None, extra_commits=0):
+    proj = tmp_path / "proj"
+    (proj / ".claude").mkdir(parents=True)
+    (proj / "f.txt").write_text("a\n")
+    git("init", "-q", ".", cwd=proj)
+    git("config", "user.name", "t", cwd=proj)
+    git("config", "user.email", "t@e.com", cwd=proj)
+    git("add", "-A", cwd=proj)
+    git("commit", "-qm", "one", cwd=proj)
+    head = subprocess.run(["git", "-C", str(proj), "rev-parse", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+    for i in range(extra_commits):
+        (proj / "f.txt").write_text("a\n" + "x\n" * (i + 1))
+        git("commit", "-aqm", "c%d" % i, cwd=proj)
+    if marker is not None:
+        (proj / ".claude" / "last-audit").write_text(marker.replace("HEAD", head))
+    return proj
+
+
+def test_prose_after_the_sha_never_contributes_hex(tmp_path):
+    """The marker may carry notes; only the first token of the first line is the clock."""
+    proj = _audit_world(tmp_path, "HEAD\n# deadbeef cafe faceb00c a note about the audit\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
+    assert "commits since the last rules audit" not in out
+    assert "UNREADABLE" not in out
+
+
+def test_unreadable_marker_says_so_instead_of_counting_history(tmp_path):
+    """The 2026-09-02 shape: a short sha plus hex-bearing prose. The old parser fabricated a sha,
+    failed the lookup and silently counted from the root — indistinguishable from never audited."""
+    proj = _audit_world(tmp_path, "zzzz\n# deadbeefcafe\n", extra_commits=30)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
+    assert "UNREADABLE" in out, "a corrupt clock must not masquerade as an old one"
+
+
+def test_missing_marker_counts_from_the_root_without_crying_corruption(tmp_path):
+    """A brownfield adopt has no marker and that is correct — it must not be told its file is broken."""
+    proj = _audit_world(tmp_path, None, extra_commits=30)
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
+    assert "31 commits since the last rules audit" in out
+    assert "UNREADABLE" not in out
+
+
+def test_abbreviated_sha_is_a_valid_clock(tmp_path):
+    proj = _audit_world(tmp_path, "HEAD\n")
+    short = (proj / ".claude" / "last-audit").read_text().strip()[:7]
+    (proj / ".claude" / "last-audit").write_text(short + "\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
+    assert "UNREADABLE" not in out and "commits since" not in out
