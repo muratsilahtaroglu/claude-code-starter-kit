@@ -58,6 +58,8 @@ reports/ritual-stats.md
 .claude/snapshots/
 .claude/ritual-log*
 .claude/agent-team-sessions
+# citation-gate's "have the .md files changed" fingerprint — machine-local, regenerated each run
+.claude/.citation-gate-last
 CLAUDE.local.md
 
 # === Research — commit findings.md; ignore raw/large downloads (rules.md §8) ===
