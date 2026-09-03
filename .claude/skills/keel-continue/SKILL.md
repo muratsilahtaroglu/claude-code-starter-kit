@@ -1,6 +1,6 @@
 ---
 name: keel-continue
-description: Work out what this session should do NEXT and continue from it — resume half-done work, or pick up the lane's newly assigned task, or report that there is nothing to do and go idle. Cross-checks the auto-loaded memory against PLAN.md + git. Role-aware (worker vs orchestrator) and read-only, so any session type may run it.
+description: Work out what this session should do NEXT and continue from it — resume half-done work, or pick up the lane's newly assigned task, or report that there is nothing to do and go idle. Cross-checks the auto-loaded memory against PLAN.md + git. Role-aware: read-only in a worker/solo session (so any session type may run it); in the ORCHESTRATOR it also SYNCS worker boards into the shared files, ROUTES what waits in Review and ASSIGNS the next item — §10.42 makes it their sole writer.
 ---
 
 # /keel-continue — decide what this session does next, then do it
@@ -13,8 +13,11 @@ and ends in exactly one of three verdicts.
 (Renamed from `/keel-start` in v0.8.28: it answers more than "how do I start" — resuming, taking new
 work, and going idle are the same decision, taken from the same evidence.)
 
-**Read-only by design** — it writes no file, so EVERY session type may run it: owner, developer,
-co-agent (rules §10.42 walls co-agents off the WRITE rituals; this isn't one).
+**Read-only in a worker/solo session** — it writes no file there, so EVERY session type may run it:
+owner, developer, co-agent (rules §10.42 walls co-agents off the WRITE rituals; this isn't one).
+**The ORCHESTRATOR branch (§3) is the exception and it is deliberate:** syncing boards, routing reviews
+and assigning work are writes only the orchestrator may make (§10.42), and no other skill carries them —
+so an orchestrator that ends this skill having only *described* a non-empty queue has stopped halfway.
 
 ## 1. Gather — cheap, no double-reads
 `CLAUDE.md` `@`-imports HANDOVER.md · LESSONS.md · TASKS.md · rules.md, re-injected from disk after
@@ -66,7 +69,11 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    own reviewer). Delegate the mechanical half to the `verifier` subagent; keep the owner's list to
    what only a human can do.
 3. **ASSIGN** — a lane is free and `## Next` has work for it: allocate the next id in that lane's
-   series (§9.32) and tell the worker.
+   series (§9.32) and tell the worker. **How you actually reach one:** resolve its address with
+   `python3 .claude/team-addresses.py` (identity ≠ address — a reopened window can be live but
+   unnamed), then `SendMessage` with `to:` set to that NAME. The message is a POINTER — id, spec
+   path, done-when, `## Required reading` — the delivery itself is the file (§10.40); a wake with no
+   file behind it gives the worker nothing to resume from after its next compaction.
    **Before calling a lane "free", check the MAPPING, not `/list-agents` names** (field case
    2026-08-19): `.claude/agent-team-sessions`' date column is a last-seen heartbeat, touched by the
    reground hook on every resolve — grep the lane's agent there. A line dated within ~2 days means
@@ -88,9 +95,17 @@ Reply with a four-part brief, one screen max:
 4. **Next step** — the verdict from §3 and ONE concrete action; then start it. On IDLE,
    the next step is "waiting for an assignment" — that is a complete answer, not a failure.
 
+**As the orchestrator the brief has a different shape** — you own no in-flight item, so parts 1–2
+are the BOARD, not your work: (1) **Lanes** — who is on what, plus any lane whose heartbeat has gone
+stale; (2) **Queues** — what waits in `## Review`, what is unrouted, which `board.md` files are newer
+than TASKS; (3) **Warnings** as above; (4) **Next step** — the SYNC/ROUTE/ASSIGN verdict and the ONE
+action, *then perform it*: the sync writes the shared files, the routing and assignment messages go
+out. Reporting a non-empty queue and stopping is not a completed run.
+
 Resuming a half-done item continues directly; STARTING NEW work first verifies tests pass
 (CLAUDE.md session protocol). If the memory files contradict each other or git, surface the
 conflict in the brief and ask which wins (§10.36) — never silently pick a side.
 
-Boundaries: writes nothing (blocks/board/lessons are `/keel-handover`'s and `/keel-distill`'s job) ·
+Boundaries: a worker/solo run writes nothing (blocks/board/lessons are `/keel-handover`'s and
+`/keel-distill`'s job; the orchestrator's SYNC/ROUTE/ASSIGN writes are the §3 exception) ·
 never auto-picks a foreign-owned item · never flips PLAN statuses (that's `/keel-phase-review`).

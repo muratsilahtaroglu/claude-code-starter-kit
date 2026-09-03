@@ -10,7 +10,7 @@ Which mechanism for what (skill vs. subagent vs. rule vs. hook vs. CLAUDE.md): `
 ## Session rhythm
 | Skill | When |
 |---|---|
-| `keel-continue` | Decide what this session does next and do it — RESUME half-done work · TAKE the lane's next assigned item (through the comprehension gate) · or report IDLE. Role-aware; read-only, so any session type may run it |
+| `keel-continue` | Decide what this session does next and do it — RESUME half-done work · TAKE the lane's next assigned item (through the comprehension gate) · or report IDLE. In the ORCHESTRATOR the verdicts are instead SYNC boards → ROUTE Review → ASSIGN, and it performs them (its writes are §10.42's; a worker/solo run stays read-only) |
 | `keel-handover` | Before ending a session: add the dated block (done / tried-failed / latest / next), drain `## Discovered`, move deliveries to `## Review` |
 | `keel-compact` | Before a manual `/compact`: runs the handover procedure, verifies freshness, then hands off to `/compact`. One command instead of several |
 | `keel-distill` | When a memory file hits its cap: rotate HANDOVER blocks to the archive, scope-triage and promote LESSONS entries, drain the inbox, lint for drift |
