@@ -172,6 +172,10 @@
     a must-run/periodic test is identified, or a mid-project rule is agreed — the AI asks **"shall I
     note this?"** and on approval appends an atomic, dated, tagged line (`[rule] [test] [fail] [gotcha]`)
     to `LESSONS.md` **immediately** — never "at compact time" (a session can die before compact runs).
+    **Read before you append** (the file is already in context — this costs nothing): does an entry
+    already say it (strengthen that one, keep its date), CONTRADICT it (the older one may be the
+    retired-correction line of a lesson measured wrong — then you are about to re-learn it), or has
+    it graduated (a `## Index` router line means the knowledge lives in a rule/skill/ADR/doc now)?
     `LESSONS.md` differs from `rules.md`: rules = the constitution written at project start; lessons =
     critical user↔AI knowledge **accumulated during** the project. **Machine-memory language =
     ENGLISH:** HANDOVER/LESSONS/worker boards are read by sessions, not humans — EN costs fewer

@@ -6,7 +6,10 @@
 >
 > - **Hot path:** the MOMENT the user corrects you, an approach fails, or a rule/test is agreed — ask
 >   *"shall I note this?"* and append HERE on approval. Never "at compact time". Unsure where it
->   belongs? Here — misfiled beats lost.
+>   belongs? Here — misfiled beats lost. **Read this file before appending** (it is already in
+>   context): an entry that says it → strengthen that one · an entry that CONTRADICTS it → it may be
+>   a retired lesson's correction line, so you are about to re-learn something measured wrong · an
+>   `## Index` line on the topic → the knowledge graduated, the pointer is the answer.
 > - **English** (rules §9.31). Exceptions: quoted owner wording, and a language-specific domain fact
 >   whose example translation would destroy.
 > - **Format:** atomic ONE-LINE entries, dated + tagged, newest first in each group. A lesson proven
