@@ -48,6 +48,33 @@ this window under its directory-derived name again. The orchestrator read "name 
 (addressing) are two different layers, and only one of them survives a client restart. `/rename
 <name>` is idempotent and cheap — run it any time addressing might have reset, not only once.
 
+**Make it automatic — install the launch wrapper once per machine (recommended).** Measured
+2026-09-03: `/rename` IS written to the session transcript (an `agent-name` record), but a process
+started with `--resume` does not copy it into the messaging record — it comes up
+`nameSource=derived`. So "I forgot to rename" is structural, not a lapse. `claude --name <agent>`
+at launch is the documented flag for that record, and the VS Code extension lets a script front the binary:
+
+    cp .claude/claude-launch-wrapper.sh ~/.claude/ && chmod +x ~/.claude/claude-launch-wrapper.sh
+    # VS Code settings on the machine that RUNS claude (remote host, if Remote-SSH):
+    #   "claudeCode.claudeProcessWrapper": "/home/<you>/.claude/claude-launch-wrapper.sh"
+
+From then on every `--resume` launch is named from `.claude/agent-team-sessions` (this step's
+mapping) — or, on any project without a map, from the transcript's own last rename. **Verify
+once after installing** — and do it with the trace, because the `exec` is transparent and the process
+cmdline looks identical either way: `touch ~/.claude/keel-launch-wrapper.log`, reload the IDE window
+(the setting is read when the extension host starts), reopen one agent tab, then read the log — a
+`named --name=<agent>` line means it fired. `python3 .claude/team-addresses.py` should then show that
+lane OK. Delete the log file to disarm; the wrapper never creates it. New sessions
+pass through untouched; the wrapper never writes to stdout and fails open to the original launch.
+The `team-addresses.py --hook` SessionStart line stays as the safety net: it tells THIS window,
+by name, when its address and identity have diverged.
+
+**Two machines, two VS Code builds = twins.** If the owner works one remote host from two clients
+on DIFFERENT VS Code versions, two VS Code servers stay alive and each resumes the same session
+ids — every identity shows 2–3 live windows. The SessionStart line marks which twin is ATTACHED
+(its server has a client) and which is DETACHED, with the `kill` command for the detached pids;
+the durable fix is version parity between the two clients (see steering "Addressing").
+
 ## 3. Adopt the charter
 Read `.claude/agents/team-<name>.md` and take it as this session's standing orders: mission, scope
 paths, lane, author folder, review routing, and — for workers — the FORBIDDEN list (no WRITE-rituals,

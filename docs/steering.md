@@ -347,6 +347,37 @@ silent-clobber shape) · an unregistered live session working the repo with no c
 `--hook` mode runs at SessionStart — one line when healthy, warnings only when something is off.
 An address is never remembered, it is resolved.
 
+**Why the name keeps vanishing — and the launch wrapper that ends it (measured 2026-09-03).**
+`/rename` writes an `agent-name` record into the session TRANSCRIPT (110 such lines in one real
+session), but a process started with `--resume <sid>` does not copy that name into its messaging
+record `~/.claude/sessions/<pid>.json` — it comes up `nameSource=derived` as `<repo>-xx`. Compaction
+keeps the name (same process); a reopen, a Remote-SSH reconnect or `--resume` loses it. So
+"forgot to rename" is the product's behaviour, not the owner's memory. `claude --name <n>` at launch
+is the documented launch flag for that record (`claude --help`) and the VS Code extension's machine-scoped
+`claudeCode.claudeProcessWrapper` lets a script front the binary: `.claude/claude-launch-wrapper.sh`
+prepends `--name <agent>` on every resume, from `.claude/agent-team-sessions` first and the
+transcript's own last rename second, and fails open to the original launch on any doubt. Install
+once per machine (`/keel-agent-team-start` §2b); the `team-addresses.py --hook` SessionStart line
+remains the safety net and now addresses THIS window by name when its address has diverged.
+CONFIRMED through the IDE on 2026-09-03: with the wrapper installed, three reopened tabs came up
+`nameSource=user` under their own agent names while the un-reopened twins stayed `derived`. Prove it
+with the wrapper's opt-in trace (`touch ~/.claude/keel-launch-wrapper.log`), never with `ps` — the
+`exec` is transparent, so a wrapped and an unwrapped launch have identical process cmdlines.
+
+**Two machines, two VS Code builds — the twin problem.** An owner working one remote host from
+home and from work, with the two clients on different VS Code versions, keeps two VS Code servers
+alive at once (`~/.vscode-server/cli/servers/Stable-<commit>/`, one per build; eight builds were
+found installed). Each client's server owns its own `claude` processes and resumes the SAME session
+ids, so `/list-agents` shows every identity twice — both twins with live sockets, both writing ONE
+transcript (the silent-clobber shape). Process age is the WRONG axis to pick the real one: going
+back to the other machine makes the OLDER twin the live one. The right axis is whether the twin's
+VS Code server has a CLIENT attached — its `code-<commit> … command-shell` process holds an
+ESTABLISHED TCP connection iff a client is connected — and `team-addresses.py` reports
+ATTACHED/DETACHED per twin with the `kill` command for the detached pids (they hold nothing that is
+not already on disk). The durable fix is outside the kit: keep both clients on the SAME VS Code
+version so they share one server, and when switching machines close the Claude tabs or run
+"Remote-SSH: Kill VS Code Server on Host" so no server is left holding sessions nobody can see.
+
 **A lost lane is never re-spawned as a subagent.** When a worker cannot be reached by name, ask
 the owner — do NOT `Agent`-spawn its charter as a subagent "to keep things moving": the spawn is a
 history-less copy, invisible in the owner's dialog list, and it silently duplicates whatever the

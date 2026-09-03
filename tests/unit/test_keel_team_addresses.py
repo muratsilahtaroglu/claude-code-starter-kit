@@ -4,8 +4,12 @@ WHY THIS FILE EXISTS. A session's NAME is process-local (`~/.claude/sessions/<PI
 pid) and silently reverts on every window/process recreation; the IDENTITY lives on disk keyed by
 session-id and survives. Confusing the two cost a live team a broadcast re-identify and nearly a
 double-assigned lane (2026-08-19), and its rarer sibling — one session-id driven from TWO windows —
-is the silent-clobber shape §10.42 exists to prevent. The resolver's core is pure, so this matrix
-feeds it fixtures directly. Backported from alice_v2 (`scripts/team_addresses.py`, 2026-08-24).
+is the silent-clobber shape §10.42 exists to prevent. On 2026-09-03 that sibling turned out to be
+the NORMAL case for an owner who works one remote host from two machines on different VS Code
+versions: two VS Code servers, every identity twinned. Process AGE is the wrong axis to pick the
+live twin (going back to the other machine makes the OLDER one live); whether the twin's VS Code
+server has a CLIENT attached is the right one. The resolver's core is pure, so this matrix feeds it
+fixtures directly. Backported from alice_v2 (`scripts/team_addresses.py`, 2026-08-24).
 
 KIT-OWNED FILE (`/keel-update` TOOLING exception, `tests/unit/test_keel_*.py`).
 """
@@ -40,7 +44,7 @@ def alive(*pids):
 def test_healthy_lane_is_ok():
     rows, unreg = ta.resolve([("s1", "frontend")], [rec("s1", "frontend", 11)], alive(11), CWD)
     assert rows == [{"agent": "frontend", "sid": "s1", "name": "frontend", "pid": 11,
-                     "status": "OK", "cwd": CWD, "windows": 1}]
+                     "status": "OK", "cwd": CWD, "windows": 1, "attached": None}]
     assert unreg == []
 
 
@@ -75,12 +79,55 @@ def test_live_session_in_another_repo_is_not_our_business():
     assert unreg == []
 
 
+def test_attachment_is_carried_per_pid():
+    rows, _ = ta.resolve([("s1", "frontend")],
+                         [rec("s1", "frontend", 11), rec("s1", "alice-v2-ea", 12)],
+                         alive(11, 12), CWD, attached={11: False, 12: True})
+    assert {r["pid"]: r["attached"] for r in rows} == {11: False, 12: True}
+
+
+# --------------------------------------------------------------------------
+# attachment() — the two-machine axis
+# --------------------------------------------------------------------------
+
+def test_attachment_maps_build_signal_onto_pids():
+    """Two VS Code builds alive: only the one with a connected client counts as attached."""
+    res = ta.attachment({302033: "08d4889f", 1442911: "fc3def67", 777: None},
+                        {"08d4889f": False, "fc3def67": True})
+    assert res == {302033: False, 1442911: True, 777: None}
+
+
+def test_attachment_never_guesses_when_signal_is_missing():
+    """A build we could not measure (ss unavailable, foreign tree) stays None, never False."""
+    assert ta.attachment({11: "abc"}, {}) == {11: None}
+
+
+# --------------------------------------------------------------------------
+# self_line() — the SELF check at SessionStart
+# --------------------------------------------------------------------------
+
+def test_self_check_names_the_rename_when_own_address_diverged():
+    """The 2026-09-03 case, seen from inside: identity @frontend, address 'alice-v2-ea'."""
+    lines = ta.self_line({"sessionId": "s1", "name": "alice-v2-ea"}, [("s1", "frontend")])
+    assert len(lines) == 1
+    assert "THIS window is @frontend" in lines[0] and "/rename frontend" in lines[0]
+
+
+def test_self_check_silent_when_address_matches():
+    assert ta.self_line({"sessionId": "s1", "name": "frontend"}, [("s1", "frontend")]) == []
+
+
+def test_self_check_silent_when_not_a_registered_identity():
+    assert ta.self_line({"sessionId": "s-solo", "name": "repo-1a"}, [("s1", "frontend")]) == []
+    assert ta.self_line(None, [("s1", "frontend")]) == []
+
+
 # --------------------------------------------------------------------------
 # format_hook() — what SessionStart injects
 # --------------------------------------------------------------------------
 
-def _hook(registry, records, live_pids):
-    rows, unreg = ta.resolve(registry, records, alive(*live_pids), CWD)
+def _hook(registry, records, live_pids, attached=None):
+    rows, unreg = ta.resolve(registry, records, alive(*live_pids), CWD, attached)
     return ta.format_hook(rows, unreg)
 
 
@@ -104,7 +151,29 @@ def test_mismatch_names_the_rename_fix():
     assert "ADDRESS ≠ IDENTITY" in joined and "/rename frontend" in joined
 
 
-def test_double_window_warns_clobber():
+def test_double_window_without_signal_warns_clobber():
     lines = _hook([("s1", "frontend")],
                   [rec("s1", "frontend", 11), rec("s1", "frontend", 12)], (11, 12))
     assert any("2 WINDOWS" in l for l in lines)
+
+
+def test_detached_twin_is_named_with_the_kill_command():
+    """The measured shape: the renamed OLD twin is detached, the derived NEW twin is attached."""
+    lines = _hook([("s1", "orchestrator")],
+                  [rec("s1", "orchestrator", 302033), rec("s1", "alice-v2-ea", 1442911)],
+                  (302033, 1442911), attached={302033: False, 1442911: True})
+    joined = "\n".join(lines)
+    assert "DETACHED" in joined and "pid 302033" in joined
+    assert "kill 302033" in joined, "the owner decides, but the exact command must be on the line"
+    assert "attached: pid 1442911" in joined
+
+
+def test_detached_twins_name_does_not_count_as_the_reachable_address():
+    """Only the attached twin carries the renamed identity here — the resolver must still tell the
+    owner to /rename the ATTACHED one, not report the lane healthy because a dead-end twin is named."""
+    lines = _hook([("s1", "orchestrator")],
+                  [rec("s1", "orchestrator", 302033), rec("s1", "alice-v2-ea", 1442911)],
+                  (302033, 1442911), attached={302033: False, 1442911: True})
+    joined = "\n".join(lines)
+    assert "ADDRESS ≠ IDENTITY" in joined and "/rename orchestrator" in joined
+    assert "address=identity" not in joined

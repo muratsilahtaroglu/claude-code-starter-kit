@@ -21,11 +21,22 @@ projects untouched · fails open · the block is logged with @attribution). Orig
 team design of 2026-08-19 — a permission rule cannot express "by target", so the topology had to
 become a hook (`reports/2026-08-19-agent-team-messaging.md`). KIT-OWNED.
 
-`test_keel_team_addresses.py` — the identity→address resolver (10 cases: healthy lane · closed
+`test_keel_team_addresses.py` — the identity→address resolver (18 cases: healthy lane · closed
 window · reverted display name flagged as NAME_MISMATCH not death · one session-id in two windows ·
 unregistered live session · per-identity aggregation so a stale dead row beside a live one stays
-quiet). Origin: the 2026-08-19 "name unreachable ≠ session dead" incident; resolver backported from
-alice_v2's `scripts/team_addresses.py`. KIT-OWNED.
+quiet · the two-machine axis: ATTACHED/DETACHED twins from the VS Code server's client signal, never
+guessed when the signal is missing · the SELF check that tells THIS window its address diverged).
+Origin: the 2026-08-19 "name unreachable ≠ session dead" incident and the 2026-09-03 two-VS-Code-
+builds twin case; resolver backported from alice_v2's `scripts/team_addresses.py`. KIT-OWNED.
+
+`test_keel_launch_wrapper.py` — the resume-keeps-its-name launcher (12 cases: identity map names
+a resumed session · separate-arg `--resume` form · transcript `agent-name` record as fallback · map
+wins over transcript · new sessions, explicit `--name`, unknown sids pass through untouched ·
+unsafe map tokens never injected · fails open when the config dir is missing · never writes stdout · the opt-in trace records both
+branches and is never created by the wrapper).
+Origin: measured 2026-09-03 — `/rename` lands in the transcript but a `--resume`d process comes up
+`nameSource=derived`, so the agent name vanished on every reopen; the fix was then confirmed
+through the real IDE (three reopened tabs came up `nameSource=user`). KIT-OWNED.
 
 `test_keel_lessons_budget.py` — the LESSONS per-entry line budget (12 cases: oversized new entry
 blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
