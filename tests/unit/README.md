@@ -53,11 +53,12 @@ Origin: `git commit -- <path>` skips an untracked file WITHOUT erroring, so a re
 reference the artefact never earned; measured on a live project where the class repeated three times
 in one day under a written rule, which is why §6.18 became a gate (§10.38). KIT-OWNED.
 
-`test_keel_entry_budget.py` — the per-entry line budget for the always-imported boards (17 cases: oversized new entry
+`test_keel_entry_budget.py` — the per-entry line budget for the always-imported boards (18 cases: oversized new entry
 blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
 · shrinking always passes · pre-existing backlog never blocks unrelated edits · per-file caps tunable via
 keel-caps · --check baseline auto-lowers and never auto-raises · the same gate over TASKS.md board
-items, whose lane `### ` headings end an entry and whose doctrine-header bullets are not entries).
+items, whose lane `### ` headings end an entry and whose doctrine-header bullets are not entries · a fenced code block is neither an entry nor
+padding for the one before it).
 Origin: a live project measured 450→1039 LESSONS lines in five days from entries GROWING, not
 multiplying — raising the file cap "was never enough"; the same disease then showed on its board
 (12 `## Review` items in 211 lines), so one hook guards both files. KIT-OWNED.

@@ -310,7 +310,7 @@ if [ -f "$DIR/TASKS.md" ] && [ -d "$DIR/.git" ]; then
     fi
   done
   if [ -n "$stale" ]; then
-    echo "[keel] delivery(ies) waiting ${cap_RD}+ days in '## Review', oldest ${oldest}d:${stale} — the chain stalls at the HUMAN step, so triage by what only you can do: delegate every re-runnable done-when to the verifier subagent (its report flips the line to 'verified — owner part: <one sentence>'), and keep your own eyes for that one sentence. Tune the threshold with REVIEW_DAYS in .claude/keel-caps."
+    echo "[keel] delivery(ies) waiting ${cap_RD}+ days in '## Review', oldest ${oldest}d:${stale} — the chain stalls at the HUMAN step: delegate re-runnable done-whens to the verifier subagent, keep only the owner sentence (§10.41; REVIEW_DAYS in .claude/keel-caps)."
   fi
 fi
 
@@ -337,7 +337,7 @@ if [ -f "$DIR/LESSONS.md" ]; then
     fi
     oldest=$(grep -E '^- 20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$DIR/LESSONS.md" | sort | head -3 | cut -c3-72 | paste -sd '|' | sed 's/|/ · /g')
     if [ "${lentries:-0}" -gt 0 ]; then
-      echo "[keel] LESSONS.md at ${llines}/${cap_L} lines, ${lentries} entries${since} — the entry budget holds LINES, but nothing LEAVES: promotion and retirement are the only exits (rules §9.33) and no signal names a candidate. Oldest three, still unpromoted: ${oldest}. At the next /keel-distill ask of each: still true → promote (rules/skill/ADR/docs) and delete here · proven wrong → retire to docs/lessons-retired.md, keep ONE corrective line · resolved → delete."
+      echo "[keel] LESSONS.md ${llines}/${cap_L} lines, ${lentries} entries${since} — the entry budget holds LINES but nothing LEAVES; oldest unpromoted: ${oldest}. Triage at the next /keel-distill: still true → promote · proven wrong → retire to docs/lessons-retired.md · resolved → delete (rules §9.33)."
     fi
   fi
 fi
@@ -354,14 +354,14 @@ if [ -d "$DIR/docs/adr" ]; then
     [ -f "$f" ] || continue
     b=$(basename "$f"); num=${b%%-*}
     case "$num" in 0000) continue ;; esac
-    grep -qE '^\*\*Status:\*\* *Accepted' "$f" 2>/dev/null || continue
+    grep -qiE '^\*\*Status:?\*\*:? *Accepted' "$f" 2>/dev/null || continue
     n=$(grep -rl --include='*.md' --exclude-dir=.git --exclude-dir=node_modules \
           -e "$b" -e "ADR-${num}" "$DIR" 2>/dev/null \
         | grep -v "/docs/adr/" | grep -v "handover-archive.md" | grep -v "lessons-retired.md" | wc -l)
     [ "$n" -eq 0 ] && orph="$orph ADR-${num}"
   done
   if [ -n "$orph" ]; then
-    echo "[keel] Accepted ADR(s) cited by NOTHING outside docs/adr/:${orph} — a decision no record, rule or CLAUDE.md 'Key decisions' line points at is either foundational and unlinked (add the pointer) or overtaken and never marked Superseded (owner flips the status; /keel-distill proposes it, rules §9.33)."
+    echo "[keel] Accepted ADR(s) cited by NOTHING outside docs/adr/:${orph} — unlinked foundation (add a pointer) or overtaken and never marked Superseded (owner flips; /keel-distill proposes, §9.33)."
   fi
 fi
 
@@ -504,12 +504,10 @@ except Exception:
 entry = projects.get(root) or projects.get(d) or {}
 if entry.get("hasTrustDialogAccepted"):
     sys.exit(0)
-print("[keel] %d permissions.allow rule(s) in .claude/settings.json are NOT in effect: this workspace "
-      "(%s) has not been trusted, and allow rules GRANT capability so they are withheld until the trust "
-      "dialog is accepted (deny/ask still apply). Symptom: everything keeps asking for approval, and "
-      "\"allow for this session\" hides it until the next restart. Fix: accept the trust prompt in an "
-      "interactive session started in this repo. Trust is keyed on the repo root and does NOT inherit "
-      "from a parent directory (docs/steering.md 'Rules of thumb')." % (len(allow), root))
+print("[keel] %d permissions.allow rule(s) in .claude/settings.json are NOT in effect — this workspace (%s) "
+      "has not been trusted, and allow rules are withheld until the trust dialog is accepted (deny/ask still "
+      "apply). Accept the prompt in an interactive session here; trust is keyed on the repo root and does NOT "
+      "inherit from a parent (docs/steering.md 'Rules of thumb')." % (len(allow), root))
 TRUSTPY
 )
   [ -n "$trust_msg" ] && echo "$trust_msg"

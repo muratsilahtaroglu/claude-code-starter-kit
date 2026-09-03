@@ -78,23 +78,32 @@ def max_lines(root, prof):
 
 
 def entries(text, prof):
-    """[(first_line, n_lines)] for every entry in the text, per the file's profile."""
-    out = []
-    lines = text.splitlines()
-    start = None
-    for i, line in enumerate(lines):
-        if prof["entry_re"].match(line):
-            if start is not None:
-                out.append((lines[start], i - start))
-            start = i
-        elif line.startswith("## ") or line.startswith("### "):
-            if start is not None:
-                out.append((lines[start], i - start))
-                start = None
-    if start is not None:
-        out.append((lines[start], len(lines) - start))
-    return out
+    """[(first_line, n_lines)] for every entry in the text, per the file's profile.
 
+    Lines inside a ``` fence are quoted text — a `- [ ]` example in a spec snippet or the doctrine
+    header — and are neither an entry nor padding for the one before it (measured 2026-09-03: an
+    index-difference count made them both). A `## `/`### ` heading ends the current entry."""
+    out = []
+    head, n, fenced = None, 0, False
+    for line in text.splitlines():
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        if prof["entry_re"].match(line):
+            if head is not None:
+                out.append((head, n))
+            head, n = line, 1
+        elif line.startswith(("## ", "### ")):
+            if head is not None:
+                out.append((head, n))
+            head = None
+        elif head is not None:
+            n += 1
+    if head is not None:
+        out.append((head, n))
+    return out
 
 def oversized(text, cap, prof):
     return [(head[:100], n) for head, n in entries(text, prof) if n > cap]

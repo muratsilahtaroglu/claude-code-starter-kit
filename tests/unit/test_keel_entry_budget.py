@@ -195,3 +195,12 @@ def test_board_and_lessons_keep_separate_baselines(board):
     assert rc == 0
     assert (board / ".claude" / "tasks-backlog").exists()
     assert not (board / ".claude" / "lessons-backlog").exists(), "no LESSONS.md here to account for"
+
+
+def test_fenced_code_is_neither_an_entry_nor_padding(board):
+    """A `- [ ]` inside a code fence (a spec snippet, the doctrine header's example) is quoted text.
+    Measured 2026-09-03 before the fix: it became a phantom entry AND the real item before it grew by
+    the fence lines — a false BLOCK on an unrelated edit, the gate-with-false-positives class."""
+    fence = "```md\n- [ ] example item\n  a\n  b\n  c\n  d\n  e\n```\n"
+    rc, _ = run(board, _board_edit(board, TASK_OK, TASK_OK + fence + "- [ ] T9: x (@dev) — done-when: y\n"))
+    assert rc == ALLOW
