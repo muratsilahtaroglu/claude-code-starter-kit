@@ -1,0 +1,14 @@
+# .claude/citation-allow — paths the citation gate must not report (one per line, reason after #).
+#
+# ONLY for a path whose absence is DELIBERATE and permanent. A path that is merely missing today is
+# a finding, not an entry here: silencing it hides the class the gate exists to catch (rules §6.18).
+# The gate ships non-empty on the kit itself because the TEMPLATE quotes example paths in its own
+# prose; a real project's list should be short, and every line has to say why.
+
+# --- illustrative paths inside template prose (they name what a project WILL create, not what exists)
+docs/team.md                        # steering + /keel-team: "materialize a project-owned docs/team.md" — the kit deliberately ships no template
+tests/integration/test_parser.py    # tests/README.md example of a why-line
+scratch/co56/premise_check.py       # scratch/README.md example of the 1-line-purpose header
+reports/team/alice_co-agent/r25_go_smoke_2026-08-12.md  # field example quoted in the team reports template
+.claude/hooks/hooks.json            # named in reports/2026-08-18-hook-audit.md as the plugin-era registry that was RETIRED in v0.8.23
+.claude/hooks/../rules.md           # reports/2026-08-18-hook-audit.md:75 quotes this to demonstrate `..` handling — it is the example, not a citation

@@ -60,6 +60,8 @@ reports/ritual-stats.md
 .claude/agent-team-sessions
 # citation-gate's "have the .md files changed" fingerprint — machine-local, regenerated each run
 .claude/.citation-gate-last
+# pytest-benchmark's output dir — created empty by the plugin, never an artifact
+.benchmarks/
 CLAUDE.local.md
 
 # === Research — commit findings.md; ignore raw/large downloads (rules.md §8) ===

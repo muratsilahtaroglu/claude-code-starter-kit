@@ -25,9 +25,13 @@ tested against the repo's ACTUAL top-level entries and the extension is not enum
 a new tree or file type is covered the day it is created, with no list to forget.
 
 INHERITED, HARD-WON, DO NOT SIMPLIFY:
-* Lookbehind. Without it a LONGER foreign path's tail matches as a local path, and it is harmful
-  both ways: absent from HEAD it invents a ghost, present it declares a real citation resolved.
-  Measured there as 56% of the standing debt.
+* Lookbehind. Without it, a path whose TAIL begins with a real top-level name is read as a repo
+  path: `~/reports/note.md` or `/reports/note.md` become `reports/note.md`, inventing a ghost when
+  HEAD lacks it and declaring a real citation resolved when it has one. NOTE, measured 2026-09-03
+  rather than inherited: the source tool called this 56% of its standing debt, but there the tree
+  list was hand-written; HERE `repo_roots()` already rejects the common `/usr/lib/.../reports/x.md`
+  shape, so the lookbehind's remaining job is only the leading-separator case above. The number does
+  not transfer — the mechanism does (§10.37: re-derive the reference, do not import the figure).
 * `os.path.normpath` before asking git. `os.path.exists("docs/../rules.md")` is True (the OS
   resolves it) but git rejects `..` inside a tree path, so every citation carrying `..` was
   reported as "on disk, not in HEAD" forever — an unfixable red.
@@ -173,9 +177,12 @@ def report(root):
     if unresolved:
         print("[citation-gate] %d cited path(s) found NOWHERE (not on disk, not in HEAD, not "
               "ignored) — counted, not assumed harmless: %s" % (len(unresolved), ", ".join(unresolved[:8])))
-    if ignored:
-        print("[citation-gate] %d cited path(s) are .gitignore'd BY DESIGN (a doc may legitimately "
-              "name a file nobody commits) — listed, not counted: %s"
+    # The BY DESIGN class exists so an ignored path is never SILENTLY dropped — but printing it when
+    # there is nothing else to say is the noise this gate warns about, every run, forever. It is
+    # context for a real finding, so it rides along with one and stays quiet on its own.
+    if ignored and (ghosts or unresolved):
+        print("[citation-gate] (context) %d other cited path(s) are .gitignore'd BY DESIGN — a doc may "
+              "legitimately name a file nobody commits; listed, not counted: %s"
               % (len(ignored), ", ".join(ignored[:5])))
     return 1 if ghosts else 0
 

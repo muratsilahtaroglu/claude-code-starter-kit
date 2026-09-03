@@ -43,7 +43,7 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   tailor it, so it is diffed hunk-by-hunk rather than skipped with the tree (without this the
   scratch-as-evidence rule of v0.8.25 could never reach an adopted project).
 - **TOOLING — template-owned; summarize changes, one approval for the batch:** `.claude/skills/**` ·
-  `.claude/hooks/**` · `.claude/agents/{researcher,verifier,auditor,README}.md` · `.claude/rules/README.md`
+  `.claude/hooks/**` · `.claude/*.py` · `.claude/claude-launch-wrapper.sh` (kit-owned tools that sit at the `.claude/` root — team-addresses, ritual-report, the launch wrapper) · `.claude/agents/{researcher,verifier,auditor,README}.md` · `.claude/rules/README.md`
   (+ example) · `tests/unit/test_keel_*.py` · `docs/security.md` · `docs/steering.md` ·
   `docs/adr/0000-adr-template.md` · `docs/adr/README.md` · `docs/assets/` · `CONTRIBUTING.md`
   (kit-meta by its own first line) · folder `README.md`s.

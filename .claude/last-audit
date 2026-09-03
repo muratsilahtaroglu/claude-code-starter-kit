@@ -1,0 +1,8 @@
+014b2b37f5b12a5375dca24b2c51446558bb5df2
+
+# Audit marker (rules §4.11 / /keel-audit). First line = the audited sha, nothing else.
+# 2026-09-03, FIRST audit in this repo: range 9020928..014b2b3 (25 commits / 54 files / +4140-393).
+# `auditor` subagent + owner spot-checks. 14 findings (2 high / 6 medium / 2 low / 4 info); 10 fixed.
+# NOT fixed, recorded as accepted: the kit does not dogfood HANDOVER §1.4 (its HANDOVER.md is the
+# shipped template, so a real block would publish to every clone) and has no separate dev-memory
+# surface. Owner decision, re-raise at the next audit.

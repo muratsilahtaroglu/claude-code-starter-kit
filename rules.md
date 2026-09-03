@@ -242,9 +242,12 @@
 38. **Rule budget.** Capped like the memory files: **~400 lines**, `.claude/keel-caps`-tunable (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written); a
-    constitution too long to hold in attention is decoration. The stock TEMPLATE is ~290 of those
-    lines, so **your project's own rules get ~110** — the budget line is drawn there, not at the
-    template. (It was ~300 total until 2026-08-18, which measured out as ~6 lines for the project and
+    constitution too long to hold in attention is decoration. **Measure, do not quote:** the stock
+    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~340 at v0.8.35), so your project's own
+    rules get the REMAINDER — check it before adding, and if the remainder is too thin the answer is
+    to retire template text or raise `RULES` in `.claude/keel-caps`, not to squeeze. A hard-coded
+    pair here rots: the previous "~290 / ~110" was written once and was 50 lines stale within a
+    fortnight, in the very rule that forbids a copied cap number (§9.33). (It was ~300 total until 2026-08-18, which measured out as ~6 lines for the project and
     forced every real project to raise the cap on day one — the default was wrong, not the projects.)
     Template text that merely restates a skill is compressed to the invariant + the pointer.
 39. **Fix the class, not the instance.** When a fix targets one failing case (a query, a test, an input),

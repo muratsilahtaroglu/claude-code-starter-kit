@@ -45,7 +45,7 @@ started in that repo. (Docs: "Project allow rules and workspace trust".)
 - **Always-on discipline** (`rules.md`, `HANDOVER.md`, `LESSONS.md`, `TASKS.md`) → `@`-imported by `CLAUDE.md`.
 - **Procedures** → skills: `/keel-continue` (decide and continue after a compact/cold start/wake: cross-check the
   auto-loaded memory against PLAN.md + git → a "where you left off · in-flight · warnings · next step"
-  brief; read-only, so even co-agents may run it),
+  brief; read-only in a worker/solo run, so even co-agents may run it — the ORCHESTRATOR branch instead syncs boards, routes Review and assigns, and writes (§10.42)),
   `/keel-agent-team-create` + `/keel-agent-team-start` (same-machine agent team: owner-only
   roster/charters · per-chat identity that survives compaction via the session map — see "Agent
   teams" under Multi-user below), `/keel-team` (human team on different machines: owner-only one-run

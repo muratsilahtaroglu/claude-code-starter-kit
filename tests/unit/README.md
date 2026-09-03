@@ -3,7 +3,7 @@
 <!-- `test_<name>.py` — what it guards + origin (phase/bug). Example:
 `test_scoring.py` — scoring edge cases: 0-price, missing fields (phase 2; the silent-NaN bug). -->
 
-`test_keel_hooks.py` — the kit's own hook regression matrix (158 cases: block-dangerous ·
+`test_keel_hooks.py` — the kit's own hook regression matrix (165 cases: block-dangerous ·
 owner-guard · reground TASKS parsing + repo invariants · the workspace-trust check that names
 allow rules withheld until the trust dialog is accepted, silent when trusted, when there are no
 allow rules, or when the config is unreadable · the review-DECAY check: an old delivery is named
@@ -16,7 +16,7 @@ while eleven commit messages claimed a verified matrix — every one had been ru
 thrown away (`reports/2026-08-18-hook-audit.md`). KIT-OWNED: `/keel-update` replaces
 `test_keel_*.py`, so never put your project's tests in that name.
 
-`test_keel_telemetry.py` — the kit's observability layer (13 cases: ritual-log agent tagging ·
+`test_keel_telemetry.py` — the kit's observability layer (17 cases: ritual-log agent tagging ·
 probe isolation · Stop-hook traces · the duplicate detector's signal · /keel-stats reporting a
 silent event kind as an INSTRUMENT gap). Origin: a false "hooks are double-firing" warning that
 ran at every session start for two days, caused by test runs writing into the live telemetry
@@ -45,10 +45,9 @@ Origin: measured 2026-09-03 — `/rename` lands in the transcript but a `--resum
 `nameSource=derived`, so the agent name vanished on every reopen; the fix was then confirmed
 through the real IDE (three reopened tabs came up `nameSource=user`). KIT-OWNED.
 
-`test_keel_citation_gate.py` — the provenance gate (9 cases: a committed citation is clean · a
+`test_keel_citation_gate.py` — the provenance gate (11 cases: a committed citation is clean · a
 note on disk but not in HEAD is a GHOST and the finding names who cites it · a report swept into
-`done/` still resolves · `..` is normalised before git is asked · a gitignored path is a THIRD class,
-listed not counted · a foreign path's TAIL never matches as a local path · an unresolvable path is
+`done/` still resolves · `..` is normalised before git is asked · a gitignored path is a THIRD class — never a ghost, silent alone, printed as context beside a real finding · a leading separator stops a foreign path's tail being read as a repo path (mutation-tested) · an unresolvable path is
 counted, never dropped · the allowlist silences a deliberate absence · a non-repo is a silent no-op).
 Origin: `git commit -- <path>` skips an untracked file WITHOUT erroring, so a record keeps a
 reference the artefact never earned; measured on a live project where the class repeated three times

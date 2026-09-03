@@ -84,28 +84,62 @@ def test_dotdot_is_normalised_before_git_is_asked(repo):
     assert rc == 0, out
 
 
-def test_gitignored_path_is_a_third_class_not_a_ghost(repo):
-    """A doc may legitimately tell the reader to create a file nobody commits."""
+def _with_ignored(repo):
+    """A doc that legitimately tells the reader to create a file nobody commits."""
     (repo / ".gitignore").write_text("config/secret.yaml\n")
     (repo / "config").mkdir()
     (repo / "config" / "secret.yaml").write_text("local\n")
-    (repo / "docs" / "rec.md").write_text("create `config/secret.yaml`\n")
     sh("git", "add", ".gitignore", cwd=repo)
+
+
+def test_gitignored_path_is_never_a_ghost_and_is_silent_on_its_own(repo):
+    """The third class exists so an ignored path is not silently DROPPED — but announcing it when
+    there is nothing else to say is noise on every run forever, which is the failure this gate's own
+    docstring names. So: never a ghost, and quiet when it is the only thing to report."""
+    _with_ignored(repo)
+    (repo / "docs" / "rec.md").write_text("create `config/secret.yaml`\n")
     sh("git", "commit", "-aqm", "ignore", cwd=repo)
     rc, out = run(repo)
     assert rc == 0
-    assert "BY DESIGN" in out and "config/secret.yaml" in out
     assert "NOT in HEAD" not in out
+    assert out.strip() == "", "an ignored-by-design path alone is not news"
 
 
-def test_foreign_paths_tail_is_not_read_as_a_local_path(repo):
-    """The lookbehind: without it, a longer foreign path's tail matches — inventing a ghost when
-    HEAD lacks it and, worse, declaring a citation resolved when HEAD happens to have it."""
+def test_gitignored_paths_ride_along_as_context_when_there_IS_a_finding(repo):
+    """Alongside a real ghost they are printed — that is what keeps them from being dropped."""
+    _with_ignored(repo)
+    (repo / "reports" / "ghost.md").write_text("never staged\n")
     (repo / "docs" / "rec.md").write_text(
-        "traceback from /usr/lib/python3.10/site-packages/reports/note.md\n")
+        "see `reports/ghost.md`, and create `config/secret.yaml`\n")
+    sh("git", "commit", "-aqm", "ignore+ghost", cwd=repo)
+    rc, out = run(repo)
+    assert rc == 1
+    assert "BY DESIGN" in out and "config/secret.yaml" in out
+
+
+def test_a_foreign_paths_tail_is_not_read_as_a_repo_path(repo):
+    """The lookbehind, pinned by the case that actually discriminates. An earlier version of this
+    test used `/usr/lib/.../site-packages/reports/note.md`, which `repo_roots()` rejects on its own:
+    deleting the lookbehind left all nine cases green (mutation-tested 2026-09-03 — a test named for
+    a guard that cannot detect its absence). The real exposure is a LEADING separator: `~/reports/…`
+    and `/reports/…` are a home path and a container path, and without the lookbehind both are read
+    as this repo's `reports/…`, inventing a ghost or falsely resolving a citation."""
+    (repo / "reports" / "ghost.md").write_text("exists on disk, never committed\n")
+    (repo / "docs" / "rec.md").write_text(
+        "my copy is at ~/reports/ghost.md and the container mounts /reports/ghost.md\n")
     sh("git", "commit", "-aqm", "foreign", cwd=repo)
     rc, out = run(repo)
-    assert rc == 0 and "site-packages" not in out
+    assert rc == 0, "neither is a repo path, so neither is a ghost"
+    assert "reports/ghost.md" not in out
+
+
+def test_the_same_name_without_a_leading_separator_IS_a_repo_path(repo):
+    """The other half of the pair — otherwise the guard above could pass by matching nothing at all."""
+    (repo / "reports" / "ghost.md").write_text("exists on disk, never committed\n")
+    (repo / "docs" / "rec.md").write_text("see `reports/ghost.md`\n")
+    sh("git", "commit", "-aqm", "local", cwd=repo)
+    rc, out = run(repo)
+    assert rc == 1 and "reports/ghost.md" in out
 
 
 def test_unresolvable_path_is_counted_not_dropped(repo):
