@@ -19,7 +19,7 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[2]
-HOOK = REPO / ".claude" / "hooks" / "lessons-entry-budget.py"
+HOOK = REPO / ".claude" / "hooks" / "entry-budget.py"
 
 BLOCK = 2
 ALLOW = 0
@@ -136,3 +136,62 @@ def test_check_auto_lowers_the_baseline(project):
     rc, out = run(project, {}, mode="--check")
     assert rc == 0 and "shrank: 5 -> 0" in out
     assert (project / ".claude" / "lessons-backlog").read_text().startswith("0")
+
+
+# --------------------------------------------------------------------------
+# TASKS.md — the same mechanism over the board (rules §10.40 "TASKS stays LEAN")
+# --------------------------------------------------------------------------
+# Measured 2026-09-03 on a live 5-agent project: `## Review` held 12 items in 211 lines — ~18 lines
+# per board item, where the rule says id · @owner · due · done-when · evidence path. The board had
+# become the place solution notes were written, and TASKS.md is @-imported IN FULL by every lane.
+
+TASK_OK = "- [ ] T1: thing (@dev) — due: 2026-09-10 — done-when: the probe passes\n"
+TASK_FAT = "- [ ] T2: thing (@dev) — done-when: x\n" + "  narrative line\n" * 5   # 6 > 4
+
+
+@pytest.fixture
+def board(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / "TASKS.md").write_text(
+        "# TASKS\n\n> - doctrine bullet in the header, not an entry\n\n## Now\n" + TASK_OK)
+    return tmp_path
+
+
+def _board_edit(board, old, new):
+    return {"tool_input": {"file_path": str(board / "TASKS.md"),
+                           "old_string": old, "new_string": new}}
+
+
+def test_lean_board_item_passes(board):
+    rc, _ = run(board, _board_edit(board, TASK_OK, TASK_OK + "- [ ] T3: x (@dev) — done-when: y\n"))
+    assert rc == ALLOW
+
+
+def test_board_item_carrying_a_solution_note_is_blocked(board):
+    rc, out = run(board, _board_edit(board, TASK_OK, TASK_OK + TASK_FAT))
+    assert rc == BLOCK
+    assert "TASKS entry budget (max 4 lines)" in out
+    assert "SPEC file" in out, "the message must name where the detail belongs"
+
+
+def test_lane_heading_ends_a_board_entry(board):
+    """`### <lane>` is a write boundary; without it the last item of a lane would swallow the next
+    heading and every item under it, and one fat lane would report as one giant entry."""
+    rc, _ = run(board, _board_edit(
+        board, TASK_OK, TASK_OK + "\n### frontend\n- [ ] F1: x (@fe) — done-when: y\n"))
+    assert rc == ALLOW
+
+
+def test_board_budget_is_tunable(board):
+    (board / ".claude" / "keel-caps").write_text("TASKS_ENTRY=20\n")
+    rc, _ = run(board, _board_edit(board, TASK_OK, TASK_OK + TASK_FAT))
+    assert rc == ALLOW
+
+
+def test_board_and_lessons_keep_separate_baselines(board):
+    """A backlog on one file must not silence or inflate the other's counter."""
+    (board / "TASKS.md").write_text("# TASKS\n\n## Now\n" + TASK_FAT)
+    rc, out = run(board, {}, mode="--check")
+    assert rc == 0
+    assert (board / ".claude" / "tasks-backlog").exists()
+    assert not (board / ".claude" / "lessons-backlog").exists(), "no LESSONS.md here to account for"

@@ -42,12 +42,14 @@ Origin: measured 2026-09-03 — `/rename` lands in the transcript but a `--resum
 `nameSource=derived`, so the agent name vanished on every reopen; the fix was then confirmed
 through the real IDE (three reopened tabs came up `nameSource=user`). KIT-OWNED.
 
-`test_keel_lessons_budget.py` — the LESSONS per-entry line budget (12 cases: oversized new entry
+`test_keel_entry_budget.py` — the per-entry line budget for the always-imported boards (17 cases: oversized new entry
 blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
-· shrinking always passes · pre-existing backlog never blocks unrelated edits · `LESSONS_ENTRY` cap
-tunable via keel-caps · --check baseline auto-lowers and never auto-raises). Origin: a live project
-measured 450→1039 lines in five days from entries GROWING, not multiplying — raising the file cap
-"was never enough". KIT-OWNED.
+· shrinking always passes · pre-existing backlog never blocks unrelated edits · per-file caps tunable via
+keel-caps · --check baseline auto-lowers and never auto-raises · the same gate over TASKS.md board
+items, whose lane `### ` headings end an entry and whose doctrine-header bullets are not entries).
+Origin: a live project measured 450→1039 LESSONS lines in five days from entries GROWING, not
+multiplying — raising the file cap "was never enough"; the same disease then showed on its board
+(12 `## Review` items in 211 lines), so one hook guards both files. KIT-OWNED.
 
 `test_keel_agent_identity.py` — agent-team identity resolution in the reground hook (5 cases: the
 resolved session's mapping date touches to TODAY on every SessionStart · other lanes' dates are
