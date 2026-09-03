@@ -254,7 +254,7 @@
     the probe deletes the fix too); remove in file+suite order — a cached loader hides it otherwise.
 40. **Team scale-up** (one-run setup: `/keel-team`). Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
     person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
-    LESSONS · TASKS · RULES · HANDOVER_BLOCKS) — owner-only, `/keel-update`-safe, never raised silently.
+    LESSONS · TASKS · RULES · HANDOVER_BLOCKS · REVIEW_DAYS) — owner-only, `/keel-update`-safe, never raised silently.
     `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + done-when; the detailed SPEC
     (requirements, manual test scripts) is an owner-approved SPEC file and every delivery ships a
     SOLUTION NOTE (problem → root cause → fix + why → changed files → tests). **A delivery exists

@@ -3,10 +3,12 @@
 <!-- `test_<name>.py` — what it guards + origin (phase/bug). Example:
 `test_scoring.py` — scoring edge cases: 0-price, missing fields (phase 2; the silent-NaN bug). -->
 
-`test_keel_hooks.py` — the kit's own hook regression matrix (145 cases: block-dangerous ·
+`test_keel_hooks.py` — the kit's own hook regression matrix (149 cases: block-dangerous ·
 owner-guard · reground TASKS parsing + repo invariants · the workspace-trust check that names
 allow rules withheld until the trust dialog is accepted, silent when trusted, when there are no
-allow rules, or when the config is unreadable). Origin: three security bypasses shipped
+allow rules, or when the config is unreadable · the review-DECAY check: an old delivery is named
+with its age, a fresh one is silent, the threshold is keel-caps-tunable, uncommitted evidence has no
+age yet). Origin: three security bypasses shipped
 while eleven commit messages claimed a verified matrix — every one had been run in a session and
 thrown away (`reports/2026-08-18-hook-audit.md`). KIT-OWNED: `/keel-update` replaces
 `test_keel_*.py`, so never put your project's tests in that name.

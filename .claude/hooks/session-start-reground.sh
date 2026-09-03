@@ -32,17 +32,17 @@ esac
 # Cap checks (rules.md §9.33): warn when a memory file needs /keel-distill. The numbers below are the
 # SOLO DEFAULTS — a team project tunes them in .claude/keel-caps (PROTECTED: /keel-update never touches
 # it; owner-only via owner-guard; rules.md §10.40), one KEY=NUMBER per line:
-#   HANDOVER=150  LESSONS=250  TASKS=100  RULES=400  HANDOVER_BLOCKS=3
+#   HANDOVER=150  LESSONS=250  TASKS=100  RULES=400  HANDOVER_BLOCKS=3  REVIEW_DAYS=3
 # The AI PROPOSES a raise (headcount grew, board starves), the USER approves, the file pins it — never
 # raised silently. Skills (distill/compact) and template headers defer to this same file.
-cap_H=150; cap_L=250; cap_T=100; cap_R=400; cap_B=3
+cap_H=150; cap_L=250; cap_T=100; cap_R=400; cap_B=3; cap_RD=3
 if [ -f "$DIR/.claude/keel-caps" ]; then
   while IFS='=' read -r k v; do
     k="$(printf '%s' "$k" | tr -d '[:space:]\r')"; v="$(printf '%s' "$v" | tr -cd '0-9')"
     [ -n "$v" ] || continue
     case "$k" in
       HANDOVER) cap_H=$v ;; LESSONS) cap_L=$v ;; TASKS) cap_T=$v ;;
-      RULES) cap_R=$v ;; HANDOVER_BLOCKS) cap_B=$v ;;
+      RULES) cap_R=$v ;; HANDOVER_BLOCKS) cap_B=$v ;; REVIEW_DAYS) cap_RD=$v ;;
     esac
   done < "$DIR/.claude/keel-caps"
 fi
@@ -284,6 +284,33 @@ if [ -f "$DIR/TASKS.md" ]; then
   for p in $evp; do [ -f "$DIR/$p" ] || evmiss="$evmiss $p"; done
   if [ -n "$evmiss" ]; then
     echo "[keel] evidence file(s) cited in '## Review' but MISSING on disk:${evmiss} — a chat summary is not a delivery (rules §10.40): write the solution note into the author's reports/team/ folder (+ its 'delivered' index line) before review."
+  fi
+fi
+
+# Review-DECAY check (rules §10.41): the chain is wip -> delivered -> verified -> closed, and the
+# step that needs a HUMAN is where it stalls — measured on a live 5-agent project 2026-09-03: of 106
+# delivery rows, 49% closed but 40% still sat at `delivered` and only 6% had ever reached `verified`.
+# Nothing in the kit measured that: the queue-size line above says HOW MANY wait, never HOW LONG, so
+# a backlog that is three items deep and three weeks old reads exactly like a fresh one. AGE is the
+# signal a lone reviewer needs, because their constraint is time, not count.
+# The delivery's age = the FIRST commit of its evidence file (when the note landed), not its last —
+# a later touch must not reset the clock. Uncommitted evidence has no age yet and is skipped.
+# Threshold: REVIEW_DAYS in .claude/keel-caps (default 3). Fail-open, and silent when nothing is old.
+if [ -f "$DIR/TASKS.md" ] && [ -d "$DIR/.git" ]; then
+  now=$(date +%s); stale=""; oldest=0
+  for p in $(section "$DIR/TASKS.md" 'Review' | grep -E '^- \[' \
+             | grep -oE 'reports/[A-Za-z0-9_./@-]+\.md' | sort -u); do
+    [ -f "$DIR/$p" ] || continue
+    born=$(git -C "$DIR" log --diff-filter=A --format=%at -1 -- "$p" 2>/dev/null | tail -1)
+    [ -n "$born" ] || continue
+    age=$(( (now - born) / 86400 ))
+    if [ "$age" -ge "$cap_RD" ]; then
+      stale="$stale $(basename "$p")(${age}d)"
+      [ "$age" -gt "$oldest" ] && oldest=$age
+    fi
+  done
+  if [ -n "$stale" ]; then
+    echo "[keel] delivery(ies) waiting ${cap_RD}+ days in '## Review', oldest ${oldest}d:${stale} — the chain stalls at the HUMAN step, so triage by what only you can do: delegate every re-runnable done-when to the verifier subagent (its report flips the line to 'verified — owner part: <one sentence>'), and keep your own eyes for that one sentence. Tune the threshold with REVIEW_DAYS in .claude/keel-caps."
   fi
 fi
 

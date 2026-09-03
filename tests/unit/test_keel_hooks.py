@@ -20,6 +20,7 @@ Every trigger string lives in DATA here and never on a command line: typing
 occurrence — see CONTRIBUTING.md).
 """
 
+import datetime
 import itertools
 import json
 import os
@@ -563,3 +564,62 @@ def test_trust_check_fails_open_when_the_config_is_missing(tmp_path):
     rc, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj,
                        dict(env, HOME=str(tmp_path)))
     assert rc == 0 and "has not been trusted" not in out
+
+
+# --------------------------------------------------------------------------
+# session-start-reground.sh — review DECAY (how long, not how many)
+# --------------------------------------------------------------------------
+# The chain wip -> delivered -> verified -> closed stalls at the step that needs a human. Measured
+# 2026-09-03 on a live 5-agent project: 106 delivery rows, 49% closed, 40% still `delivered`, 6%
+# ever `verified`. The pre-existing queue line counts items and says nothing about AGE, so a
+# three-week-old backlog reads exactly like this morning's. Age is what a lone reviewer needs.
+
+def _review_world(tmp_path, days_old, threshold=None, commit=True):
+    """A project with one '## Review' delivery whose evidence file landed `days_old` days ago."""
+    proj = tmp_path / "proj"
+    (proj / ".claude").mkdir(parents=True)
+    (proj / "reports" / "team" / "dev").mkdir(parents=True)
+    ev = proj / "reports" / "team" / "dev" / "t1_fix.md"
+    ev.write_text("solution note\n")
+    (proj / "TASKS.md").write_text(
+        "# TASKS\n\n## Now\n\n## Review\n"
+        "- [x] T1 done (@dev) — evidence: reports/team/dev/t1_fix.md\n")
+    if threshold is not None:
+        (proj / ".claude" / "keel-caps").write_text("REVIEW_DAYS=%d\n" % threshold)
+    git("init", "-q", ".", cwd=proj)
+    git("config", "user.name", "dev", cwd=proj)
+    git("config", "user.email", "dev@example.com", cwd=proj)
+    if commit:
+        when = (datetime.datetime.now() - datetime.timedelta(days=days_old)).isoformat()
+        git("add", "-A", cwd=proj)
+        subprocess.run(["git", "-C", str(proj), "commit", "-q", "-m", "deliver"], check=True,
+                       capture_output=True,
+                       env=dict(os.environ, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when))
+    return proj
+
+
+def test_old_delivery_is_named_with_its_age(tmp_path):
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"},
+                      _review_world(tmp_path, days_old=9))
+    assert "waiting 3+ days" in out and "t1_fix.md(9d)" in out
+    assert "verifier subagent" in out, "the way out is delegation, not guilt"
+
+
+def test_fresh_delivery_is_silent(tmp_path):
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"},
+                      _review_world(tmp_path, days_old=0))
+    assert "waiting" not in out
+
+
+def test_threshold_is_tunable_via_keel_caps(tmp_path):
+    """A team that reviews weekly must be able to say so instead of muting the check."""
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"},
+                      _review_world(tmp_path, days_old=5, threshold=10))
+    assert "waiting" not in out
+
+
+def test_uncommitted_evidence_has_no_age_yet(tmp_path):
+    """Age comes from the note's FIRST commit; an unstaged note is not 'old', it is not landed."""
+    rc, out = run_hook("session-start-reground.sh", {"source": "startup"},
+                       _review_world(tmp_path, days_old=9, commit=False))
+    assert rc == 0 and "waiting" not in out
