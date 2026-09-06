@@ -96,7 +96,8 @@
     Mechanism guide: `docs/steering.md`.
     **Self-check before you deliver:** nothing is marked `delivered` straight from your own keyboard —
     an INDEPENDENT sub-agent code-reviews the diff first (scope: changed files + what the `done-when`
-    CLAIMS; a measurement claim gets its probe re-run), findings fixed and re-reviewed until clean;
+    CLAIMS; a measurement claim gets its probe re-run — where policy denies a worker sub-agents, §10.41
+    names the routed-review substitute), findings fixed and re-reviewed until clean;
     the orchestrator gates its OWN changes the same way before committing. Its output still isn't
     taken blindly (verify each finding, record why one was rejected), and it never replaces §10.41's
     routed review — you still don't pick your own official reviewer.
@@ -206,7 +207,10 @@
     rules (conduct) / skills (procedure) / ADRs (decision) / docs (domain fact) (file-scoped ones → a
     `paths:`-scoped `.claude/rules/` rule, or a `paths:`-scoped SKILL when the cluster must survive
     a mid-task compaction; **promotion DELETES the entry** — its one pointer is a router line in
-    LESSONS `## Index`, never a "moved to X" stub), and lint for contradictions.
+    LESSONS `## Index`, never a "moved to X" stub), and lint for contradictions. **A third exit —
+    COOL:** an entry still true but no longer CITED (from `## Index` or any report/spec/ADR — the
+    measurable proxy for "applied") moves verbatim to `docs/retro/<YYYY-MM>.md` with one router line
+    left; cooling is neither deletion nor retirement (`docs/retro/README.md`).
     **A memory file's HEADER is doctrine, not state:** it says how the file works, is written once and
     frozen, and carries no date, measurement, pending decision, cap NUMBER (`.claude/keel-caps` is the
     authority — a copy drifts) or chat quote; those go in the BODY or the proper board. Detail that
@@ -243,7 +247,7 @@
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written); a
     constitution too long to hold in attention is decoration. **Measure, do not quote:** the stock
-    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~340 at v0.8.35), so your project's own
+    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~381 at v0.8.36), so your project's own
     rules get the REMAINDER — check it before adding, and if the remainder is too thin the answer is
     to retire template text or raise `RULES` in `.claude/keel-caps`, not to squeeze. A hard-coded
     pair here rots: the previous "~290 / ~110" was written once and was 50 lines stale within a
@@ -265,14 +269,26 @@
     the probe deletes the fix too); remove in file+suite order — a cached loader hides it otherwise.
 40. **Team scale-up** (one-run setup: `/keel-team`). Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
     person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
-    LESSONS · TASKS · RULES · HANDOVER_BLOCKS · REVIEW_DAYS) — owner-only, `/keel-update`-safe, never raised silently.
-    `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + done-when; the detailed SPEC
+    LESSONS · TASKS · RULES · HANDOVER_BLOCKS · REVIEW_DAYS · LESSONS_ENTRY · TASKS_ENTRY ·
+    TASKS_ENTRY_CHARS) — owner-only, `/keel-update`-safe, never raised silently.
+    **EPIC layer:** work that does not finish in one round — or one CLASS of fix spread over many
+    surfaces (§10.39) — is an EPIC, not an item: `E-<name>`, body in an ADR/spec, and the board carries
+    ONLY the running sub-item `E-<name>/<n>` (each independently deliverable — if it is not, the split
+    is in the wrong place). The epic never enters `## Now` (the board stays finishable), its
+    precondition is a MEASUREMENT ("characterisation tests green and committed"), never an intent, and
+    its body is RE-READ at every sub-item close before the next opens (`/keel-continue`). Field: without
+    the layer one class-shaped fix took 28 deliveries · 4 lanes · 20 days, and a blocker's written
+    reason sat 7 days stale with nobody measuring it.
+    `TASKS.md` stays LEAN at any size: an item = id + `@owner` + `due:` + tier + done-when + evidence
+    path, **≤400 characters** (the entry gate blocks only a NEW or GROWN overflow — shrinking always
+    passes; measured the day it landed: 0 of 27 items complied, median 1287); the detailed SPEC
     (requirements, manual test scripts) is an owner-approved SPEC file and every delivery ships a
     SOLUTION NOTE (problem → root cause → fix + why → changed files → tests). **A delivery exists
     only as its file:** a chat summary is NOT a delivery — an item may not move to `## Review`
     without its note's path on the line (the reground hook flags pathless lines AND files missing on
-    disk), and each delivery walks ONE state chain: `wip → delivered → verified (owner part: <one
-    sentence>) → closed <date> accepted|rejected`. Team reports file
+    disk), and a T2 delivery walks ONE state chain: `wip → delivered → verified (owner part: <one
+    sentence>) → closed <date> accepted|rejected` (T0/T1 close at `delivered` once the
+    orchestrator has run the done-when — §10.41 tiers). Team reports file
     per AUTHOR — `reports/team/<@tag>/<task>_spec.md` / `<task>_fix_<date>.md` (+ evidence subfolders;
     **Markdown only**) — each carrying ONE line in the `reports/team/README.md` index, which IS the
     team's review todolist ("what's finished under @X" = the `[x]` lines in their section; exact
@@ -315,6 +331,17 @@
     cannot explain is REJECTED to `## Now` ("comprehension gap"). Binds work carrying
     test/verification claims or changing product behavior (owner may waive trivia); applies to
     EVERYONE, the owner included (their probe = the phase-review gate).
+    **TIER at assignment — ceremony follows RISK, not habit.** The orchestrator writes `T0`/`T1`/`T2`
+    on the item (a lane may argue UP with a measurement, never down): **T0** measurement · doc · 0
+    product code → the orchestrator reads and closes; **T1** product code, behaviour unchanged (hygiene
+    · tests · refactor · logging) → own teardown test, orchestrator runs the done-when ONCE and closes;
+    **T2** behaviour/number changes · security · ADR-touching · contracts · prompts → teardown + ONE
+    independent check + routed review + the owner's half. Only T2 enters `## Review`; a T0/T1 line goes
+    straight to the index + HANDOVER (a). The §4.11 independent check is a `verifier` sub-agent where
+    policy allows one and a ROUTED REVIEW session where it does not (workers are often denied
+    sub-agents — a requirement nobody can meet is decoration); for the orchestrator's OWN changes the
+    sub-agent stays mandatory. Field: 45 items sat in Review, 37 with no owner part; one suite ran 3×
+    per delivery.
 42. **Parallel sessions — co-agents and agent teams** (mechanism + setup: docs/steering.md "Agent
     teams", `/keel-agent-team-create|-start`; the roster is OWNER-only like all governance).
     Extra Claude sessions in the same repo may work the board like teammates — unlike a sub-agent
@@ -338,5 +365,17 @@
     a decision two workers reach alone is one no shared file records). A message WAKES an idle peer
     session and fires SessionStart, so identity and memory return from disk — hence no sleep loops
     anywhere: `/keel-continue` ends in IDLE and stops. Each chat is `/rename`d to its agent, because
-    that name IS the messaging address. A message is a POINTER; the delivery is the file. Deliveries
+    that name IS the messaging address. A message is a POINTER; the delivery is the file. T2 deliveries
     land in `## Review`; §10.41 + the §4.11 verify duty apply unchanged.
+    **Owner absence** (the owner says they will be away): (a) the return date is written ABSOLUTE
+    ("Monday" is stale in two days), (b) the owner's queue is PARKED and no session lines its work up
+    behind it, (c) review AGE is not read as neglect while parked, (d) lanes keep working
+    owner-independently and the return is PREPARED — the owner's round pre-sliced by observation
+    (`/keel-continue` ROUTE). Field: a weekend ran 4 lanes with 0 owner questions; `## Review` went
+    17 items → 6 questions.
+    **Status is the lane's, the board is the orchestrator's:** "being worked on right now" is not a
+    board state, so each lane overwrites ONE line in `reports/team/<name>/status` (id · state · time ·
+    sentence; `make team-status`) — its own surface, one writer. **Anchors, not line numbers:** a
+    board is cited by ITEM ID, never `board.md:NNN` — anchors rot by the next round and pin a worker
+    board against rotation (the `board-<YYYY-MM>.md` freeze is orchestrator-only, since the anchors
+    that block it live on surfaces the lane may not edit; the citation gate warns on them).

@@ -11,6 +11,11 @@ Shipped with the kit:
 - **`verifier`** — adversarial fact-checker (CONFIRMED / REFUTED / UNCERTAIN); backs rules.md §4.
 - **`auditor`** — read-only rules-compliance spot-check over a commit range; backs `/keel-audit` (the
   SessionStart hook nudges when one is due).
+- **`observer`** — OWNER-triggered outside eye, never spawned by the orchestrator: critiques the process
+  and the rules themselves (compliance is the auditor's axis, critique is this one's), writes only under
+  `reports/team/<owner-tag>/observer/`, and opens every round with what became of the LAST round's
+  findings plus its own refuted/total ratio. Field-earned on a 5-agent team (2026-09-05/06): 30
+  recommendations were evaluated and none tracked until the follow-up duty existed.
 
 **Add project-specific subagents here as the project needs them** — e.g. a `regression-runner`, a
 `migration-reviewer`, a `log-analyst`. The set is meant to **grow per project**, not stay fixed. Keep

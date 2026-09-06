@@ -63,6 +63,15 @@ For each block being rotated, triage by criticality — **content-aware, not age
   valve on a long project's `[gotcha]` list: reference facts belong in docs, file-scoped stock
   behind its trigger — not in the always-loaded core.
 
+- **COOL what is still true but no longer cited** — the third exit, for the entry that is neither
+  wrong (retire) nor applied often enough to promote, yet earns no line in a file every session pays
+  for. Proxy criterion, labelled as one: is the entry cited from `## Index` or from any report / spec
+  / ADR (`grep -rl` its key phrase)? Not cited → move it VERBATIM (with its date) to
+  `docs/retro/<YYYY-MM>.md` and leave ONE router line in `## Index`. Cooling is not deletion and not
+  retirement (`docs/retro/README.md`). Field origin: a file stuck at 1000/1000 for weeks because the
+  entry budget throttled the inflow while nothing opened an outflow; 82 of its 132 entries were
+  single-copy knowledge, so the exit had to be worked per entry, never as a bulk sweep.
+
 ## 3. Prune TASKS.md
 - Verify done items were deleted (their one-liner lives in HANDOVER (a)); delete any stragglers.
 - **Drain `## Discovered` to convergence** (incl. project variants like `## Discovered-team`) — it is

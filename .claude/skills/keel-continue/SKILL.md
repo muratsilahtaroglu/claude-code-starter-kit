@@ -77,9 +77,22 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    read the boards, then write the shared files — statuses and `## Review` moves into TASKS,
    findings into LESSONS with `@<name>` attribution, index lines into `reports/team/README.md`.
 2. **ROUTE** — anything sitting in `## Review`: routing is yours alone (a deliverer never picks its
-   own reviewer). Delegate the mechanical half to the `verifier` subagent; keep the owner's list to
-   what only a human can do.
-3. **ASSIGN** — a lane is free and `## Next` has work for it: allocate the next id in that lane's
+   own reviewer). **First apply the TIER the item was assigned at (§10.41):** a T0 (measurement ·
+   doc · 0 product code) or T1 (product code, behaviour unchanged) delivery does not belong in
+   `## Review` at all — run its done-when ONCE, close it, and its one-liner goes straight to the
+   index + HANDOVER (a). Only T2 (behaviour/number changes · security · ADR-touching · contracts ·
+   prompts) gets routed review + the owner's half. Delegate the mechanical half to the `verifier`
+   subagent (or to a routed review session when the deliverer's policy closes sub-agents); keep the
+   owner's list to what only a human can do — and **SLICE that list before handing it over:** group
+   the items that close on the SAME observation (one question, one screen, one restart serves all
+   of them), write each item's OBSERVATION line (what the owner should SEE, not PASS/FAIL), and check
+   the partition SUMS to the item count. Field measurement: 17 items → 6 questions + 3 desk lines,
+   because the axis that splits an owner round is the QUESTION, not the item.
+   **EPIC step-over:** if the round closed an `E-<name>/<n>` sub-item, READ the epic's body (its ADR
+   or spec) before anything else, update it from what was learned, then open `E-<name>/<n+1>` or
+   close the epic. An epic whose body is not re-read at each close becomes a stale plan — this
+   project's most frequent defect, in the field, was stale item text.
+3. **ASSIGN** — a lane is free OR its queue is <2 deep, and `## Next` has work for it: allocate the next id in that lane's
    series (§9.32) and tell the worker. **How you actually reach one:** resolve its address with
    `python3 .claude/team-addresses.py` (identity ≠ address — a reopened window can be live but
    unnamed), then `SendMessage` with `to:` set to that NAME. The message is a POINTER — id, spec
@@ -90,6 +103,13 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    FIRST thing to measure, and a premise you cannot source you have probably invented. Field: 26
    deliveries in one project refuted their assignment's premise, some after a full lane round spent
    reproducing an invented one. A refuted premise costs one cheap read; an invented one costs a round.
+   Mark the premise `H:` in the item text — it is a hypothesis, not a fact — and write the item's
+   TIER (T0/T1/T2, §10.41) on the line: the tier decides how much ceremony the delivery gets.
+   **Keep every lane's queue ≥2 deep** (the running item + the next one): a worker's LAST step on a
+   delivery is to take its next item, so it must already be on the board — a lane that delivers and
+   waits for a message is a lane the owner has to hand-crank (field: four lanes idled that way for a
+   weekend). Nothing left to queue for a lane? Say so to the owner in the brief ("lane X empty") —
+   an empty lane is information, a silent one is a stall.
    **Before calling a lane "free", check the MAPPING, not `/list-agents` names** (field case
    2026-08-19): `.claude/agent-team-sessions`' date column is a last-seen heartbeat, touched by the
    reground hook on every resolve — grep the lane's agent there. A line dated within ~2 days means

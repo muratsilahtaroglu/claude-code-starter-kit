@@ -35,6 +35,10 @@ human lanes and agent lanes share the same TASKS board, and creation authority i
 5. **Review routing notes** — the default is review-v2 (rules §10.41): the orchestrator routes every
    review and delegates the mechanical half to the `verifier` subagent; name any area that instead
    deserves a DEDICATED reviewer agent (rare — each extra agent is a chat window the owner must steer).
+   Optional and OUTSIDE the roster: an `observer` (`.claude/agents/observer.md`) — owner-triggered,
+   never spawned or briefed by the orchestrator, no lane, writes only under
+   `reports/team/<owner-tag>/observer/`. It critiques the rules and the process; the auditor checks
+   compliance with them. Offer it; do not seed it as a lane.
 
 ## 2. Generate charters — the owner approves the FULL text before anything lands
 One file per agent: `.claude/agents/team-<name>.md`, from this skeleton (same approval bar as
@@ -57,7 +61,25 @@ line is load-bearing: the reground hook greps it):
       `star-topology.sh` hook blocks it rather than trusting anyone to remember. Two fixed forms,
       kept SHORT because delivering a message re-sends the recipient's whole context:
         · receiving work  → `<id> yours · done-when: <criterion> · spec: <path>`
-        · reporting done  → `<id> delivered · evidence: <path>`
+        · reporting done  → `<id> delivered · evidence: <path> · next: <id or "lane empty">`
+      The delivery's LAST step is taking the next item already queued in your lane (the orchestrator
+      keeps it ≥2 deep); "lane empty" is a message, waiting silently is a stall.
+    - Status — ONE line, overwritten, in `reports/team/<name>/status`:
+      `<id> · waiting|working|delivered|blocked · <YYYY-MM-DD HH:MM> · <one sentence>`. The board
+      knows open vs delivered; "being worked on RIGHT NOW" lives only here (`make team-status`
+      prints every lane's line). Single writer, so no clobber; `delivered → verified → closed` is
+      the orchestrator's chain on the shared board, not yours.
+    - Premise is a hypothesis: the item's reason line starts with `H:` — the assigner's reading that
+      day, not a fact. Your FIRST step is the cheapest read-only check of `H:`; if it fails, the
+      delivery IS the refutation (0 product lines) and the item closes as a result (§10.41).
+    - EPIC PROPOSAL: when an item cannot finish in one round, or the same CLASS of fix is spread over
+      many surfaces (§10.39), say so in your board's REQUESTS — "this is an epic, not an item" — with
+      the surface list; the orchestrator opens `E-<name>` and its first sub-item (§10.40). Field cost
+      of having no place to say it: 28 deliveries · 4 lanes · 20 days for one class-shaped fix.
+    - Cite boards by ITEM ID, never `board.md:NNN`: a line anchor is stale next round and pins the
+      board against rotation. When your board passes ~2000 lines the ORCHESTRATOR freezes it
+      (`git mv board.md board-<YYYY-MM>.md` + a fresh one) — a lane cannot, because the anchors that
+      block the move live on surfaces it may not edit (measured: 3 of 4).
     - Source tags: every judgment you relay carries its provenance — 🟦 owner decision
       (verbatim + date + channel) · 🟪 a developer's words · 🟨 your own suggestion · 🟩 another
       agent's words (report path) · ⬜ a measurement (number + how + limits). An untagged
@@ -74,8 +96,9 @@ line is load-bearing: the reground hook greps it):
       three sections: lane MIRROR (id · done-when · live status/progress) · findings INBOX
       (`[gotcha]/[fail]/[rule]` lines the MOMENT they happen, §9.31 — orchestrator promotes them) ·
       REQUESTS to the orchestrator (blockers, out-of-scope finds). Delivering: solution-note FILE in
-      your folder + mark `delivered` on YOUR board — the orchestrator moves the TASKS item to
-      `## Review` and writes the index line (§10.40 file-first).
+      your folder + mark `delivered` on YOUR board — the orchestrator moves a T2 item to `## Review`,
+      closes a T0/T1 item by running its done-when once (§10.41 tiers), and writes the index line
+      (§10.40 file-first).
     - Author folder: `reports/team/<name>/` — board.md, specs (+ Comprehension log, §10.41), solution notes, evidence.
     - Review: routing is the orchestrator's alone — never pick your own reviewer (§10.41).
     - FORBIDDEN (worker, rules §10.42): WRITE-rituals (handover · distill · compact · phase-review ·
@@ -85,8 +108,11 @@ line is load-bearing: the reground hook greps it):
       ENGLISH regardless (§9.31 — machine-read memory), human surfaces stay in the project language.
 
 The ORCHESTRATOR charter (`Role: orchestrator`) inverts the duties: it runs the rituals + git
-(commit; push stays ask-gated), assigns lanes/@tags, routes EVERY review (delegating the mechanical
-half — it does not re-measure deliveries inline), curates memory (single-writer surfaces: it reads
+(commit; push stays ask-gated), assigns lanes/@tags **with a TIER on every item** (T0 · T1 · T2,
+§10.41 — only T2 enters `## Review`; T0/T1 it closes itself by running the done-when once), keeps
+every lane's queue ≥2 deep, opens epics (`E-<name>`, §10.40) and re-reads the epic body at each
+sub-item close, routes EVERY T2 review (delegating the mechanical
+half — it does not re-measure deliveries inline) and SLICES the owner's round by observation, curates memory (single-writer surfaces: it reads
 `git diff` for fresh worker writes before any curation pass, §10.42), owns external request boards,
 and takes NO work items itself. It is also the ONLY writer of the shared memory files (§10.42
 write-surface split): each work block STARTS by reading the worker boards

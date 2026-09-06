@@ -5,15 +5,16 @@ pid) and silently reverts on every window/process recreation; the IDENTITY lives
 session-id and survives. Confusing the two cost a live team a broadcast re-identify and nearly a
 double-assigned lane (2026-08-19), and its rarer sibling — one session-id driven from TWO windows —
 is the silent-clobber shape §10.42 exists to prevent. On 2026-09-03 that sibling turned out to be
-the NORMAL case for an owner who works one remote host from two machines on different VS Code
-versions: two VS Code servers, every identity twinned. Process AGE is the wrong axis to pick the
-live twin (going back to the other machine makes the OLDER one live); whether the twin's VS Code
-server has a CLIENT attached is the right one. The resolver's core is pure, so this matrix feeds it
+the NORMAL case: every reconnect (sleep, tunnel, a second machine) resumes the SAME session id in a
+NEW process, so twins accumulate on their own. The first port picked the live twin by `attached`,
+which is computed per VS Code BUILD and read True for 11 of 11 processes (2026-09-06); the right
+axis is START TIME — the newest process is live, older ones are lossless leftovers. The resolver's core is pure, so this matrix feeds it
 fixtures directly. Backported from alice_v2 (`scripts/team_addresses.py`, 2026-08-24).
 
 KIT-OWNED FILE (`/keel-update` TOOLING exception, `tests/unit/test_keel_*.py`).
 """
 
+import re
 import importlib.util
 import sys
 from pathlib import Path
@@ -44,7 +45,8 @@ def alive(*pids):
 def test_healthy_lane_is_ok():
     rows, unreg = ta.resolve([("s1", "frontend")], [rec("s1", "frontend", 11)], alive(11), CWD)
     assert rows == [{"agent": "frontend", "sid": "s1", "name": "frontend", "pid": 11,
-                     "status": "OK", "cwd": CWD, "windows": 1, "attached": None}]
+                     "status": "OK", "cwd": CWD, "windows": 1, "attached": None,
+                     "leftover": None, "started": None}]
     assert unreg == []
 
 
@@ -126,8 +128,8 @@ def test_self_check_silent_when_not_a_registered_identity():
 # format_hook() — what SessionStart injects
 # --------------------------------------------------------------------------
 
-def _hook(registry, records, live_pids, attached=None):
-    rows, unreg = ta.resolve(registry, records, alive(*live_pids), CWD, attached)
+def _hook(registry, records, live_pids, attached=None, started=None):
+    rows, unreg = ta.resolve(registry, records, alive(*live_pids), CWD, attached, started)
     return ta.format_hook(rows, unreg)
 
 
@@ -157,23 +159,43 @@ def test_double_window_without_signal_warns_clobber():
     assert any("2 WINDOWS" in l for l in lines)
 
 
-def test_detached_twin_is_named_with_the_kill_command():
-    """The measured shape: the renamed OLD twin is detached, the derived NEW twin is attached."""
+def test_the_newest_process_of_a_session_id_is_live_and_the_older_are_leftovers():
+    """Owner 2026-09-06, measured the same day: a reconnect respawns the SAME session-id in a NEW
+    process, so the LIVE twin is the newest by START TIME. `attached` is deliberately set to the
+    OPPOSITE of the verdict here — it must not be able to change the answer, because it is computed
+    per VS Code BUILD (11 of 11 processes read attached in the live measurement)."""
     lines = _hook([("s1", "orchestrator")],
                   [rec("s1", "orchestrator", 302033), rec("s1", "alice-v2-ea", 1442911)],
-                  (302033, 1442911), attached={302033: False, 1442911: True})
+                  (302033, 1442911),
+                  attached={302033: True, 1442911: False},
+                  started={302033: 100, 1442911: 900})
     joined = "\n".join(lines)
-    assert "DETACHED" in joined and "pid 302033" in joined
-    assert "kill 302033" in joined, "the owner decides, but the exact command must be on the line"
-    assert "attached: pid 1442911" in joined
+    assert "NEWEST (pid 1442911)" in joined
+    assert "leftovers: pid 302033" in joined
+    assert "LOSSLESS" in joined
+    # The word may appear as a PROHIBITION ("do NOT kill by pid"); what must never appear is a
+    # runnable `kill <pid>` command, because pids are recycled and a frozen one is a security error.
+    assert not re.search(r"kill\s+\d", joined)
+    assert "do NOT kill by pid" in joined
 
 
-def test_detached_twins_name_does_not_count_as_the_reachable_address():
-    """Only the attached twin carries the renamed identity here — the resolver must still tell the
-    owner to /rename the ATTACHED one, not report the lane healthy because a dead-end twin is named."""
+def test_a_leftovers_name_does_not_count_as_the_reachable_address():
+    """The renamed identity sits on the OLD process; the reachable address is the newest one, so the
+    owner must still be told to /rename it — not shown a healthy lane because a leftover is named."""
     lines = _hook([("s1", "orchestrator")],
                   [rec("s1", "orchestrator", 302033), rec("s1", "alice-v2-ea", 1442911)],
-                  (302033, 1442911), attached={302033: False, 1442911: True})
+                  (302033, 1442911), started={302033: 100, 1442911: 900})
     joined = "\n".join(lines)
     assert "ADDRESS ≠ IDENTITY" in joined and "/rename orchestrator" in joined
     assert "address=identity" not in joined
+
+
+def test_unmeasured_start_time_is_never_called_a_leftover():
+    """UNKNOWN is not OLD. With no start times the twin warning still fires (two windows IS a
+    clobber risk) but it must NOT name a leftover, because nothing measured which is older."""
+    lines = _hook([("s1", "orchestrator")],
+                  [rec("s1", "orchestrator", 302033), rec("s1", "orchestrator", 1442911)],
+                  (302033, 1442911))
+    joined = "\n".join(lines)
+    assert "WINDOWS" in joined and "UNMEASURED" in joined
+    assert "leftovers" not in joined and not re.search(r"kill\s+\d", joined)

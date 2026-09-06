@@ -88,6 +88,8 @@ lessons were always-relevant, ~52% bound specific files, and any one task needed
   bodies re-inject; a path rule waits for the next file match).
 - **(C) Permanent domain/API fact** → `docs/` (architecture "known limitations", or a guide).
 - **(D) Superseded / closed / promoted** → **deleted**. Git is the archive.
+- **(E) Still true, no longer cited** → **cooled** to `docs/retro/<YYYY-MM>.md` verbatim, one router
+  line left in `## Index` (`docs/retro/README.md` — the proxy criterion and why it is a proxy).
 
 **Promotion deletes the entry.** Never leave a "moved to X" stub — a field case left 42 lines of them,
 taxing every session. The one surviving pointer is a line in the file's `## Index` router:

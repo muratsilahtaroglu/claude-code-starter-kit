@@ -170,7 +170,11 @@ def test_lean_board_item_passes(board):
 def test_board_item_carrying_a_solution_note_is_blocked(board):
     rc, out = run(board, _board_edit(board, TASK_OK, TASK_OK + TASK_FAT))
     assert rc == BLOCK
-    assert "TASKS entry budget (max 4 lines)" in out
+    # The banner names BOTH axes since the character budget landed (İ3, 2026-09-06), so this
+    # pins what the verdict MEANS — the LINE axis fired and named the count — instead of the
+    # exact sentence. A cell that pins prose reddens on wording; this one reddens on behaviour.
+    assert "TASKS entry budget (max 4 lines" in out
+    assert "6 lines —" in out
     assert "SPEC file" in out, "the message must name where the detail belongs"
 
 
@@ -203,4 +207,37 @@ def test_fenced_code_is_neither_an_entry_nor_padding(board):
     the fence lines — a false BLOCK on an unrelated edit, the gate-with-false-positives class."""
     fence = "```md\n- [ ] example item\n  a\n  b\n  c\n  d\n  e\n```\n"
     rc, _ = run(board, _board_edit(board, TASK_OK, TASK_OK + fence + "- [ ] T9: x (@dev) — done-when: y\n"))
+    assert rc == ALLOW
+
+
+# İ3 (2026-09-06): the CHARACTER axis. Its whole point is the case the LINE budget cannot see, so the
+# fixture is deliberately 1 line — if this cell ever passes with a line-count message, the axis is dead.
+TASK_LONG_ONE_LINER = "- [ ] T3: thing (@dev) — done-when: " + "y" * 500 + "\n"
+
+
+def test_one_line_item_over_the_character_budget_is_blocked(board):
+    rc, out = run(board, _board_edit(board, TASK_OK, TASK_OK + TASK_LONG_ONE_LINER))
+    assert rc == BLOCK
+    assert "characters —" in out          # the CHARACTER axis fired...
+    assert "lines —" not in out           # ...and the line axis did NOT: 1 line is under the cap
+
+
+def test_character_budget_is_tunable_via_keel_caps(board):
+    (board / ".claude" / "keel-caps").write_text("TASKS_ENTRY_CHARS=9000\n", encoding="utf-8")
+    rc, _ = run(board, _board_edit(board, TASK_OK, TASK_OK + TASK_LONG_ONE_LINER))
+    assert rc == ALLOW
+
+
+def test_shrinking_a_character_oversized_item_still_passes(board):
+    """The cell that pins WHY sizes are kept per AXIS (İ3, 2026-09-06).
+
+    Measured with a mutation rather than reasoned: collapsing the two axes into one key does NOT
+    let a growing character count hide (the first thing I wrote, and it was wrong in DIRECTION) --
+    it breaks MONOTONE DESCENT, because the remembered LINE count is tiny next to any character
+    count, so a SHRINKING entry compares against it and blocks. That turns the budget into the
+    always-red gate this project refuses to build."""
+    fat = "- [ ] T4: thing (@dev) — done-when: " + "z" * 900 + "\n"
+    less = "- [ ] T4: thing (@dev) — done-when: " + "z" * 500 + "\n"
+    (board / "TASKS.md").write_text("# TASKS\n\n## Now\n" + TASK_OK + fat, encoding="utf-8")
+    rc, _ = run(board, _board_edit(board, fat, less))
     assert rc == ALLOW

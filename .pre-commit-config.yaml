@@ -23,3 +23,14 @@ repos:
         entry: bash -c 'git diff --cached --name-only | grep -E "(^|/)\.env$" && exit 1 || exit 0'
         language: system
         pass_filenames: false
+
+      # OPT-IN — uncomment once `make test-fast` runs in seconds on this project. Measured field
+      # case: the full suite had not been run for 11 days and .git/hooks was empty, so ~30 commits
+      # shipped unverified. A commit-time SUBSET closes that window; the full suite stays `make test`.
+      # (A "commit message must name the suite" rule was considered and rejected: docs-only commits exist.)
+      # - id: fast-tests
+      #   name: Fast test subset (make test-fast)
+      #   entry: make test-fast
+      #   language: system
+      #   pass_filenames: false
+      #   stages: [commit]

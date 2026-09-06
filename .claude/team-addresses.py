@@ -12,16 +12,17 @@ identity is durable, the address is VOLATILE => an address is never REMEMBERED, 
 (rules §10.42). Field cost of not knowing this: an orchestrator read "name unreachable" as
 "session dead" and broadcast a needless re-identify to three live workers (2026-08-19).
 
-TWO MACHINES, TWO VS CODE BUILDS (measured 2026-09-03). An owner working the same remote host from
-home and from work, with the two clients on different VS Code versions, gets TWO VS Code servers
-alive at once (`~/.vscode-server/cli/servers/Stable-<commit>/`, one per build). Each client's
-server keeps its own `claude` processes and resumes the SAME session ids => every identity shows
-2-3 live processes ("windows"), all with live sockets. Process AGE is the WRONG axis to pick the
-real one (when the owner goes back to the other machine, the OLDER twin is the one in use). The
-right axis is whether that process's VS Code server currently has a CLIENT attached: the server
-build's `command-shell` process holds an ESTABLISHED TCP connection iff a client is connected.
-This resolver reports ATTACHED / DETACHED per twin and names the detached pids — the owner decides
-to kill them (both twins share ONE transcript; a detached twin holds nothing that is not on disk).
+TWINS — ONE SESSION-ID, SEVERAL PROCESSES (measured 2026-09-03, criterion CORRECTED 2026-09-06).
+Every reconnect — machine sleep/restart, a Remote-SSH tunnel re-established, a second machine on a
+different VS Code build — spawns a NEW `claude` process that RESUMES THE SAME session id; the old
+one stays asleep. So twins are not a user error, they accumulate on their own (6 identities showed
+2-3 processes each). The first port picked the live twin by whether its VS Code server had a CLIENT
+attached; that axis is BLIND — `attached` is computed per VS Code BUILD, not per session, so 11 of
+11 processes read attached. The right axis is START TIME: the NEWEST pid of a session id is live,
+older ones are reconnect leftovers, and closing a leftover is LOSSLESS (same session, one transcript
+on disk). A pid with no measurable start time is never called a leftover — unknown is not old.
+`make team-clean` prints the table; nothing here ever runs `kill` (pids are recycled — a frozen
+`kill <pid>` in a record is a security error), the owner closes the leftover WINDOWS.
 
 Usage:  python3 .claude/team-addresses.py [--check] [--json] [--hook]
   --check : exit 1 when any registered identity has no live address, a name diverges from its
@@ -61,12 +62,25 @@ def parse_registry(lines):
     return out
 
 
-def resolve(registry, records, is_alive, repo_cwd, attached=None):
+def resolve(registry, records, is_alive, repo_cwd, attached=None, started=None):
     """Pure core. registry: [(session_id, agent)] · records: [dict] (sessions/*.json contents) ·
-    is_alive: pid -> bool · repo_cwd: this repo's absolute path · attached: {pid: True|False|None}.
+    is_alive: pid -> bool · repo_cwd: this repo's absolute path · attached: {pid: True|False|None} ·
+    started: {pid: comparable start time} (larger = newer).
     Returns (rows, unregistered): one row per live process of each registered identity (or one
-    NO_PROCESS row), plus live sessions working THIS repo that adopted no identity."""
+    NO_PROCESS row), plus live sessions working THIS repo that adopted no identity.
+
+    ⛔ WHICH TWIN IS LIVE IS DECIDED BY START TIME, NOT BY `attached` (owner named the cause
+    2026-09-06; measured the same day). A VS Code reconnect — machine sleep/restart, remote tunnel
+    re-established — spawns a NEW process RESUMING THE SAME `session_id`; the old one stays asleep.
+    So twins are not a user error, they accumulate on their own. And `attached` CANNOT discriminate
+    them: it is computed per VS Code BUILD (`build_has_client`), not per session, so 11 of 11
+    processes read `attached` in the live measurement. ⇒ Criterion: **the NEWEST pid of a session-id
+    is live, older ones are reconnect leftovers**, and closing a leftover is LOSSLESS — same
+    session, one transcript, shared on disk.
+    ⚠ A pid with NO start time is never called a leftover: unknown is not old (a reading that means
+    both "old" and "unmeasured" is the class this repo keeps paying for)."""
     attached = attached or {}
+    started = started or {}
     by_sid = {}
     for rec in records:
         by_sid.setdefault(rec.get("sessionId"), []).append(rec)
@@ -78,6 +92,10 @@ def resolve(registry, records, is_alive, repo_cwd, attached=None):
             rows.append({"agent": agent, "sid": sid, "name": None, "pid": None,
                          "status": "NO_PROCESS", "cwd": None, "windows": 0, "attached": None})
             continue
+        newest = None
+        timed = [r for r in live if started.get(r.get("pid")) is not None]
+        if timed:
+            newest = max(timed, key=lambda r: started[r.get("pid")]).get("pid")
         for rec in live:
             name = rec.get("name")
             cwd = rec.get("cwd")
@@ -87,9 +105,13 @@ def resolve(registry, records, is_alive, repo_cwd, attached=None):
                 status = "OTHER_REPO"
             else:
                 status = "OK"
-            rows.append({"agent": agent, "sid": sid, "name": name, "pid": rec.get("pid"),
+            # `leftover` is True only when a NEWER sibling was actually measured; None = unknown.
+            pid = rec.get("pid")
+            leftover = None if newest is None or started.get(pid) is None else (pid != newest)
+            rows.append({"agent": agent, "sid": sid, "name": name, "pid": pid,
                          "status": status, "cwd": cwd, "windows": len(live),
-                         "attached": attached.get(rec.get("pid"))})
+                         "attached": attached.get(pid), "leftover": leftover,
+                         "started": started.get(pid)})
 
     known = {sid for sid, _ in registry}
     unregistered = [r for r in records
@@ -142,24 +164,26 @@ def format_hook(rows, unregistered):
             continue
         windows = max(r["windows"] for r in live)
         if windows > 1:
-            det = [r for r in live if r["attached"] is False]
-            att = [r for r in live if r["attached"] is True]
-            if att and det:
-                warn.append("[team] 🔴 %s is driven from **%d WINDOWS** — attached: pid %s ('%s'); "
-                            "DETACHED (its VS Code server has no client — the other machine's "
-                            "leftover): %s. All twins write ONE transcript (silent-clobber risk, §10.42); "
-                            "a detached twin holds nothing that is not on disk — kill: `kill %s`"
-                            % (agent, windows,
-                               ", ".join(str(r["pid"]) for r in att),
-                               ", ".join(str(r["name"]) for r in att),
-                               ", ".join("pid %s ('%s')" % (r["pid"], r["name"]) for r in det),
-                               " ".join(str(r["pid"]) for r in det)))
+            # ONE line per identity, and the criterion is START TIME, not `attached` (owner
+            # 2026-09-06). `attached` is per VS Code BUILD, so it read True for 11 of 11 processes
+            # and could not tell a live twin from a reconnect leftover.
+            newest = [r for r in live if r.get("leftover") is False]
+            old_ones = [r for r in live if r.get("leftover") is True]
+            if newest and old_ones:
+                warn.append("[team] 🔴 %s: %d processes on ONE session-id — live is the NEWEST "
+                            "(pid %s); reconnect leftovers: %s. They share one transcript on disk, "
+                            "so closing a leftover is LOSSLESS — close those windows (do NOT kill "
+                            "by pid: pids are recycled). Cause: a reconnect resumes the same "
+                            "session-id in a NEW process. Table: `make team-clean`"
+                            % (agent, windows, newest[0]["pid"],
+                               ", ".join("pid %s ('%s')" % (r["pid"], r["name"]) for r in old_ones)))
             else:
                 warn.append("[team] 🔴 %s is driven from **%d WINDOWS** (pid %s) — silent-clobber "
-                            "risk on shared files (§10.42); close one."
+                            "risk on shared files (§10.42); age UNMEASURED, so which is the "
+                            "leftover is not decided here. Table: `make team-clean`"
                             % (agent, windows, ", ".join(str(r["pid"]) for r in live)))
-        mism = [r for r in live if r["status"] == "NAME_MISMATCH" and r["attached"] is not False]
-        if mism and not any(r["status"] == "OK" and r["attached"] is not False for r in live):
+        mism = [r for r in live if r["status"] == "NAME_MISMATCH" and r.get("leftover") is not True]
+        if mism and not any(r["status"] == "OK" and r.get("leftover") is not True for r in live):
             warn.append("[team] ⚠ ADDRESS ≠ IDENTITY: %s → a message reaches the name '%s' "
                         "(not the identity) — run /rename %s in that chat"
                         % (agent, mism[0]["name"], agent))
@@ -264,6 +288,30 @@ def _build_has_client(builds, established):
     return res
 
 
+def _pid_start(pid):
+    """Process start time from `/proc/<pid>/stat` field 22 (clock ticks since boot).
+
+    Monotonic and locale-free — deliberately NOT `ps -o lstart=`, whose text form is locale- and
+    format-dependent. Returns None when unreadable, and None means UNKNOWN, never "old".
+    """
+    try:
+        with open("/proc/%d/stat" % int(pid), encoding="utf-8", errors="replace") as fh:
+            data = fh.read()
+        # comm may contain spaces/parens ⇒ split AFTER the last ')' (the documented parse)
+        return int(data[data.rindex(")") + 2:].split()[19])
+    except (OSError, ValueError, TypeError, IndexError):
+        return None
+
+
+def _started_for(records):
+    out = {}
+    for rec in records:
+        pid = rec.get("pid")
+        if pid is not None:
+            out[pid] = _pid_start(pid)
+    return out
+
+
 def _attachment_for(records):
     live = [r.get("pid") for r in records if _pid_alive(r.get("pid"))]
     pid_build = {p: _build_of(p) for p in live}
@@ -302,7 +350,8 @@ def main(argv=None):
         attached = _attachment_for(records)
     except Exception:                  # the signal is a bonus, never a blocker
         attached = {}
-    rows, unregistered = resolve(registry, records, _pid_alive, repo, attached)
+    rows, unregistered = resolve(registry, records, _pid_alive, repo, attached,
+                                 _started_for(records))
 
     if args.hook:
         try:
@@ -315,14 +364,21 @@ def main(argv=None):
     if args.json:
         print(json.dumps({"rows": rows, "unregistered": unregistered}, indent=2, ensure_ascii=False))
     else:
-        print("%-18s %-18s %-8s %-9s %s" % ("identity", "ADDRESS (current name)", "pid", "client", "status"))
+        print("%-18s %-18s %-8s %-9s %s" % ("identity", "ADDRESS (current name)", "pid",
+                                            "twin", "status"))
         print("-" * 72)
         for r in rows:
             note = {"OK": "", "NAME_MISMATCH": "  <- name diverged (messages go to the NAME)",
                     "OTHER_REPO": "  <- working ANOTHER repo", "NO_PROCESS": "  <- window closed"}[r["status"]]
             if r["windows"] > 1:
                 note += "  ** SAME IDENTITY driven from %d windows **" % r["windows"]
-            client = {True: "attached", False: "DETACHED", None: "-"}[r["attached"]]
+            # The column is the LIVENESS verdict, and its axis is AGE, not `attached` (owner
+            # 2026-09-06): `attached` is per VS Code BUILD, so it read True for 11 of 11 processes
+            # and could not separate a live twin from a reconnect leftover.
+            # `-` when the identity has ONE process: there is no twin to be newer than, and
+            # printing "live" there would imply a comparison that never happened.
+            client = ("-" if (r.get("windows") or 0) < 2
+                      else {True: "LEFTOVER", False: "live", None: "?"}[r.get("leftover")])
             print("%-18s %-18s %-8s %-9s %s%s" % (r["agent"], r["name"] or "-", r["pid"] or "-",
                                                   client, r["status"], note))
         for r in unregistered:

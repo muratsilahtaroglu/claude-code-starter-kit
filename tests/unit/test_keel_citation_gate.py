@@ -163,3 +163,50 @@ def test_allowlist_silences_a_deliberate_absence(repo):
 def test_non_repo_directory_is_a_silent_noop(tmp_path):
     rc, out = run(tmp_path)
     assert rc == 0 and out == ""
+
+
+# --------------------------------------------------------------------------
+# 2026-09-06 — two classes ported from a live project's gate (alice_v2 `citation_head_check.py`)
+# --------------------------------------------------------------------------
+
+def test_recorded_absent_marker_keeps_a_measured_absence_out_of_the_ghost_list(repo):
+    """A record that MEASURED a file is gone cites a path that must not exist. Without the marker the
+    gate punishes the most valuable record type; with it the path is counted, never a ghost. The
+    marker is per LINE — a second, unmarked citation of a real ghost on another line still fires."""
+    # The probe copy existed during the run and was deleted afterwards — so it is NOT on disk now.
+    (repo / "reports" / "gone.md").write_text("probe copy, deleted after the run\n")
+    (repo / "reports" / "gone.md").unlink()
+    (repo / "docs" / "rec.md").write_text(
+        "the probe `reports/gone.md` was removed after the run (RECORDED-ABSENT)\n")
+    rc, out = run(repo)
+    assert rc == 0 and "NOT in HEAD" not in out
+    # Not an exemption: beside a REAL ghost the count of marked paths is printed, so the marker
+    # cannot become the quiet way to make a ghost disappear.
+    (repo / "reports" / "ghost.md").write_text("never staged\n")
+    (repo / "docs" / "rec.md").write_text(
+        "the probe `reports/gone.md` was removed (RECORDED-ABSENT)\nsee `reports/ghost.md`\n")
+    rc, out = run(repo)
+    assert rc == 1 and "reports/ghost.md" in out
+    assert "RECORDED-ABSENT" in out and "reports/gone.md" in out
+
+
+def test_recorded_absent_marker_does_not_cover_a_file_that_is_still_on_disk(repo):
+    """Found by the pre-delivery reviewer: a marker on the ONLY ghost made the gate silent. The marker
+    means 'gone'; a marked path that still exists on disk is a ghost wearing the marker."""
+    (repo / "reports" / "still_here.md").write_text("never staged, never deleted\n")
+    (repo / "docs" / "rec.md").write_text("see `reports/still_here.md` (RECORDED-ABSENT)\n")
+    rc, out = run(repo)
+    assert rc == 1 and "reports/still_here.md" in out and "NOT in HEAD" in out
+
+
+def test_line_anchor_into_a_rotating_board_is_warned_but_does_not_fail(repo):
+    """`board.md:NNN` is right the day it is written and stale by the next round — and it pins the
+    board against rotation because the lane may not rewrite the surface carrying it (a lane measured
+    3 of its 4 anchors on other surfaces, 2026-09-06). A warning class of its own; exit stays 0."""
+    (repo / "docs" / "rec.md").write_text(
+        "see `reports/note.md` and reports/team/fe/board.md:1589 and TASKS.md:334\n")
+    rc, out = run(repo)
+    assert rc == 0
+    assert "line-number anchor" in out
+    assert "reports/team/fe/board.md:1589" in out and "TASKS.md:334" in out
+    assert "docs/rec.md" in out, "the citing file must be named or nobody can fix the anchor"

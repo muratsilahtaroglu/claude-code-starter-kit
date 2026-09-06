@@ -56,6 +56,14 @@ PROFILES = {
     },
     "TASKS.md": {
         "cap_key": "TASKS_ENTRY", "default": 4, "baseline": ".claude/tasks-backlog",
+        # İ3 (audit 2026-09-05, owner-approved 2026-09-06): a board item is capped in CHARACTERS too,
+        # because our lines run long — 4 lines x ~180 chars is 720, so the LINE budget alone let an
+        # item stay a solution note with hard wraps. MEASURED the day it landed: 0 of 27 items
+        # complied, median 1287, max 4795 ⇒ real work, not a formatting tidy-up. Enforced with the
+        # SAME monotone-descent semantics as the line budget (only NEWLY-over or GROWN entries block;
+        # shrinking always passes), because a gate red on every item trains its operator to walk past
+        # it. Its legitimate destination is the föy/SPEC — ADR-0013's epic layer landed alongside it.
+        "char_cap_key": "TASKS_ENTRY_CHARS", "char_default": 400,
         # A board item; the doctrine header's bullets carry no checkbox, so they are not entries.
         "entry_re": re.compile(r"^\s*- \[[ x]\]"),
         "shape": ("Item shape: id · @owner · due: · done-when · evidence path (rules §10.40).\n"
@@ -66,25 +74,30 @@ PROFILES = {
 }
 
 
-def max_lines(root, prof):
+def max_lines(root, prof, cap_key="cap_key", default_key="default"):
+    """Cap for one axis, read from `.claude/keel-caps`. Returns None when the profile declares no
+    such axis (only TASKS carries a character cap), so callers can skip it."""
+    key = prof.get(cap_key)
+    if key is None:
+        return None
     try:
         with open(os.path.join(root, ".claude", "keel-caps"), encoding="utf-8") as fh:
             for line in fh:
-                if line.strip().startswith(prof["cap_key"] + "="):
+                if line.strip().startswith(key + "="):
                     return int(line.split("=", 1)[1].split("#")[0].strip())
     except (OSError, ValueError):
         pass
-    return prof["default"]
+    return prof.get(default_key)
 
 
 def entries(text, prof):
-    """[(first_line, n_lines)] for every entry in the text, per the file's profile.
+    """[(first_line, n_lines, n_chars)] for every entry in the text, per the file's profile.
 
     Lines inside a ``` fence are quoted text — a `- [ ]` example in a spec snippet or the doctrine
     header — and are neither an entry nor padding for the one before it (measured 2026-09-03: an
     index-difference count made them both). A `## `/`### ` heading ends the current entry."""
     out = []
-    head, n, fenced = None, 0, False
+    head, n, chars, fenced = None, 0, 0, False
     for line in text.splitlines():
         if line.lstrip().startswith("```"):
             fenced = not fenced
@@ -93,26 +106,39 @@ def entries(text, prof):
             continue
         if prof["entry_re"].match(line):
             if head is not None:
-                out.append((head, n))
-            head, n = line, 1
+                out.append((head, n, chars))
+            head, n, chars = line, 1, len(line.strip())
         elif line.startswith(("## ", "### ")):
             if head is not None:
-                out.append((head, n))
+                out.append((head, n, chars))
             head = None
         elif head is not None:
             n += 1
+            chars += len(line.strip())
     if head is not None:
-        out.append((head, n))
+        out.append((head, n, chars))
     return out
 
-def oversized(text, cap, prof):
-    return [(head[:100], n) for head, n in entries(text, prof) if n > cap]
+
+def oversized(text, cap, prof, char_cap=None):
+    """[(head, measure, unit)] — the LINE and CHARACTER axes are reported SEPARATELY, because a
+    single number cannot say which axis was exceeded (the mutation-matrix lesson, one layer out)."""
+    out = []
+    for head, n, chars in entries(text, prof):
+        if n > cap:
+            out.append((head[:100], n, "lines"))
+        elif char_cap and chars > char_cap:
+            out.append((head[:100], chars, "characters"))
+    return out
 
 
-def _msg(bad, cap, name, prof):
-    parts = ["%s entry budget (max %d lines) EXCEEDED:" % (name.replace(".md", ""), cap)]
-    for head, n in bad:
-        parts.append("  %d lines — %s" % (n, head))
+def _msg(bad, cap, name, prof, char_cap=None):
+    limit = "max %d lines" % cap
+    if char_cap:
+        limit += " / %d characters" % char_cap
+    parts = ["%s entry budget (%s) EXCEEDED:" % (name.replace(".md", ""), limit)]
+    for head, n, unit in bad:
+        parts.append("  %d %s — %s" % (n, unit, head))
     parts.append("")
     parts.append(prof["shape"])
     return "\n".join(parts)
@@ -126,9 +152,10 @@ def check(root):
         if not os.path.exists(path):
             continue
         cap = max_lines(root, prof)
+        char_cap = max_lines(root, prof, "char_cap_key", "char_default")
         try:
             with open(path, encoding="utf-8") as fh:
-                bad = oversized(fh.read(), cap, prof)
+                bad = oversized(fh.read(), cap, prof, char_cap)
         except OSError:
             continue
         n = len(bad)
@@ -173,6 +200,7 @@ def hook():
         return 0
     root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
     cap = max_lines(root, prof)
+    char_cap = max_lines(root, prof, "char_cap_key", "char_default")
     try:
         with open(fp, encoding="utf-8") as fh:
             before = fh.read()
@@ -190,18 +218,22 @@ def hook():
         after = before.replace(old, new, len(before.split(old)) - 1
                                if ti.get("replace_all") else 1)
 
+    # Sizes are tracked PER AXIS: a line count and a character count are not comparable, and
+    # keying them together would let a growing character count hide behind a steady line count.
     grew = []
     before_sizes = {}
-    for head, n in entries(before, prof):
+    for head, n, chars in entries(before, prof):
         key = head[:100]
-        before_sizes[key] = max(n, before_sizes.get(key, 0))
-    for head, n in oversized(after, cap, prof):
-        prev_n = before_sizes.get(head)
+        prev = before_sizes.get(key, (0, 0))
+        before_sizes[key] = (max(n, prev[0]), max(chars, prev[1]))
+    for head, n, unit in oversized(after, cap, prof, char_cap):
+        prev = before_sizes.get(head)
+        prev_n = None if prev is None else (prev[0] if unit == "lines" else prev[1])
         if prev_n is None or n > prev_n:         # newly oversized, or an oversized entry grew
-            grew.append((head, n))
+            grew.append((head, n, unit))
     if not grew:
         return 0                                 # shrinking/restructuring an oversized entry passes
-    sys.stderr.write(_msg(grew, cap, os.path.basename(fp), prof) + "\n")
+    sys.stderr.write(_msg(grew, cap, os.path.basename(fp), prof, char_cap) + "\n")
     return 2
 
 

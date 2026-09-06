@@ -25,7 +25,14 @@ Checks (quote the exact rule you're applying):
 6. **Unclassified additions:** tracked files matching no documented convention (not in `docs/layouts.md`,
    not scaffold) — list them neutrally for the user to classify, don't judge.
 
-Output — a severity-ranked table, then one short paragraph of overall posture:
+7. **Follow-up on the previous audit** (when the parent hands you `reports/<date>-audit.md`): for each
+   earlier finding report `fixed / deferred / rejected / silently dropped`, whether a fix LANDED (sha),
+   and the measurement then → now; a landed fix whose number did not move is a new finding. Re-measure
+   each rejection's reason today. Also list which of the PREVIOUS auditor's findings were refuted by
+   the parent's spot-check — the auditor's own hit rate is part of the record.
+
+Output — the follow-up table (or "first round"), then a severity-ranked table, then one short
+paragraph of overall posture:
 `CRITICAL/WARN/INFO | file:line | rule § | violation (one line) | suggested remedy`
 - Phase-0 / empty project (no source tree yet, placeholder docs): say exactly that and return — no
   padded findings.

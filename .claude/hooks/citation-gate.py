@@ -57,6 +57,18 @@ PAT = re.compile(r"(?<![A-Za-z0-9_@./-])"
                  r"([A-Za-z0-9_@.-]+(?:/[A-Za-z0-9_@.-]+)+\.[A-Za-z0-9]{1,6})")
 STATE = ".claude/.citation-gate-last"
 ALLOW = ".claude/citation-allow"          # one path per line; reasons as # comments
+# A record that MEASURED an absence (a deleted file, a probe copy removed after the run, "no such
+# test was ever written") cites a path that must NOT exist — that citation IS the record, not a
+# defect. Without a marker the gate discourages the most valuable record type there is. Writer's
+# job, on the citing LINE: `... scratch/probe.py (RECORDED-ABSENT)`. Counted, never a ghost.
+ABSENCE_MARK = "(RECORDED-ABSENT)"
+# Line-number anchors into files that are CURATED or ROTATED by design rot structurally: the board
+# is rewritten each round, a worker board is frozen to `board-<YYYY-MM>.md` when it grows. Measured
+# 2026-08-27: 254 anchors into permanent files — 0 out of range; 50 into live memory — 14 (28%)
+# out of range. And on 2026-09-06 a lane could not rotate its own board because 3 of 4
+# `board.md:NNN` anchors lived on surfaces it may not edit. Cite the item id / section instead.
+LIVE_ANCHOR = re.compile(r"(?<![A-Za-z0-9_/.-])((?:[A-Za-z0-9_@.-]+/)*"
+                         r"(?:board|TASKS|HANDOVER|LESSONS|PLAN)\.md):(\d+)")
 
 
 def git(root, *args):
@@ -113,8 +125,12 @@ def classify(root, path):
     return "unresolved"
 
 
-def cited_paths(root, files):
-    """{path: [citing files]} for every token whose first segment is a real top-level entry."""
+def cited_paths(root, files, recorded_absent=None, live_anchors=None):
+    """{path: [citing files]} for every token whose first segment is a real top-level entry.
+
+    A line carrying ABSENCE_MARK is skipped here and its paths are appended to `recorded_absent`
+    (a list, if given) — the record SAYS the file is gone, so "not in HEAD" is the expected reading.
+    Line-number anchors into live/rotating files go to `live_anchors` as (citing file, anchor)."""
     roots = repo_roots(root)
     out = {}
     for f in files:
@@ -123,9 +139,22 @@ def cited_paths(root, files):
                 text = fh.read()
         except OSError:
             continue
-        for m in PAT.finditer(text):
-            p = m.group(1)
-            if p.split("/", 1)[0] in roots:
+        for line in text.splitlines():
+            if live_anchors is not None:
+                for m in LIVE_ANCHOR.finditer(line):
+                    live_anchors.append((f, "%s:%s" % (m.group(1), m.group(2))))
+            marked = ABSENCE_MARK in line
+            for m in PAT.finditer(line):
+                p = m.group(1)
+                if p.split("/", 1)[0] not in roots:
+                    continue
+                # The marker says the file is GONE. A marked path that is still on disk is not a
+                # measured absence — it is a ghost wearing the marker, so it falls through and is
+                # reported like any other (the reviewer's refutation, 2026-09-06).
+                if marked and not os.path.exists(os.path.join(root, p)):
+                    if recorded_absent is not None:
+                        recorded_absent.append(p)
+                    continue
                 out.setdefault(p, []).append(f)
     return out
 
@@ -156,7 +185,8 @@ def report(root):
         with open(ap, encoding="utf-8") as fh:
             allow = {l.split("#")[0].strip() for l in fh if l.split("#")[0].strip()}
     ghosts, unresolved, ignored = {}, [], []
-    for p, citers in sorted(cited_paths(root, files).items()):
+    absent, anchors = [], []
+    for p, citers in sorted(cited_paths(root, files, absent, anchors).items()):
         if p in allow:
             continue
         kind = classify(root, p)
@@ -184,6 +214,21 @@ def report(root):
         print("[citation-gate] (context) %d other cited path(s) are .gitignore'd BY DESIGN — a doc may "
               "legitimately name a file nobody commits; listed, not counted: %s"
               % (len(ignored), ", ".join(ignored[:5])))
+    # RECORDED-ABSENT is a class, not an exemption: the count is printed so a marker cannot become
+    # the quiet way to make a ghost disappear — but only beside a real finding (no standing noise).
+    if absent and (ghosts or unresolved):
+        print("[citation-gate] (context) %d cited path(s) are marked %s by their record — measured "
+              "absences, not checked against HEAD: %s"
+              % (len(set(absent)), ABSENCE_MARK, ", ".join(sorted(set(absent))[:5])))
+    # Line anchors into curated/rotating files are a WARNING class of their own (exit stays 0 for
+    # them): the anchor was right the day it was written and rots by design — and it blocks the
+    # cited board's rotation, because the lane may not rewrite the surface that carries it.
+    if anchors:
+        shown = sorted(set("%s ← %s" % (a, f) for f, a in anchors))
+        print("[citation-gate] %d line-number anchor(s) into files that are curated or rotated by "
+              "design (`board.md:N`, TASKS/HANDOVER/LESSONS/PLAN) — an anchor there is stale by the "
+              "next round and pins the file against rotation (§10.42); cite the item id or section "
+              "instead: %s" % (len(shown), "; ".join(shown[:6])))
     return 1 if ghosts else 0
 
 

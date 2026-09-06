@@ -17,7 +17,8 @@
 >   ONE corrective line stays here — never silently deleted, never a stub paying rent every session.
 > - **Keep only ALWAYS-relevant lessons.** File-scoped → a `paths:`-scoped rule (or SKILL, if it must
 >   survive a mid-task compaction) · permanent domain fact → `docs/` · retired or promoted →
->   DELETED here. **Promotion deletes the entry**; its one pointer is the `## Index` line below.
+>   DELETED here · still true but no longer CITED → cooled to `docs/retro/<YYYY-MM>.md` (`/keel-distill`).
+>   **Promotion deletes the entry**; its one pointer is the `## Index` line below.
 >
 > This header is DOCTRINE. Anything dated, measured, or awaiting a decision goes in the BODY.
 

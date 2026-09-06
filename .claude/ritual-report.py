@@ -5,8 +5,10 @@ event counts) + a detail table. Deterministic, stdlib-only; run via /keel-stats 
     python3 .claude/ritual-report.py
 Colors reuse PLAN.md's classDefs: session=green, manual compact=amber, auto compact=red.
 """
+import glob
 import os
 import re
+import subprocess
 from collections import Counter
 from datetime import datetime
 
@@ -107,6 +109,100 @@ def table(intervals):
     return "\n".join(rows)
 
 
+# Trees whose files are PROCESS, not product: the discipline scaffold. Anything else under a
+# directory is product; `tests/` is its own class. Root files (CLAUDE.md, Makefile, pyproject) are
+# scaffold. A project whose code lives in an unusual tree reads these numbers as an approximation —
+# the classifier is written down so it can be argued with, not silently trusted.
+SCAFFOLD = ("docs/", "reports/", "scratch/", "research/", ".claude/", ".github/",
+            "requirements/", "config/")
+
+
+def classify(path):
+    if path.startswith("tests/"):
+        return "tests"
+    if "/" not in path or path.startswith(SCAFFOLD):
+        return "process"
+    return "product"
+
+
+def process_metrics(root):
+    """Numbers the ritual log cannot see — derived from git and the tree, never typed by hand.
+    Field origin (5-agent project, 2026-09-05 audit, derived manually): 70% of 1017 commits touched
+    no product or test code, reports ran 3.8x the product LOC, the @-imported context was ~234 KB per
+    session — and none of it was visible until someone counted. Each project sees its own here."""
+    def sh(*args):
+        try:
+            return subprocess.run(["git", "-C", root, *args], capture_output=True, text=True,
+                                  timeout=60).stdout
+        except (OSError, subprocess.SubprocessError):
+            return ""
+    lines = ["## Process metrics (git + tree, this clone)", ""]
+    # 1. commits touching product/tests vs process-only (last 500)
+    commits, cur = [], None
+    for line in sh("log", "--name-only", "--format=%x00%h", "-500").splitlines():
+        if line.startswith("\x00"):
+            cur = set()
+            commits.append(cur)
+        elif line.strip() and cur is not None:
+            cur.add(classify(line.strip()))
+    n = len(commits)
+    if n:
+        touching = sum(1 for c in commits if c & {"product", "tests"})
+        lines.append(f"- **Commits** (last {n}): {touching} touch product/tests, "
+                     f"{n - touching} are process-only ({100 * (n - touching) // n}%).")
+    # 2. LOC per class
+    loc = Counter()
+    for f in sh("ls-files").splitlines():
+        try:
+            with open(os.path.join(root, f), "rb") as fh:
+                loc[classify(f)] += fh.read().count(b"\n")
+        except OSError:
+            pass
+    if loc:
+        ratio = (f" — process/product = {loc['process'] / loc['product']:.1f}x"
+                 if loc["product"] else "")
+        lines.append(f"- **Tracked lines:** product {loc['product']} · tests {loc['tests']} · "
+                     f"process (docs/reports/scaffold) {loc['process']}{ratio}.")
+    # 3. @-imported bytes per session
+    size, imported = 0, []
+    cp = os.path.join(root, "CLAUDE.md")
+    if os.path.isfile(cp):
+        size = os.path.getsize(cp)
+        with open(cp, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if line.startswith("@"):
+                    ip = os.path.join(root, line[1:].strip())
+                    if os.path.isfile(ip):
+                        size += os.path.getsize(ip)
+                        imported.append(line[1:].strip())
+        lines.append(f"- **Always-loaded context:** {size // 1024} KB per session start "
+                     f"(CLAUDE.md + {len(imported)} `@`-imports: {', '.join(imported) or '—'}).")
+    # 4. age of the newest test log
+    logs = glob.glob(os.path.join(root, "reports", "tests", "*", "*.log"))
+    if logs:
+        newest = max(os.path.getmtime(p) for p in logs)
+        days = (datetime.now().timestamp() - newest) / 86400
+        lines.append(f"- **Last `make test` log:** {days:.1f} days old ({len(logs)} logs kept locally).")
+    else:
+        lines.append("- **Last `make test` log:** none under `reports/tests/` — the suite has not been "
+                     "run through `make test` on this clone (or logs were cleaned).")
+    # 5. the Review queue: how many, how old
+    tp = os.path.join(root, "TASKS.md")
+    if os.path.isfile(tp):
+        with open(tp, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+        m = re.search(r"^## Review\b.*?(?=^## |\Z)", text, re.S | re.M)
+        if m:
+            items = re.findall(r"^\s*- \[[ x]\].*$", m.group(0), re.M)
+            dates = sorted(re.findall(r"\b(20\d\d-\d\d-\d\d)\b", m.group(0)))
+            oldest = f", oldest date on a line {dates[0]}" if dates else ""
+            lines.append(f"- **`## Review` queue:** {len(items)} item(s){oldest}.")
+    lines.append("")
+    lines.append("> Classifier: `tests/` = tests · scaffold trees + root files = process · everything "
+                 "else = product. Approximate by design; argue with the list in `ritual-report.py`.")
+    return "\n".join(lines)
+
+
 def main():
     entries = parse(LOG)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
@@ -143,6 +239,7 @@ def main():
             f"## Timeline (last {MAX_DIAGRAM_INTERVALS} intervals)\n\n{mermaid(ivs)}\n\n"
             f"## All intervals\n\n{table(ivs)}\n"
         )
+    body += "\n" + process_metrics(ROOT) + "\n"
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(body)
     print(f"wrote {OUT} ({len(entries)} log lines)")

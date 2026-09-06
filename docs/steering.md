@@ -379,19 +379,20 @@ CONFIRMED through the IDE on 2026-09-03: with the wrapper installed, three reope
 with the wrapper's opt-in trace (`touch ~/.claude/keel-launch-wrapper.log`), never with `ps` — the
 `exec` is transparent, so a wrapped and an unwrapped launch have identical process cmdlines.
 
-**Two machines, two VS Code builds — the twin problem.** An owner working one remote host from
-home and from work, with the two clients on different VS Code versions, keeps two VS Code servers
-alive at once (`~/.vscode-server/cli/servers/Stable-<commit>/`, one per build; eight builds were
-found installed). Each client's server owns its own `claude` processes and resumes the SAME session
-ids, so `/list-agents` shows every identity twice — both twins with live sockets, both writing ONE
-transcript (the silent-clobber shape). Process age is the WRONG axis to pick the real one: going
-back to the other machine makes the OLDER twin the live one. The right axis is whether the twin's
-VS Code server has a CLIENT attached — its `code-<commit> … command-shell` process holds an
-ESTABLISHED TCP connection iff a client is connected — and `team-addresses.py` reports
-ATTACHED/DETACHED per twin with the `kill` command for the detached pids (they hold nothing that is
-not already on disk). The durable fix is outside the kit: keep both clients on the SAME VS Code
-version so they share one server, and when switching machines close the Claude tabs or run
-"Remote-SSH: Kill VS Code Server on Host" so no server is left holding sessions nobody can see.
+**Twins — one session id, several processes.** Every reconnect — machine sleep or restart, a
+Remote-SSH tunnel re-established, a second machine on another VS Code build — spawns a NEW `claude`
+process that RESUMES THE SAME session id; the old one stays asleep. So twins are not a user error,
+they accumulate on their own (measured 2026-09-06: 6 identities, 2–3 processes each), and every twin
+writes ONE transcript (the silent-clobber shape). The first fix (2026-09-03) picked the live twin by
+whether its VS Code server had a CLIENT attached; that axis is BLIND — `attached` is computed per VS
+Code BUILD, not per session, so 11 of 11 processes read attached. The axis that discriminates is
+START TIME: the NEWEST process of a session id is live, older ones are reconnect leftovers, and
+closing a leftover is LOSSLESS (same session, transcript on disk). `team-addresses.py` prints
+live/LEFTOVER per twin and never a `kill <pid>` (pids are recycled — a frozen kill command in a record
+is a security error); `make team-clean` prints the table, the owner closes the leftover WINDOWS.
+Prevention: close the Claude tabs before disconnecting or sleeping; a pile-up clears in one move with
+"Remote-SSH: Kill VS Code Server on Host". A pid with no measurable start time is never called a
+leftover — unknown is not old.
 
 **A lost lane is never re-spawned as a subagent.** When a worker cannot be reached by name, ask
 the owner — do NOT `Agent`-spawn its charter as a subagent "to keep things moving": the spawn is a
@@ -412,6 +413,17 @@ Two fixed forms, deliberately terse:
 **A message is a pointer, never the delivery.** The delivery is the file (rules §10.40); a chat
 summary is not one, and the reground hook flags a `## Review` line whose evidence file is missing.
 Waking a worker does not start its work either: it lands at the §10.41 comprehension gate first.
+
+### The outside eye: `observer` (optional, owner-triggered)
+`/keel-audit` asks *"were the written rules followed?"*; the `observer` agent
+(`.claude/agents/observer.md`) asks *"is the rule RIGHT, is the process healthy?"* — it may report that
+a rule was obeyed and still did harm. It sits OUTSIDE the roster: no lane, never spawned or briefed by
+the orchestrator (a critic working from the agenda of what it criticises is not independent — one
+layer above "the deliverer does not pick its reviewer"), one write folder
+(`reports/team/<owner-tag>/observer/`), and every round opens with what became of the LAST round's
+findings plus its own refuted/total ratio. Field origin (5-agent team, 2026-09-05/06): 30
+recommendations were evaluated, 24 accepted, and none TRACKED until that follow-up duty existed —
+*a disposition is not an item*.
 
 ### Claude Code's own agent teams (optional accelerator)
 
