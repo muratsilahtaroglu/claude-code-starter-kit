@@ -62,7 +62,7 @@ PROFILES = {
         # complied, median 1287, max 4795 ⇒ real work, not a formatting tidy-up. Enforced with the
         # SAME monotone-descent semantics as the line budget (only NEWLY-over or GROWN entries block;
         # shrinking always passes), because a gate red on every item trains its operator to walk past
-        # it. Its legitimate destination is the föy/SPEC — ADR-0013's epic layer landed alongside it.
+        # it. Its legitimate destination is the SPEC file — rules §10.40's EPIC layer landed alongside it.
         "char_cap_key": "TASKS_ENTRY_CHARS", "char_default": 400,
         # A board item; the doctrine header's bullets carry no checkbox, so they are not entries.
         "entry_re": re.compile(r"^\s*- \[[ x]\]"),
