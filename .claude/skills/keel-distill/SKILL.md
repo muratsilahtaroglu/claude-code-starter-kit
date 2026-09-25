@@ -127,7 +127,8 @@ live work, and "what is @X still carrying?" becomes a directory listing again.
   graduated-lesson rule/skill/doc has its ONE Index line — an orphan cluster is invisible to
   sessions whose trigger hasn't fired; a dead line hides lessons that still exist. (The reground
   hook flags dead targets at session start; the missing-line direction is checked here.) Same mirror check for `reports/team/README.md`: every
-  report file has exactly ONE index line (an orphan = unfindable evidence; a duplicate diverges —
+  INDEXED report — live status, or cited by a permanent record (the template's scope line) — has
+  exactly ONE index line (an orphan = unfindable evidence; a duplicate diverges —
   field case: the same report indexed twice with two different status texts), statuses use only
   the controlled vocabulary (`wip · delivered · verified — owner part: <…> · closed <date>
   accepted|rejected`, `[x]` only at closed), and the mirror counts `done/` files too — a `closed`

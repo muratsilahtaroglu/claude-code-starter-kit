@@ -33,9 +33,13 @@ esac
 # SOLO DEFAULTS — a team project tunes them in .claude/keel-caps (PROTECTED: /keel-update never touches
 # it; owner-only via owner-guard; rules.md §10.40), one KEY=NUMBER per line:
 #   HANDOVER=150  LESSONS=250  TASKS=100  RULES=400  HANDOVER_BLOCKS=3  REVIEW_DAYS=3
+#   HANDOVER_KB=24  LESSONS_KB=40  TASKS_KB=16  RULES_KB=48  CLAUDE_KB=16  CONTEXT_KB=120
+# The _KB caps exist because a LINE cap is blind to line LENGTH: measured on a live project, HANDOVER
+# read 146/150 lines (green) at 244 KB — one line held 135 KB — and auto-compact fired 3x in 5 min.
 # The AI PROPOSES a raise (headcount grew, board starves), the USER approves, the file pins it — never
 # raised silently. Skills (distill/compact) and template headers defer to this same file.
 cap_H=150; cap_L=250; cap_T=100; cap_R=400; cap_B=3; cap_RD=3
+kb_H=24; kb_L=40; kb_T=16; kb_R=48; kb_C=16; kb_ALL=120
 if [ -f "$DIR/.claude/keel-caps" ]; then
   while IFS='=' read -r k v; do
     k="$(printf '%s' "$k" | tr -d '[:space:]\r')"; v="$(printf '%s' "$v" | tr -cd '0-9')"
@@ -43,8 +47,24 @@ if [ -f "$DIR/.claude/keel-caps" ]; then
     case "$k" in
       HANDOVER) cap_H=$v ;; LESSONS) cap_L=$v ;; TASKS) cap_T=$v ;;
       RULES) cap_R=$v ;; HANDOVER_BLOCKS) cap_B=$v ;; REVIEW_DAYS) cap_RD=$v ;;
+      HANDOVER_KB) kb_H=$v ;; LESSONS_KB) kb_L=$v ;; TASKS_KB) kb_T=$v ;;
+      RULES_KB) kb_R=$v ;; CLAUDE_KB) kb_C=$v ;; CONTEXT_KB) kb_ALL=$v ;;
     esac
   done < "$DIR/.claude/keel-caps"
+fi
+# A RAISED line cap scales its KB default in the same proportion (unless <FILE>_KB is set): an owner
+# who chose LESSONS=1000 must not meet a second, hidden 40 KB limit. Same rule as
+# .claude/keel-compact-check.py (pinned equal by a test).
+kbset() { [ -f "$DIR/.claude/keel-caps" ] && grep -qE "^[[:space:]]*$1[[:space:]]*=" "$DIR/.claude/keel-caps"; }
+kbscale() { # $1=kb_default $2=line_cap $3=line_default
+  if [ "$2" -gt "$3" ]; then echo $(( ($1 * $2 + $3 - 1) / $3 )); else echo "$1"; fi
+}
+kbset HANDOVER_KB || kb_H=$(kbscale 24 "$cap_H" 150)
+kbset LESSONS_KB  || kb_L=$(kbscale 40 "$cap_L" 250)
+kbset TASKS_KB    || kb_T=$(kbscale 16 "$cap_T" 100)
+kbset RULES_KB    || kb_R=$(kbscale 48 "$cap_R" 400)
+if ! kbset CONTEXT_KB; then
+  d=$(( (kb_H + kb_L + kb_T + kb_R + kb_C) * 5 / 6 )); [ "$d" -gt "$kb_ALL" ] && kb_ALL=$d
 fi
 warn_cap() { # $1=file $2=max_lines
   [ -f "$DIR/$1" ] || return 0
@@ -57,6 +77,40 @@ warn_cap() { # $1=file $2=max_lines
 warn_cap "HANDOVER.md" "$cap_H"
 warn_cap "LESSONS.md" "$cap_L"
 warn_cap "TASKS.md" "$cap_T"
+
+# Size check (bytes), per always-loaded file and in total — the axis the line caps cannot see.
+# Names the longest line too: in the field case one line WAS the overflow, and "split that line"
+# is a different remedy from "rotate a block".
+total_b=0
+warn_kb() { # $1=file $2=max_kb
+  [ -f "$DIR/$1" ] || return 0
+  b=$(wc -c < "$DIR/$1" 2>/dev/null || echo 0); b=${b:-0}
+  total_b=$((total_b + b))
+  if [ "$b" -gt $(( $2 * 1024 )) ]; then
+    longest=$(awk '{ if (length($0) > m) { m = length($0); n = NR } } END { printf "line %d, %d chars", n, m }' "$DIR/$1" 2>/dev/null)
+    echo "[keel] $1 is $((b / 1024)) KB (cap ${2} KB, .claude/keel-caps) — longest: ${longest}. Every session loads it IN FULL: split long lines into one fact each (narrative → a report) or /keel-distill."
+  fi
+}
+warn_kb "HANDOVER.md" "$kb_H"; warn_kb "LESSONS.md" "$kb_L"; warn_kb "TASKS.md" "$kb_T"
+warn_kb "rules.md" "$kb_R"; warn_kb "CLAUDE.md" "$kb_C"
+if [ "$total_b" -gt $(( kb_ALL * 1024 )) ]; then
+  echo "[keel] always-loaded memory totals $((total_b / 1024)) KB (cap ${kb_ALL} KB, CONTEXT_KB) — paid by EVERY session start and again after every compaction."
+fi
+
+# STALE-DISK debt (written by pre-compact-snapshot.sh): a compaction — usually AUTO — crossed a
+# dirty tree whose HANDOVER.md was untouched, so the WHY of that work may live only in the summary.
+# A systemMessage dies with the context it warns; this line is what survives. Settle it (write the
+# handover block) BEFORE new work. Cleared automatically once HANDOVER.md is newer than the marker.
+if [ -f "$DIR/.claude/ritual-log" ] && [ -f "$DIR/HANDOVER.md" ]; then
+  sd=$(grep ' STALE-DISK' "$DIR/.claude/ritual-log" 2>/dev/null | tail -1 | cut -c1-19)
+  if [ -n "$sd" ]; then
+    sd_s=$(date -d "$sd" +%s 2>/dev/null || echo 0)
+    h_s=$(stat -c %Y "$DIR/HANDOVER.md" 2>/dev/null || echo 0)
+    if [ "${sd_s:-0}" -gt "${h_s:-0}" ]; then
+      echo "[keel] STALE-DISK debt: at ${sd} a compaction crossed a dirty tree with HANDOVER.md untouched — the WHY of that work may exist only in the summary. Write/refresh this session's HANDOVER block (/keel-handover) BEFORE new work."
+    fi
+  fi
+fi
 
 # Rule-budget check (rules.md §10.38): the constitution is capped like the memory files — a rules.md
 # nobody can hold in attention stops steering anything.

@@ -16,13 +16,22 @@ always — this is the umbrella, not a replacement.
    `/keel-distill` when caps are hit, the session block (a)–(d), PLAN.md status flips + the
    regenerated diagram, TASKS.md cleanup, and the §9.31 sweep of unwritten agreements into
    `LESSONS.md`. Do not duplicate its steps here — invoke it.
-2. **Freshness gate** — report a short pass/fail checklist; fix gaps before proceeding:
+2. **Freshness gate — RUN `python3 .claude/keel-compact-check.py` (ONE call; its `rc` is the
+   verdict).** It measures the mechanical half of the list below and prints its own scope: size per
+   always-loaded file (lines · KB · over-long lines — caps read from `.claude/keel-caps`), HANDOVER
+   block count + top-block date + "written this session" + STALE-DISK debt, `## Now` per lane,
+   `## Review` evidence files, ghost citations, and the push boundary. rc 0 pass · 1 RED (fix, re-run)
+   · 2 the instrument failed (fall back to the list by hand). It refuses to fake the one
+   non-mechanical item and PRINTS it instead — the §9.31 sweep is yours. Why a script: on a live
+   5-agent project this checklist cost 17 / 25 / 59 tool turns per ritual at the fullest context of
+   the session (~37M cache reads for one run). The list it replaces, for reference:
    - [ ] `HANDOVER.md` top block carries THIS session's `YYYY-MM-DD HH:MM` and describes THIS session
          (same-day ≠ same-session: another session's block from today is still stale — add your own).
    - [ ] `TASKS.md ## Now` matches reality; finished items deleted (one-liners in block (a)).
    - [ ] No agreement / gotcha / failed approach from this conversation is still unwritten (§9.31).
    - [ ] Caps respected (defaults — `.claude/keel-caps` overrides, rules §10.40): HANDOVER ≤ 3 blocks /
-         ~150 · LESSONS ≤ ~250 · TASKS ≤ ~100 (else `/keel-distill`).
+         ~150 · LESSONS ≤ ~250 · TASKS ≤ ~100 (else `/keel-distill`) — in LINES *and* KB, with no line
+         over its per-line cap (a line cap alone once let HANDOVER reach 244 KB on 146 lines).
    - [ ] `PLAN.md` statuses + _Current focus_ current (if the project uses PLAN.md).
 3. **Offer an approved commit + the batched push** (rules.md §1.3, §6.15) — this is the natural push
    boundary: commits accrued through the session go out here in ONE approval (the `ask` on push fires

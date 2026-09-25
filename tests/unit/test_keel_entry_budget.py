@@ -241,3 +241,104 @@ def test_shrinking_a_character_oversized_item_still_passes(board):
     (board / "TASKS.md").write_text("# TASKS\n\n## Now\n" + TASK_OK + fat, encoding="utf-8")
     rc, _ = run(board, _board_edit(board, fat, less))
     assert rc == ALLOW
+
+
+# --------------------------------------------------------------------------
+# Per-LINE cap on every always-loaded file (2026-09-25). The field case: HANDOVER at 146/150 lines —
+# green on every line/entry cap — had grown to 244 KB because ONE line held 135 KB, and auto-compact
+# fired three times in five minutes. None of the caps above could see a line's LENGTH.
+# --------------------------------------------------------------------------
+
+def _root_edit(root, name, old, new):
+    return {"tool_input": {"file_path": str(root / name), "old_string": old, "new_string": new}}
+
+
+@pytest.fixture
+def handover(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / "HANDOVER.md").write_text("# HANDOVER\n\n### 2026-09-25 — x\n- (a) short fact\n")
+    return tmp_path
+
+
+def test_a_new_long_line_in_handover_is_blocked(handover):
+    """The 135 KB line: HANDOVER has no entry profile, so before this axis nothing looked at it."""
+    rc, out = run(handover, _root_edit(handover, "HANDOVER.md", "- (a) short fact\n",
+                                       "- (a) short fact\n- (a) " + "narrative " * 60 + "\n"))
+    assert rc == BLOCK
+    assert "per-LINE cap EXCEEDED" in out and "One line = one fact" in out
+
+
+def test_shortening_a_long_line_passes_and_lengthening_it_blocks(handover):
+    """Monotone descent by DOMINANCE: a verbatim-only test blocked the SHORTENING edit (tried first)."""
+    long = "- (a) " + "x" * 900
+    (handover / "HANDOVER.md").write_text("# HANDOVER\n\n" + long + "\n")
+    assert run(handover, _root_edit(handover, "HANDOVER.md", long, "- (a) " + "x" * 500))[0] == ALLOW
+    assert run(handover, _root_edit(handover, "HANDOVER.md", long, "- (a) " + "x" * 950))[0] == BLOCK
+
+
+def test_a_second_long_line_blocks_even_beside_a_longer_old_one(handover):
+    """Dominance, not max: keeping the 900-char line and ADDING a 500-char one is worse, not equal."""
+    long = "- (a) " + "x" * 900
+    (handover / "HANDOVER.md").write_text("# HANDOVER\n\n" + long + "\n")
+    rc, _ = run(handover, _root_edit(handover, "HANDOVER.md", long, long + "\n- (a) " + "y" * 500))
+    assert rc == BLOCK
+
+
+def test_line_cap_is_tunable_and_only_guards_the_project_root(handover):
+    (handover / ".claude" / "keel-caps").write_text("HANDOVER_LINE_CHARS=2000\n")
+    edit = _root_edit(handover, "HANDOVER.md", "- (a) short fact\n", "- (a) " + "z" * 900 + "\n")
+    assert run(handover, edit)[0] == ALLOW
+    (handover / "docs").mkdir()
+    (handover / "docs" / "HANDOVER.md").write_text("- (a) short fact\n")
+    nested = _root_edit(handover, "docs/HANDOVER.md", "- (a) short fact\n", "- " + "z" * 5000 + "\n")
+    assert run(handover, nested)[0] == ALLOW, "a docs/ copy is not @-imported and is not guarded"
+
+
+def test_rules_and_claude_md_are_guarded_too(handover):
+    (handover / "rules.md").write_text("# rules\n1. short rule\n")
+    rc, _ = run(handover, _root_edit(handover, "rules.md", "1. short rule\n", "1. " + "w" * 700 + "\n"))
+    assert rc == BLOCK
+
+
+# Pre-release review findings (2026-09-25), each pinned.
+
+def _load_hook():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("entry_budget", HOOK)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+class _FakeEnc:
+    """One token per character — lets the token axis be tested without tiktoken installed."""
+    def encode(self, s):
+        return list(s)
+
+
+def test_a_new_over_token_line_cannot_hide_behind_an_old_over_character_line():
+    """In ONE sorted list the new over-TOKEN line 'replaced' the old over-CHARACTER one and passed."""
+    eb = _load_hook()
+    before = "x" * 500                       # over the 400-char cap
+    after = "y" * 299                        # under 400 chars, but 299 tokens > a 100-token cap
+    assert eb.long_new_lines(before, after, 400, 100, _FakeEnc()) == [(1, 299, "tokens")]
+
+
+def test_hook_fails_open_on_a_malformed_payload(handover):
+    proc = subprocess.run(["python3", str(HOOK), "--hook"], input=json.dumps([]),
+                          capture_output=True, text=True, cwd=str(handover),
+                          env=dict(os.environ, CLAUDE_PROJECT_DIR=str(handover)))
+    assert proc.returncode == ALLOW and "Traceback" not in proc.stderr
+
+
+def test_a_relative_file_path_is_resolved_against_the_project_root(handover, tmp_path_factory):
+    """With cwd != root, `before` used to be read as empty, so every OLD long line looked new."""
+    long = "- (a) " + "x" * 900
+    (handover / "HANDOVER.md").write_text("# HANDOVER\n\n" + long + "\n")
+    elsewhere = tmp_path_factory.mktemp("cwd")
+    payload = {"tool_input": {"file_path": "HANDOVER.md",
+                              "content": "# HANDOVER\n\n" + long + "\n- (a) new short fact\n"}}
+    proc = subprocess.run(["python3", str(HOOK), "--hook"], input=json.dumps(payload),
+                          capture_output=True, text=True, cwd=str(elsewhere),
+                          env=dict(os.environ, CLAUDE_PROJECT_DIR=str(handover)))
+    assert proc.returncode == ALLOW, proc.stderr

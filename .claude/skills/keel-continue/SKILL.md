@@ -88,6 +88,26 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    of them), write each item's OBSERVATION line (what the owner should SEE, not PASS/FAIL), and check
    the partition SUMS to the item count. Field measurement: 17 items → 6 questions + 3 desk lines,
    because the axis that splits an owner round is the QUESTION, not the item.
+   **The owner's step must be able to FAIL.** Each owner line names the string that should appear on
+   screen AND the one that means FAIL — "is it visible?" is not a step (a new section satisfies it
+   whatever the fix did). **Rehearse it first:** before a live step reaches the owner, the reviewing
+   session runs it on the real stack/model with TWO DIFFERENT inputs of the same shape — never the
+   owner's exact input, because learning memories and caches learn from the rehearsal and turn the owner's
+   round into a cache hit. Input 1 fails → the step goes back to its lane, not to the owner; a
+   behaviour that could not be produced goes as "not produced in rehearsal", never as an expected
+   PASS. Field: the first time a gate met a real model sentence was on the owner's screen.
+   **Boundary sweep on every T2 before the owner sees it** (findings, not a fix round): the smallest
+   and largest value of any limit argument · a value that does not exist · the same concept in a
+   second spelling (case, language, underscore) — through the entry point the USER hits, not a
+   hand-written twin of it.
+   **Round cap — the third FAIL stops the patch loop.** When the same item comes back FAIL for the
+   third time, do not queue r4: reopen the APPROACH — is this an epic (§10.40), is the layer wrong,
+   does it need an owner desk decision or an `observer` look? Each round closing one escape while the
+   review finds the next is the signature of patching an open class with a closed list. Field: two
+   items ran to r9 and r11 on hand-written grammar rules, every round correct, the class never closed.
+   **One channel to the owner:** desk decisions reach the owner through the ORCHESTRATOR only; lanes
+   (the reviewer included) MEASURE the options and hand them up, and bring the owner nothing but live
+   test steps. Two channels ask the same question twice.
    **EPIC step-over:** if the round closed an `E-<name>/<n>` sub-item, READ the epic's body (its ADR
    or spec) before anything else, update it from what was learned, then open `E-<name>/<n+1>` or
    close the epic. An epic whose body is not re-read at each close becomes a stale plan — this
@@ -105,6 +125,13 @@ The verdicts differ, because the orchestrator takes no work items of its own (§
    reproducing an invented one. A refuted premise costs one cheap read; an invented one costs a round.
    Mark the premise `H:` in the item text — it is a hypothesis, not a fact — and write the item's
    TIER (T0/T1/T2, §10.41) on the line: the tier decides how much ceremony the delivery gets.
+   **An item proposal carries four things before it reaches the board:** the problem in one sentence
+   (the owner's words verbatim if they said it) · a SURFACE COUNT found by search, not memory (does the
+   product already have this kind of surface? then the item IMPROVES it, it does not add one) · the
+   owner step written so it CAN fail · the tier. Field: an item that named no surface added a fourth
+   progress section where the owner wanted the existing three improved — rejected, and the product
+   was not at fault, the item was. A project may add the owner's approval before an item is written
+   (team boards often do); record that choice in the orchestrator's charter.
    **Keep every lane's queue ≥2 deep** (the running item + the next one): a worker's LAST step on a
    delivery is to take its next item, so it must already be on the board — a lane that delivers and
    waits for a message is a lane the owner has to hand-crank (field: four lanes idled that way for a

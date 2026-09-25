@@ -191,7 +191,8 @@ Roles from then on:
   `reports/team/` files into the AUTHOR's own folder — `reports/team/<@tag>/` for each developer, the
   owner, and every co-agent — with task-prefixed names inside (`<task>_spec.md`, `<task>_fix_<date>.md`;
   bulky/raw evidence as a `<task>_<what>/` subfolder), **Markdown only** (no .docx/binary docs).
-  `reports/team/README.md` is the single INDEX **and the review todolist**: one line per report —
+  `reports/team/README.md` is the single INDEX **and the review todolist**: one line per LIVE or
+  CITED report (a closed, uncited one needs none — see the template's scope line) —
   `file · task · what · status` — appended at delivery (part of the solution-note step); statuses come
   ONLY from the controlled vocabulary `wip · delivered · verified — owner part: <…> · closed <date>
   accepted|rejected` (`[x]` only at closed; the author appends, the orchestrator flips — the format
@@ -393,6 +394,13 @@ is a security error); `make team-clean` prints the table, the owner closes the l
 Prevention: close the Claude tabs before disconnecting or sleeping; a pile-up clears in one move with
 "Remote-SSH: Kill VS Code Server on Host". A pid with no measurable start time is never called a
 leftover — unknown is not old.
+**Option: a date suffix on every window name** (`<agent>_<MM_DD>`, e.g. `review_09_24`; the owner of a
+live 5-agent team chose it after twins clobbered each other). A window whose name does not carry
+TODAY's suffix does no work — its one allowed action is asking for `/rename <agent>_<MM_DD>` — and a
+second window with today's suffix for the same agent stops both until the owner picks one. It makes
+a stale twin visible at a glance, at the price of a rename per window per day; write the choice in
+the orchestrator's charter if you adopt it. Addresses stay RESOLVED (`team-addresses.py` /
+`ListAgents` at send time), never remembered.
 
 **A lost lane is never re-spawned as a subagent.** When a worker cannot be reached by name, ask
 the owner — do NOT `Agent`-spawn its charter as a subagent "to keep things moving": the spawn is a

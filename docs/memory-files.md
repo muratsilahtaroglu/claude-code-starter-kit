@@ -90,6 +90,11 @@ lessons were always-relevant, ~52% bound specific files, and any one task needed
 - **(D) Superseded / closed / promoted** → **deleted**. Git is the archive.
 - **(E) Still true, no longer cited** → **cooled** to `docs/retro/<YYYY-MM>.md` verbatim, one router
   line left in `## Index` (`docs/retro/README.md` — the proxy criterion and why it is a proxy).
+- **Never BLANK a line to keep a line-number citation alive.** A moved entry is DELETED here; if other
+  files cite `LESSONS.md:<n>`, those anchors are the defect — rewrite them to the entry's date/key
+  phrase (the citation gate lists them). Field: a project cooled 67 entries by blanking their lines
+  in place to protect 55 line anchors, leaving a 1000-line file that was half empty lines — still
+  paid for, still at its line cap.
 
 **Promotion deletes the entry.** Never leave a "moved to X" stub — a field case left 42 lines of them,
 taxing every session. The one surviving pointer is a line in the file's `## Index` router:

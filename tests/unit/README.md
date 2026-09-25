@@ -3,7 +3,7 @@
 <!-- `test_<name>.py` — what it guards + origin (phase/bug). Example:
 `test_scoring.py` — scoring edge cases: 0-price, missing fields (phase 2; the silent-NaN bug). -->
 
-`test_keel_hooks.py` — the kit's own hook regression matrix (165 cases: block-dangerous ·
+`test_keel_hooks.py` — the kit's own hook regression matrix (169 cases: block-dangerous ·
 owner-guard · reground TASKS parsing + repo invariants · the workspace-trust check that names
 allow rules withheld until the trust dialog is accepted, silent when trusted, when there are no
 allow rules, or when the config is unreadable · the review-DECAY check: an old delivery is named
@@ -53,7 +53,8 @@ Origin: `git commit -- <path>` skips an untracked file WITHOUT erroring, so a re
 reference the artefact never earned; measured on a live project where the class repeated three times
 in one day under a written rule, which is why §6.18 became a gate (§10.38). KIT-OWNED.
 
-`test_keel_entry_budget.py` — the per-entry line budget for the always-imported boards (18 cases: oversized new entry
+`test_keel_compact_check.py` — the one-call freshness gate `/keel-compact` runs (13 cases: a fresh project passes and still prints the human step · one huge line is RED under the line cap · top-block date incl. a date-range heading · STALE-DISK debt · `## Now` counted per lane · Review line without a note · ghost citation · instrument fault fails CLOSED · defaults equal the SessionStart hook's · one existing path cannot vouch for a missing note · a raised line cap scales its KB default, in both readers · an unreadable STALE-DISK marker is not settled). Born from a ritual that cost up to 59 tool turns.
+`test_keel_entry_budget.py` — the per-entry budget for the always-imported boards plus the per-LINE cap on every always-loaded root file (29 cases; the line axis: a new over-token line cannot hide behind an old over-character one · fail-open on a malformed payload · relative paths resolve against the root · a new long HANDOVER line blocks · shortening passes and lengthening blocks (dominance) · a second long line beside a longer one blocks · tunable and root-only · rules/CLAUDE guarded; the entry axis: oversized new entry
 blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
 · shrinking always passes · pre-existing backlog never blocks unrelated edits · per-file caps tunable via
 keel-caps · --check baseline auto-lowers and never auto-raises · the same gate over TASKS.md board

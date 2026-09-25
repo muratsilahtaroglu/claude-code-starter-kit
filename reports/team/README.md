@@ -15,9 +15,13 @@
 > **`done/`** subfolder and rewrites every citation in the same pass — so the flat folder shows only
 > live work. Nothing else ever moves a report.
 >
-> **This README is the single index AND the team's review todolist** — one line per report,
-> `file · task · what · status`, grouped by author (sections mirror the folders; the `/keel-distill`
-> lint checks the mirror: every file exactly ONE line, no orphans, no duplicates). **A delivery
+> **This README is the single index AND the team's review todolist** — one line per INDEXED report,
+> `file · task · what · status`, grouped by author. **Scope: (a) every report whose status is LIVE
+> (`wip` · `delivered` · `verified`) and (b) every report a permanent record CITES.** A closed report
+> nobody cites needs no line — that is not debt (field: 608 of 1094 reports on a live project had no
+> line, so "every file one line" was a dead norm; a dead norm is revised, never left silently dead).
+> The cost is written: an uncited closed report is found with `grep`. The `/keel-distill` lint checks
+> the mirror within that scope: exactly ONE line per indexed file, no orphans, no duplicates. **A delivery
 > exists only as its file:** a chat summary is not a delivery — the reground hook flags TASKS
 > `## Review` lines whose evidence file is missing on disk.
 >

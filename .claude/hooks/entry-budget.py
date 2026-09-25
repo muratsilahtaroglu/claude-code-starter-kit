@@ -31,6 +31,18 @@ counter rose 41 -> 43 in three days). This version SIMULATES the post-edit file:
 replacement to the on-disk content and blocks when the edit makes any entry newly oversized or an
 oversized entry LONGER. Shrinking or restructuring an oversized entry always passes.
 
+THE SECOND BLIND SPOT — LINE LENGTH (measured on the same project, 2026-09-24/25): every cap above
+counts LINES or ENTRIES, and none of them sees how LONG a line is. HANDOVER sat at 146/150 lines —
+green — while it had grown to 244 KB, because ONE line held 135 KB; auto-compact then fired three
+times in five minutes. So every ALWAYS-LOADED file (CLAUDE.md · rules.md · HANDOVER.md · LESSONS.md
+· TASKS.md, at the project root) also carries a per-LINE character cap (`<FILE>_LINE_CHARS`,
+default 400): a write that ADDS a line over the cap is blocked; a line already in the file verbatim
+never is (monotone descent again — cleanup must never be punished). Characters, not bytes, so a
+Turkish or emoji line is not penalised twice. Tokens are the real cost, but counting them needs a
+tokenizer: when `tiktoken` is importable, an optional `<FILE>_LINE_TOKENS` key adds a token axis
+(approximate — OpenAI's cl100k, not Claude's tokenizer); without it that axis is skipped, never
+guessed from a made-up ratio.
+
 Registrations: PreToolUse (Write|Edit; exit 2 = block, fail-open on anything unexpected) +
 SessionStart --check (advisory: prints only when the standing backlog GREW — a gate that is always
 red trains its operator to walk past it; the measure is monotone descent, not zero).
@@ -72,6 +84,80 @@ PROFILES = {
                   "FULL by every session — a board item is a POINTER, not the delivery."),
     },
 }
+
+
+# Per-LINE caps for every always-loaded file (see header: THE SECOND BLIND SPOT). Keyed by the file
+# name AT THE PROJECT ROOT — a `docs/x/TASKS.md` is not @-imported and is not guarded here.
+LINE_CAPS = {"CLAUDE.md": "CLAUDE", "rules.md": "RULES", "HANDOVER.md": "HANDOVER",
+             "LESSONS.md": "LESSONS", "TASKS.md": "TASKS"}
+LINE_CHARS_DEFAULT = 400
+
+
+def read_caps(root):
+    """{KEY: int} from `.claude/keel-caps`; comment lines and unparseable values are ignored."""
+    out = {}
+    try:
+        with open(os.path.join(root, ".claude", "keel-caps"), encoding="utf-8") as fh:
+            for line in fh:
+                line = line.split("#")[0].strip()
+                if "=" not in line:
+                    continue
+                k, _, v = line.partition("=")
+                try:
+                    out[k.strip()] = int(v.strip())
+                except ValueError:
+                    pass
+    except OSError:
+        pass
+    return out
+
+
+def _tokenizer():
+    try:
+        import tiktoken
+        return tiktoken.get_encoding("cl100k_base")
+    except Exception:
+        return None
+
+
+def long_new_lines(before, after, char_cap, token_cap=None, enc=None):
+    """[(line_no, measure, unit)] for over-cap lines of `after` that make the file WORSE.
+
+    Monotone descent on this axis, by DOMINANCE: the over-cap measures of `after`, sorted longest
+    first, must each be <= the matching one of `before`, and there may not be more of them. So a
+    long line may stay, move or shrink; a NEW long line, or one made LONGER, blocks. (A plain
+    "is it verbatim in before?" test was tried first and blocks a line that is being SHORTENED —
+    cleanup must never be punished.)"""
+    def measures(text):
+        out = []
+        for i, line in enumerate(text.splitlines(), 1):
+            if char_cap and len(line) > char_cap:
+                out.append((len(line), i, "characters"))
+            elif token_cap and enc is not None:
+                n = len(enc.encode(line))
+                if n > token_cap:
+                    out.append((n, i, "tokens"))
+        return sorted(out, reverse=True)
+    worse = []
+    # Each UNIT is compared on its own: in one sorted list a new over-TOKEN line could "replace" an
+    # old over-CHARACTER line and pass (found by the pre-release review).
+    for unit in ("characters", "tokens"):
+        old = [m for m in measures(before) if m[2] == unit]
+        new = [m for m in measures(after) if m[2] == unit]
+        worse += [m for k, m in enumerate(new) if k >= len(old) or m[0] > old[k][0]]
+    return [(i, n, unit) for n, i, unit in sorted(worse, key=lambda m: m[1])]
+
+
+def line_caps_for(root, name):
+    """(char_cap, token_cap) for an always-loaded file; token_cap is None unless configured."""
+    caps = read_caps(root)
+    key = LINE_CAPS[name]
+    default = LINE_CHARS_DEFAULT
+    if name == "TASKS.md":
+        # A board item already has its own CHARACTER budget; the line cap never undercuts it, or a
+        # project that raised TASKS_ENTRY_CHARS would be blocked by a second, silent number.
+        default = max(default, caps.get("TASKS_ENTRY_CHARS", 400))
+    return caps.get(key + "_LINE_CHARS", default), caps.get(key + "_LINE_TOKENS")
 
 
 def max_lines(root, prof, cap_key="cap_key", default_key="default"):
@@ -195,12 +281,14 @@ def hook():
         return 0
     ti = payload.get("tool_input") or {}
     fp = ti.get("file_path") or ""
-    prof = PROFILES.get(os.path.basename(fp))
-    if prof is None:
-        return 0
+    name = os.path.basename(fp)
     root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
-    cap = max_lines(root, prof)
-    char_cap = max_lines(root, prof, "char_cap_key", "char_default")
+    if fp and not os.path.isabs(fp):
+        fp = os.path.join(root, fp)   # else `before` is read from the cwd and every old line looks new
+    at_root = os.path.abspath(os.path.dirname(fp) or root) == os.path.abspath(root)
+    prof = PROFILES.get(name)
+    if prof is None and not (at_root and name in LINE_CAPS):
+        return 0
     try:
         with open(fp, encoding="utf-8") as fh:
             before = fh.read()
@@ -217,6 +305,38 @@ def hook():
             return 0                             # unmatched edit will fail anyway — not our call
         after = before.replace(old, new, len(before.split(old)) - 1
                                if ti.get("replace_all") else 1)
+
+    # The entry budget speaks first (its message names the entry and its shape); the per-LINE cap
+    # is the backstop that also covers the files without an entry profile (CLAUDE.md, rules.md,
+    # HANDOVER.md).
+    if prof is not None:
+        rc = _entry_gate(root, fp, prof, before, after)
+        if rc:
+            return rc
+    return _line_gate(root, name, at_root, before, after)
+
+
+def _line_gate(root, name, at_root, before, after):
+    if not (at_root and name in LINE_CAPS):
+        return 0
+    char_cap, token_cap = line_caps_for(root, name)
+    enc = _tokenizer() if token_cap else None
+    long = long_new_lines(before, after, char_cap, token_cap, enc)
+    if not long:
+        return 0
+    sys.stderr.write(
+        "%s per-LINE cap EXCEEDED (%d characters%s): %s\n"
+        "One line = one fact. A narrative, a table or a round-by-round story goes to a report\n"
+        "or docs/ and the line keeps a pointer to it — this file is loaded IN FULL by every\n"
+        "session, and a line cap alone let one line reach 135 KB on a live project.\n"
+        % (name, char_cap, (" / %d tokens" % token_cap) if token_cap and enc else "",
+           ", ".join("line %d: %d %s" % x for x in long[:5])))
+    return 2
+
+
+def _entry_gate(root, fp, prof, before, after):
+    cap = max_lines(root, prof)
+    char_cap = max_lines(root, prof, "char_cap_key", "char_default")
 
     # Sizes are tracked PER AXIS: a line count and a character count are not comparable, and
     # keying them together would let a growing character count hide behind a steady line count.
@@ -239,9 +359,14 @@ def hook():
 
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else "--check"
-    if arg == "--hook":
-        return hook()
-    return check(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
+    try:
+        if arg == "--hook":
+            return hook()
+        return check(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
+    except Exception:
+        # FAIL-OPEN, always: a budget reminder must never break a write or a session start (an
+        # odd payload, a non-UTF-8 file, a tokenizer that rejects special tokens).
+        return 0
 
 
 if __name__ == "__main__":

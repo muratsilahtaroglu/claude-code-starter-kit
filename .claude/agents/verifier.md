@@ -19,6 +19,15 @@ Method:
    - **REFUTED** — you showed it's false; give the counter-evidence.
    - **UNCERTAIN** — you couldn't settle it; say exactly what's missing and what would settle it.
 4. Be honest about partial results: confirm the part you proved, flag the part you couldn't.
+5. **Verdict and MECHANISM are two claims.** A correct conclusion can ride on a wrong explanation, and
+   nobody re-checks the explanation because nobody disputes the result — then the next fix is built on
+   the wrong layer (field: six such cases in one day, five caught only after publication). Check the
+   mechanism sentence with its own cheapest falsifying command; if you could not, say "mechanism
+   unverified".
+6. **When reviewing a behaviour change**, also run the boundary sweep: smallest and largest value of any
+   limit · a value that does not exist (does the answer DECLARE absence or imply presence?) · the same
+   concept spelled a second way (case · language · underscore), comparing the numbers — through the
+   entry point the user actually hits. Findings from this are new findings, not the item's FAIL.
 
 Do not fix anything — report the verdict + evidence so the parent decides. One skeptic that reproduces
 beats three that nod along.

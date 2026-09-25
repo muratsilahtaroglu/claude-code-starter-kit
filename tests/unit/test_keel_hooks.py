@@ -413,6 +413,11 @@ def test_cap_defaults_match_their_documentation():
         assert documented == actual, (
             f"documented default {key}={documented} != code {var}={actual}"
         )
+    kdoc = next(ln for ln in src.splitlines() if "HANDOVER_KB=" in ln and ln.lstrip().startswith("#"))
+    kcode = next(ln for ln in src.splitlines() if ln.startswith("kb_H="))
+    for key, var in (("HANDOVER_KB", "kb_H"), ("LESSONS_KB", "kb_L"), ("TASKS_KB", "kb_T"),
+                     ("RULES_KB", "kb_R"), ("CLAUDE_KB", "kb_C"), ("CONTEXT_KB", "kb_ALL")):
+        assert kdoc.split(f"{key}=")[1].split()[0] == kcode.split(f"{var}=")[1].split(";")[0].strip()
 
 
 def test_every_unit_test_file_has_a_why_line():
@@ -754,3 +759,56 @@ def test_abbreviated_sha_is_a_valid_clock(tmp_path):
     (proj / ".claude" / "last-audit").write_text(short + "\n")
     _, out = run_hook("session-start-reground.sh", {"source": "startup"}, proj)
     assert "UNREADABLE" not in out and "commits since" not in out
+
+
+# --------------------------------------------------------------------------
+# Size axis + STALE-DISK debt (2026-09-25). Field case: HANDOVER 146/150 lines (green) at 244 KB —
+# one line held 135 KB — and auto-compact fired 3x in 5 min; and an auto-compact crossed a dirty
+# tree whose WHY reached disk only because a ritual happened to run ten minutes later.
+# --------------------------------------------------------------------------
+
+def _mem_project(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / "HANDOVER.md").write_text("# HANDOVER\n\n### 2026-09-25 — x\n- (a) fine\n")
+    return tmp_path
+
+
+def test_a_handover_under_its_line_cap_but_over_its_kb_cap_is_named_with_its_longest_line(tmp_path):
+    p = _mem_project(tmp_path)
+    (p / "HANDOVER.md").write_text("# HANDOVER\n- (a) " + "n" * 30000 + "\n- (a) fine\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, p)
+    assert "HANDOVER.md is 29 KB (cap 24 KB" in out
+    assert "longest: line 2" in out, "the remedy differs when ONE line is the overflow"
+
+
+def test_kb_cap_is_tunable(tmp_path):
+    p = _mem_project(tmp_path)
+    (p / "HANDOVER.md").write_text("# HANDOVER\n- (a) " + "n" * 30000 + "\n")
+    (p / ".claude" / "keel-caps").write_text("HANDOVER_KB=64\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, p)
+    assert "HANDOVER.md is" not in out
+
+
+def test_pre_compact_writes_a_durable_stale_disk_line_with_its_trigger(tmp_path):
+    p = _mem_project(tmp_path)
+    git("init", "-q", cwd=p)
+    git("-c", "user.name=t", "-c", "user.email=t@e", "add", "HANDOVER.md", cwd=p)
+    git("-c", "user.name=t", "-c", "user.email=t@e", "commit", "-qm", "base", cwd=p)
+    (p / "work.py").write_text("x = 1\n")                     # dirty tree, HANDOVER untouched
+    rc, out = run_hook("pre-compact-snapshot.sh", {"trigger": "auto"}, p)
+    assert rc == ALLOW
+    log = (p / ".claude" / "ritual-log").read_text()
+    assert "compact auto STALE-DISK" in log
+
+
+def test_stale_disk_debt_is_raised_until_handover_is_newer(tmp_path):
+    p = _mem_project(tmp_path)
+    old = (datetime.datetime.now() - datetime.timedelta(hours=2))
+    os.utime(p / "HANDOVER.md", (old.timestamp(), old.timestamp()))
+    stamp = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+    (p / ".claude" / "ritual-log").write_text(stamp + " compact auto STALE-DISK: tree dirty\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "compact"}, p)
+    assert "STALE-DISK debt" in out
+    (p / "HANDOVER.md").write_text("# HANDOVER\n\n### 2026-09-25 — settled\n")   # mtime = now
+    _, out = run_hook("session-start-reground.sh", {"source": "compact"}, p)
+    assert "STALE-DISK debt" not in out

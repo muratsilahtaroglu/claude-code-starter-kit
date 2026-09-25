@@ -6,6 +6,7 @@
 # warn (systemMessage) if the handover looks stale. Always exits 0 — never blocks auto-compact.
 set -u
 DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+payload="$(cat 2>/dev/null || true)"   # carries "trigger": manual|auto
 SNAP="$DIR/.claude/snapshots"
 
 # If the snapshot dir can't be created, say so loudly — a silent no-op would defeat the safety net —
@@ -30,7 +31,13 @@ fi
 if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   changed=$(git -C "$DIR" status --porcelain 2>/dev/null)
   if [ -n "$changed" ] && [ -z "$(git -C "$DIR" status --porcelain -- HANDOVER.md 2>/dev/null)" ]; then
-    printf '{"systemMessage":"[keel] Compacting with a dirty tree but HANDOVER.md not updated — next time run /keel-compact first: it refreshes the disk, then hands off to /compact (snapshot saved to .claude/snapshots/)."}\n'
+    # DURABLE marker first: the systemMessage below dies with the context it warns, so an AUTO
+    # compaction would otherwise leave NO record that this boundary was crossed without a handover
+    # block (field case: a fix committed at 07:41, auto-compact at 07:43, its WHY reached disk at
+    # 07:53 only because a ritual happened to run). The SessionStart hook reads this line back.
+    trig=$(printf '%s' "$payload" | grep -o '"trigger"[[:space:]]*:[[:space:]]*"[a-z]*"' | grep -o '[a-z]*"$' | tr -d '"')
+    echo "$(date '+%F %T') compact ${trig:-?} STALE-DISK: tree dirty, HANDOVER.md untouched" >> "$DIR/.claude/ritual-log" 2>/dev/null || true
+    printf '{"systemMessage":"[keel] Compacting with a dirty tree but HANDOVER.md not updated — the WHY of this work may now exist only in the summary. A STALE-DISK line was written to .claude/ritual-log; the next session start asks you to settle it first. Next time run /keel-compact (snapshot saved to .claude/snapshots/)."}\n'
   fi
 fi
 exit 0

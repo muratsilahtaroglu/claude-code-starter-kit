@@ -10,7 +10,10 @@
 > - On overflow run `/keel-distill`: critical facts → `LESSONS.md`, raw block verbatim →
 >   `docs/handover-archive.md` (never imported, grep-able forever).
 > - Strip session narration as you write (commit counts, sha ranges, "ran /keel-distill") — keep
->   decisions and their WHY.
+>   decisions and their WHY. **One line = one fact**; a story or a table is a report, the line points
+>   to it (a per-line cap is enforced — a line cap alone is blind to line length).
+> - Update the block at the end of each work block, not only at session end — auto-compact is never
+>   blocked, and a disk that is already current is the only net under it.
 >
 > This header is DOCTRINE. Anything dated, measured, or awaiting a decision goes in the BODY.
 

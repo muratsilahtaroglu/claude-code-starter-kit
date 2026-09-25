@@ -47,6 +47,16 @@ Steps:
    asked if I saved", "don't rush", who said what). A DECISION that merely touches git is different —
    keep the WHY ("left settings.json unstaged — it holds the machine's allow-list"), drop the mechanics.
    At the ~150-line cap this noise is exactly what crowds out the facts that matter.
+   **One line = one fact.** A line that needs a second sentence of story, a table, or a round-by-round
+   account is a REPORT — write it under `reports/` and leave the line as the fact + a pointer. The
+   entry-budget hook blocks a new line over its per-line cap (`HANDOVER_LINE_CHARS`, default 400):
+   measured on a live project, a 150-LINE cap stayed green while one line grew to 135 KB, and the
+   file's weight fired auto-compact three times in five minutes.
+   **Rhythm: update the block at the end of each WORK BLOCK, not only at session end.** Auto-compact
+   is never blocked, so the only net under it is a disk that is already current; field case: a fix
+   committed at 07:41, auto-compact at 07:43, and its WHY reached disk at 07:53 only because a ritual
+   happened to run. If the SessionStart hook reports a **STALE-DISK debt**, settle it here FIRST —
+   a compaction crossed this session's work before the block was written.
 3. **PLAN.md** (if the project uses it): flip the phase statuses that changed this session, refresh
    _Current focus_, regenerate the diagram block from the table (see `/keel-plan` step 2) — patch the file,
    never rewrite it wholesale. If the wip phase's gate looks MET (its `## Now` items all checked, gate

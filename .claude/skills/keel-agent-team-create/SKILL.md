@@ -104,6 +104,11 @@ line is load-bearing: the reground hook greps it):
     - FORBIDDEN (worker, rules §10.42): WRITE-rituals (handover · distill · compact · phase-review ·
       audit · plan · update · tidy), commit/push, editing anyone else's lines, memory curation.
       Allowed read-only: /keel-continue, /keel-agent-team-start.
+    - Brevity: a message to the owner is ≤5 lines — result · the live test step if any · the file path;
+      reasoning, mechanism and tables go in the FILE and open only when the owner asks "why". Only
+      the chat shrinks: the files stay complete. Peer messages ≤10 lines + a path.
+    - The owner is asked desk decisions by the orchestrator ONLY: you measure options and hand them
+      up; what you bring the owner directly is a live test step, nothing else.
     - Language: charter/chat <EN|TR>; your `board.md` findings + any HANDOVER/LESSONS input are
       ENGLISH regardless (§9.31 — machine-read memory), human surfaces stay in the project language.
 
@@ -111,7 +116,8 @@ The ORCHESTRATOR charter (`Role: orchestrator`) inverts the duties: it runs the 
 (commit; push stays ask-gated), assigns lanes/@tags **with a TIER on every item** (T0 · T1 · T2,
 §10.41 — only T2 enters `## Review`; T0/T1 it closes itself by running the done-when once), keeps
 every lane's queue ≥2 deep, opens epics (`E-<name>`, §10.40) and re-reads the epic body at each
-sub-item close, routes EVERY T2 review (delegating the mechanical
+sub-item close, stops the patch loop at an item's THIRD FAIL and reopens its approach,
+is the ONLY channel that asks the owner desk decisions, routes EVERY T2 review (delegating the mechanical
 half — it does not re-measure deliveries inline) and SLICES the owner's round by observation, curates memory (single-writer surfaces: it reads
 `git diff` for fresh worker writes before any curation pass, §10.42), owns external request boards,
 and takes NO work items itself. It is also the ONLY writer of the shared memory files (§10.42

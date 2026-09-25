@@ -49,7 +49,8 @@
    `/keel-compact` skill bundles this + the cap check, then hands off to `/compact`) — one dated **session block** (newest
    first) with (a) completed, (b) tried-and-failed (so they aren't retried), (c) latest updates,
    (d) next steps — in ENGLISH (machine-read memory, §9.31). **Hard cap: max 3 blocks / ~150 lines** (it is `@`-imported into every session — bloat
-   is a per-session token tax and an adherence tax). On overflow run **`/keel-distill`** (§9.33): oldest
+   is a per-session token tax and an adherence tax) — and in KB, ONE FACT PER LINE (a per-line cap is enforced: a line
+   cap alone stayed green while one line reached 135 KB). Refresh the block at each WORK BLOCK's end, not only at session end. On overflow run **`/keel-distill`** (§9.33): oldest
    block's critical facts → `LESSONS.md`, raw block → `docs/handover-archive.md` verbatim. Default is a
    **single root** handover. On large multi-area projects the AI may create **per-area handovers**
    (`<area>/HANDOVER.md`, e.g. backend/frontend/agent) when an area needs its own — the root then indexes
@@ -240,14 +241,15 @@
     same-named file (one `README.md` entry exempted 25), a check matching only paths calls basename-only
     references dead (~54% false staleness). Exempt by PATH, resolve by BASENAME. Report the discrepancy
     only once the instrument
-    is cleared — and say which side you checked. (Field: bit four times in one project; a probe's
+    is cleared — and say which side you checked. **The MECHANISM sentence is a separate claim:** a right verdict
+    can carry a wrong explanation nobody re-checks (field: six in one day) — falsify it too, or write "unmeasured". (Field: bit four times in one project; a probe's
     exclusive `< end` against a tool's inclusive end manufactured a suspiciously clean ratio, and a
     raw `count()` reference read ~17% high on unmerged row versions — the TOOL was right both times.)
 38. **Rule budget.** Capped like the memory files: **~400 lines**, `.claude/keel-caps`-tunable (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written); a
     constitution too long to hold in attention is decoration. **Measure, do not quote:** the stock
-    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~381 at v0.8.36), so your project's own
+    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~388 at v0.8.37), so your project's own
     rules get the REMAINDER — check it before adding, and if the remainder is too thin the answer is
     to retire template text or raise `RULES` in `.claude/keel-caps`, not to squeeze. A hard-coded
     pair here rots: the previous "~290 / ~110" was written once and was 50 lines stale within a
@@ -259,6 +261,8 @@
     runtime prompts or code so one example passes. Verified = a **variant case the fix was not built on**
     also passes + the original failing case joins the regression/golden set (§2.8, `tests/fixtures/`).
     A deliberate point-fix is OK only when **declared**: "point fix — generalize later" in TASKS/LESSONS.
+    **The third FAIL on one item stops the patch loop:** reopen the APPROACH (epic? wrong layer? owner desk?) before
+    r4 — one escape closed per round is a closed list chasing an open class (field: r9 and r11 on grammar rules).
     **A CLASS-shaped task names its SURFACES first.** When the done-when is a property that must hold
     EVERYWHERE (a language, a permission, a unit, a date format), the spec enumerates the surfaces —
     found by a SEARCH, not from memory — and that list IS the done-when. Skip it and the property is
@@ -270,7 +274,7 @@
 40. **Team scale-up** (one-run setup: `/keel-team`). Memory caps GROW with headcount: the AI PROPOSES a raise (a starving board, a 5+
     person `## Now`) and on approval pins it in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER ·
     LESSONS · TASKS · RULES · HANDOVER_BLOCKS · REVIEW_DAYS · LESSONS_ENTRY · TASKS_ENTRY ·
-    TASKS_ENTRY_CHARS) — owner-only, `/keel-update`-safe, never raised silently.
+    TASKS_ENTRY_CHARS · `<FILE>_KB` · CONTEXT_KB · `<FILE>_LINE_CHARS|_LINE_TOKENS`) — owner-only, `/keel-update`-safe, never raised silently.
     **EPIC layer:** work that does not finish in one round — or one CLASS of fix spread over many
     surfaces (§10.39) — is an EPIC, not an item: `E-<name>`, body in an ADR/spec, and the board carries
     ONLY the running sub-item `E-<name>/<n>` (each independently deliverable — if it is not, the split
@@ -290,8 +294,8 @@
     sentence>) → closed <date> accepted|rejected` (T0/T1 close at `delivered` once the
     orchestrator has run the done-when — §10.41 tiers). Team reports file
     per AUTHOR — `reports/team/<@tag>/<task>_spec.md` / `<task>_fix_<date>.md` (+ evidence subfolders;
-    **Markdown only**) — each carrying ONE line in the `reports/team/README.md` index, which IS the
-    team's review todolist ("what's finished under @X" = the `[x]` lines in their section; exact
+    **Markdown only**) — each LIVE or CITED one carrying ONE line in the `reports/team/README.md` index, which IS the
+    team's review todolist ("what's finished under @X" = the `[x]` lines in their section — an uncited closed report: grep; exact
     format, status vocabulary and who-flips-what live in that template — on same-machine agent teams
     the orchestrator writes every transition, §10.42). Reports are never deleted — they are the
     permanent artifacts other files cite (§ steering "Team reports"); findability lives in the
@@ -341,7 +345,9 @@
     policy allows one and a ROUTED REVIEW session where it does not (workers are often denied
     sub-agents — a requirement nobody can meet is decoration); for the orchestrator's OWN changes the
     sub-agent stays mandatory. Field: 45 items sat in Review, 37 with no owner part; one suite ran 3×
-    per delivery.
+    per delivery. **An owner step must be able to FAIL** (it names the string that means FAIL — "is it
+    visible?" is not a step) and is REHEARSED first on the real stack with two different inputs of its
+    shape, never the owner's own (caches learn from rehearsals); `/keel-continue` ROUTE has the procedure.
 42. **Parallel sessions — co-agents and agent teams** (mechanism + setup: docs/steering.md "Agent
     teams", `/keel-agent-team-create|-start`; the roster is OWNER-only like all governance).
     Extra Claude sessions in the same repo may work the board like teammates — unlike a sub-agent
@@ -359,7 +365,8 @@
     refreshed read-only from TASKS · findings inbox on the §9.31 hot path · requests) plus its
     spec/fix files; the orchestrator SYNCS boards into the shared files each work block with
     `@<name>` attribution. Without this, two writers clobber each other SILENTLY (field case:
-    alice_v2 2026-08-12, fresh progress nearly overwritten twice during a cap pass).
+    alice_v2 2026-08-12, fresh progress nearly overwritten twice during a cap pass). The owner is ONE surface too: desk decisions reach
+    the owner through the orchestrator ONLY — lanes measure options, and bring the owner live test steps alone.
     **Star, not mesh — and WOKEN, not polling:** the orchestrator assigns, workers report back to IT,
     and worker→worker messaging is BLOCKED by a hook (a permission rule cannot decide by target; and
     a decision two workers reach alone is one no shared file records). A message WAKES an idle peer
