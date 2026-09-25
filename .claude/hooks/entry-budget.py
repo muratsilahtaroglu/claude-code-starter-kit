@@ -56,7 +56,7 @@ PROFILES = {
     },
     "TASKS.md": {
         "cap_key": "TASKS_ENTRY", "default": 4, "baseline": ".claude/tasks-backlog",
-        # İ3 (audit 2026-09-05, owner-approved 2026-09-06): a board item is capped in CHARACTERS too,
+        # the char-axis addition (audit 2026-09-05, owner-approved 2026-09-06): a board item is capped in CHARACTERS too,
         # because our lines run long — 4 lines x ~180 chars is 720, so the LINE budget alone let an
         # item stay a solution note with hard wraps. MEASURED the day it landed: 0 of 27 items
         # complied, median 1287, max 4795 ⇒ real work, not a formatting tidy-up. Enforced with the
