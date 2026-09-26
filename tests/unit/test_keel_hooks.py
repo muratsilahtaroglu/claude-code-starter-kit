@@ -294,7 +294,7 @@ def test_owner_guard_fails_open_on_unset_identity(armed_repo):
 # every section that follows. AUDIT-2026-08-18: 12 of 24 orderings mis-parsed.
 
 SECTIONS = {
-    "Now": "## Now\n- [ ] T1: ongoing — done-when: x\n### alice\n- [ ] T5: lane item — done-when: z\n",
+    "Now": "## Now\n- [ ] T1: ongoing — done-when: x\n### lane-b\n- [ ] T5: lane item — done-when: z\n",
     "Next": "## Next\n- [ ] T2: later — done-when: y\n",
     "Review": "## Review\n- [x] T7 fix (@dev) — evidence: reports/team/dev/t7.md\n",
     "Discovered": "## Discovered\n- [ ] T9: a raw find\n",

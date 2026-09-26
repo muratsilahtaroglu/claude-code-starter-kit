@@ -9,7 +9,7 @@ the NORMAL case: every reconnect (sleep, tunnel, a second machine) resumes the S
 NEW process, so twins accumulate on their own. The first port picked the live twin by `attached`,
 which is computed per VS Code BUILD and read True for 11 of 11 processes (2026-09-06); the right
 axis is START TIME — the newest process is live, older ones are lossless leftovers. The resolver's core is pure, so this matrix feeds it
-fixtures directly. Backported from alice_v2 (`scripts/team_addresses.py`, 2026-08-24).
+fixtures directly. Backported from a live team project (`scripts/team_addresses.py`, 2026-08-24).
 
 KIT-OWNED FILE (`/keel-update` TOOLING exception, `tests/unit/test_keel_*.py`).
 """
@@ -83,7 +83,7 @@ def test_live_session_in_another_repo_is_not_our_business():
 
 def test_attachment_is_carried_per_pid():
     rows, _ = ta.resolve([("s1", "frontend")],
-                         [rec("s1", "frontend", 11), rec("s1", "alice-v2-ea", 12)],
+                         [rec("s1", "frontend", 11), rec("s1", "my-app-ea", 12)],
                          alive(11, 12), CWD, attached={11: False, 12: True})
     assert {r["pid"]: r["attached"] for r in rows} == {11: False, 12: True}
 
@@ -109,8 +109,8 @@ def test_attachment_never_guesses_when_signal_is_missing():
 # --------------------------------------------------------------------------
 
 def test_self_check_names_the_rename_when_own_address_diverged():
-    """The 2026-09-03 case, seen from inside: identity @frontend, address 'alice-v2-ea'."""
-    lines = ta.self_line({"sessionId": "s1", "name": "alice-v2-ea"}, [("s1", "frontend")])
+    """The 2026-09-03 case, seen from inside: identity @frontend, address 'my-app-ea'."""
+    lines = ta.self_line({"sessionId": "s1", "name": "my-app-ea"}, [("s1", "frontend")])
     assert len(lines) == 1
     assert "THIS window is @frontend" in lines[0] and "/rename frontend" in lines[0]
 
@@ -165,7 +165,7 @@ def test_the_newest_process_of_a_session_id_is_live_and_the_older_are_leftovers(
     OPPOSITE of the verdict here — it must not be able to change the answer, because it is computed
     per VS Code BUILD (11 of 11 processes read attached in the live measurement)."""
     lines = _hook([("s1", "orchestrator")],
-                  [rec("s1", "orchestrator", 302033), rec("s1", "alice-v2-ea", 1442911)],
+                  [rec("s1", "orchestrator", 302033), rec("s1", "my-app-ea", 1442911)],
                   (302033, 1442911),
                   attached={302033: True, 1442911: False},
                   started={302033: 100, 1442911: 900})
@@ -183,7 +183,7 @@ def test_a_leftovers_name_does_not_count_as_the_reachable_address():
     """The renamed identity sits on the OLD process; the reachable address is the newest one, so the
     owner must still be told to /rename it — not shown a healthy lane because a leftover is named."""
     lines = _hook([("s1", "orchestrator")],
-                  [rec("s1", "orchestrator", 302033), rec("s1", "alice-v2-ea", 1442911)],
+                  [rec("s1", "orchestrator", 302033), rec("s1", "my-app-ea", 1442911)],
                   (302033, 1442911), started={302033: 100, 1442911: 900})
     joined = "\n".join(lines)
     assert "ADDRESS ≠ IDENTITY" in joined and "/rename orchestrator" in joined

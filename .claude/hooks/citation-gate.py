@@ -54,7 +54,7 @@ import sys
 
 # A path-like token: <segment>/<...>.<ext>. The lookbehind is load-bearing (see header).
 PAT = re.compile(r"(?<![A-Za-z0-9_@./-])"
-                 r"([A-Za-z0-9_@.-]+(?:/[A-Za-z0-9_@.-]+)+\.[A-Za-z0-9]{1,6})")
+                 r"([A-Za-z0-9_@.-]+(?:/[A-Za-z0-9_@.-]+)+\.[A-Za-z0-9]{1,6})(?![A-Za-z0-9])")
 STATE = ".claude/.citation-gate-last"
 ALLOW = ".claude/citation-allow"          # one path per line; reasons as # comments
 # A record that MEASURED an absence (a deleted file, a probe copy removed after the run, "no such

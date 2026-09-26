@@ -9,6 +9,6 @@
 docs/team.md                        # steering + /keel-team: "materialize a project-owned docs/team.md" — the kit deliberately ships no template
 tests/integration/test_parser.py    # tests/README.md example of a why-line
 scratch/co56/premise_check.py       # scratch/README.md example of the 1-line-purpose header
-reports/team/alice_co-agent/r25_go_smoke_2026-08-12.md  # field example quoted in the team reports template
+reports/team/co-agent/r25_go_smoke_2026-08-12.md  # field example quoted in the team reports template
 .claude/hooks/hooks.json            # named in reports/2026-08-18-hook-audit.md as the plugin-era registry that was RETIRED in v0.8.23
 .claude/hooks/../rules.md           # reports/2026-08-18-hook-audit.md:75 quotes this to demonstrate `..` handling — it is the example, not a citation

@@ -1,6 +1,6 @@
 # scratch/ layout audit — why a mature project leaves the template's taxonomy
 
-_2026-08-18 · internal measurement · corpus: `alice_v2/scratch/`, a live multi-agent project.
+_2026-08-18 · internal measurement · corpus: `<field-project>/scratch/`, a live multi-agent project.
 The kit was NOT applied to that project from here — it is read-only evidence; the fixes land in the
 template and reach it through `/keel-update`._
 
@@ -53,7 +53,7 @@ Both are recorded because the fix ships the grep commands:
    caught this measurement. (rules §10.37: a surprising measurement indicts the instrument first —
    0/56 was surprising enough to check, and the instrument was the culprit.)
 2. **Path-only citation checks under-report.** With the regex fixed, `r25` still read as uncited:
-   its citation is `reports/team/alice_co-agent/r25_go_smoke_2026-08-12.md` — the id is in the report's
+   its citation is `reports/team/co-agent/r25_go_smoke_2026-08-12.md` — the id is in the report's
    FILENAME, not in a `scratch/r25` path string. A dead-folder verdict needs both directions. Same
    shape as the ~54% basename false-staleness measured for LESSONS citations
    (`reports/2026-08-17-lessons-scope-audit.md`).

@@ -166,7 +166,7 @@ def test_non_repo_directory_is_a_silent_noop(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# 2026-09-06 — two classes ported from a live project's gate (alice_v2 `citation_head_check.py`)
+# 2026-09-06 — two classes ported from a live project's gate (`citation_head_check.py`)
 # --------------------------------------------------------------------------
 
 def test_recorded_absent_marker_keeps_a_measured_absence_out_of_the_ghost_list(repo):
@@ -210,3 +210,12 @@ def test_line_anchor_into_a_rotating_board_is_warned_but_does_not_fail(repo):
     assert "line-number anchor" in out
     assert "reports/team/fe/board.md:1589" in out and "TASKS.md:334" in out
     assert "docs/rec.md" in out, "the citing file must be named or nobody can fix the anchor"
+
+
+def test_a_long_extension_is_not_truncated_into_a_ghost_path():
+    """`.claude/keel-caps.example` was read as `.claude/keel-caps.exampl` and reported NOWHERE."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("cg", REPO / ".claude" / "hooks" / "citation-gate.py")
+    cg = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cg)
+    assert cg.PAT.findall("see .claude/keel-caps.example and docs/a.md") == ["docs/a.md"]

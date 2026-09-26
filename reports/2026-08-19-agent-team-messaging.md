@@ -94,7 +94,7 @@ also confirmed the same day's ritual-log attribution work on a real invocation.
 
 `SendMessage`'s `to:` is the peer's **session name** from `/list-agents`, not the keel agent name. An
 unnamed session is named after its working directory: a live seven-session team in one repo listed as
-`alice-v2-01`, `alice-v2-91`, `alice-v2-7a`… mutually indistinguishable. The orchestrator could not
+`my-app-01`, `my-app-91`, `my-app-7a`… mutually indistinguishable. The orchestrator could not
 address a worker, and the star wall could not recognise a target as a teammate.
 
 So `/keel-agent-team-start` now has each chat run `/rename <agent>`. After that the agent name is the

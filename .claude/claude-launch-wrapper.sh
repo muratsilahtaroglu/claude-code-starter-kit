@@ -11,7 +11,7 @@
 #   `claude --name <n>` is the documented flag for setting that name at launch (`claude --help`).
 #   VERIFIED END-TO-END 2026-09-03 through the VS Code extension on a live 5-agent team: with this
 #   wrapper behind `claudeCode.claudeProcessWrapper`, three reopened tabs came up `nameSource=user`
-#   under their own agent names (`review`, `alice_co-agent`, `orchestrator`) while the un-reopened
+#   under their own agent names (`review`, `co-agent`, `orchestrator`) while the un-reopened
 #   twins stayed `derived`. The IDE resumes with the `--resume=<sid>` form and never renames after
 #   launch, which is exactly the gap this closes.
 #   PROVING IT REQUIRES THE TRACE BELOW: the `exec` is transparent, so a wrapped launch and a direct

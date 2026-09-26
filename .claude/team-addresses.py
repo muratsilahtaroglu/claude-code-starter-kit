@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Agent-team ADDRESS resolver: registered identity (session-id) -> that identity's CURRENT
-message name. Backported from a live team project (alice_v2, measured 2026-08-24); extended
+message name. Backported from a live team project (measured 2026-08-24); extended
 2026-09-03 with the two-machine case.
 
 WHY THIS EXISTS. A session's NAME is process-local — it lives in the `name` field of

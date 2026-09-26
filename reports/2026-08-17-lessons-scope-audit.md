@@ -1,7 +1,7 @@
 # LESSONS.md scope audit — how much of an always-loaded lessons file any one task actually needs
 
 _2026-08-17 · internal measurement (not external research — the citations live in
-`research/{web,articles}/findings.md`) · corpus: `alice_v2/LESSONS.md`, a live 10-month project._
+`research/{web,articles}/findings.md`) · corpus: `<field-project>/LESSONS.md`, a live 10-month project._
 
 ## Headline
 

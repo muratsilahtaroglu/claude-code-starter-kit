@@ -368,7 +368,7 @@
     refreshed read-only from TASKS · findings inbox on the §9.31 hot path · requests) plus its
     spec/fix files; the orchestrator SYNCS boards into the shared files each work block with
     `@<name>` attribution. Without this, two writers clobber each other SILENTLY (field case:
-    alice_v2 2026-08-12, fresh progress nearly overwritten twice during a cap pass). The owner is ONE surface too: desk decisions reach
+    2026-08-12, fresh progress nearly overwritten twice during a cap pass). The owner is ONE surface too: desk decisions reach
     the owner through the orchestrator ONLY — lanes measure options, and bring the owner live test steps alone.
     **Star, not mesh — and WOKEN, not polling:** the orchestrator assigns, workers report back to IT,
     and worker→worker messaging is BLOCKED by a hook (a permission rule cannot decide by target; and

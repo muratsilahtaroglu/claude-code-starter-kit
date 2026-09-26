@@ -1,7 +1,7 @@
 """Regression matrix for the LESSONS per-entry line budget — rules.md §10.38 ("enforced beats
 written") applied to memory bloat.
 
-WHY THIS FILE EXISTS. Measured on a live project (alice_v2, 2026-08-25): LESSONS grew 450 -> 1039
+WHY THIS FILE EXISTS. Measured on a live project (2026-08-25): LESSONS grew 450 -> 1039
 lines in five days while entry COUNT grew only 1.5x — entries were getting LONGER, so raising the
 file cap "was never enough" (owner's words). The original hook checked only the written FRAGMENT,
 so folding new material into an existing entry passed unseen — and that fold-in habit is exactly

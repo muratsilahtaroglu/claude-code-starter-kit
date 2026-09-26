@@ -1,6 +1,6 @@
 """Regression matrix for agent-team identity resolution — rules.md §10.42.
 
-WHY THIS FILE EXISTS. Field case 2026-08-19 (alice_v2): a VS Code restart left the session id and
+WHY THIS FILE EXISTS. Field case 2026-08-19 (a live team project): a VS Code restart left the session id and
 `.claude/agent-team-sessions` mapping completely intact — the reground hook re-injected the right
 identity — but `/list-agents` went back to showing the window under its directory-derived name.
 The orchestrator read "the name I know is unreachable" as "the session is dead" and broadcast a

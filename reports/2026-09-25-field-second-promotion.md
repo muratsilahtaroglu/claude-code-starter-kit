@@ -1,8 +1,8 @@
-# 2026-09-25 — alice_v2 second promotion round (v0.8.37)
+# 2026-09-25 — the field project second promotion round (v0.8.37)
 
-**Source:** alice_v2 measured read-only over 2026-09-06 → 2026-09-25 (783 commits). alice had not pulled
-v0.8.36; nothing in alice was changed (kit-first — alice pulls via `/keel-update`). Previous round:
-`reports/2026-09-06-alice-promotion-review.md`.
+**Source:** The field project measured read-only over 2026-09-06 → 2026-09-25 (783 commits). The field project had not pulled
+v0.8.36; nothing in the field project was changed (kit-first — the field project pulls via `/keel-update`). Previous round:
+`reports/2026-09-06-field-promotion-review.md`.
 
 ## What the project showed (measured)
 | Signal | Value |
@@ -15,13 +15,13 @@ v0.8.36; nothing in alice was changed (kit-first — alice pulls via `/keel-upda
 | LESSONS | 67 entries cooled to `docs/retro/`, but by BLANKING 508 lines in place to keep 55 line anchors |
 
 ## Decisions
-| alice mechanism / defect | Verdict | Landed in kit |
+| Field-project mechanism / defect | Verdict | Landed in kit |
 |---|---|---|
 | Per-LINE token caps (the 244 KB HANDOVER) | **ENTERS, narrower** — characters enforced (stdlib), tokens optional when `tiktoken` is installed | `entry-budget.py` per-line gate on CLAUDE/rules/HANDOVER/LESSONS/TASKS · reground KB caps + longest line · rules §1.4 |
 | `keel_compact_gate.py` (ritual cost) | **ENTERS**, rewritten generic | `.claude/keel-compact-check.py` · `/keel-compact` step 2 |
 | STALE-DISK marker on auto-compact + handover rhythm per work block | **ENTERS** | `pre-compact-snapshot.sh` · reground debt check · `/keel-handover` · HANDOVER header · rules §1.4 |
 | Item approval fields (surface count, owner step that can FAIL) | **ENTERS**; the owner-approval step itself stays a project choice | `/keel-continue` ASSIGN · rules §10.41 |
-| Rehearsal of live steps (2 variant inputs, never the owner's own) | **ENTERS**; port/model/account are alice's | `/keel-continue` ROUTE · rules §10.41 |
+| Rehearsal of live steps (2 variant inputs, never the owner's own) | **ENTERS**; port/model/account are the field project's | `/keel-continue` ROUTE · rules §10.41 |
 | Boundary sweep on T2 | **ENTERS** | `/keel-continue` ROUTE · `verifier.md` check 6 |
 | Mechanism sentence is a separate claim | **ENTERS** | rules §10.37 · `verifier.md` check 5 |
 | Index scope: live or cited reports only (608/1094 had no line) | **ENTERS** | `reports/team/README.md` · rules §10.40 · `/keel-distill` lint · steering |
@@ -31,7 +31,7 @@ v0.8.36; nothing in alice was changed (kit-first — alice pulls via `/keel-upda
 | r9/r11 patch loops (defect) | **FIXED IN KIT** — the third FAIL stops the loop and reopens the approach | rules §10.39 · `/keel-continue` ROUTE · orchestrator text |
 | Blanking lines to keep anchors (defect) | **FIXED IN KIT** — documented as forbidden; anchors are the defect | `docs/memory-files.md` |
 | `observer.md` missing from `/keel-update` TOOLING (kit's own v0.8.36 defect) | **FIXED** | `keel-update` SKILL bucket |
-| `anchor-gate.py`, `owner_step_freshness.py`, `gate_corpus_diff.py` | **DOES NOT ENTER** — tied to alice's test style / id formats; concepts covered above | — |
+| `anchor-gate.py`, `owner_step_freshness.py`, `gate_corpus_diff.py` | **DOES NOT ENTER** — tied to the field project's test style / id formats; concepts covered above | — |
 
 ## Verification
 - Suite: 265 → 290 passed (`pytest tests/unit`); every new gate has cells for its RED and its pass.
@@ -42,17 +42,17 @@ v0.8.36; nothing in alice was changed (kit-first — alice pulls via `/keel-upda
   an unreadable STALE-DISK marker read as settled · the new KB default became a hidden second limit
   on a project that had raised its line cap (now scales in proportion, in both readers) · new cap keys
   were undocumented in §10.40.
-- Run read-only against alice_v2, `keel-compact-check.py` reports what the project must fix on pull:
+- Run read-only against the field project, `keel-compact-check.py` reports what the project must fix on pull:
   one rules.md line of 401 characters, 9 ghost citations, and (on the old defaults) nothing else.
 
 ## Addendum 2026-09-26 — v0.8.38 (post-release audit of v0.8.37)
-An auditor pass and a second independent review found defects in v0.8.37 before alice_v2 pulled it.
+An auditor pass and a second independent review found defects in v0.8.37 before the field project pulled it.
 Every fix has a test that fails on the old code (checked by swapping the old files back in).
-- **STALE-DISK was role-blind** (alice_v2 carries 163 markers): a worker was told to write HANDOVER,
+- **STALE-DISK was role-blind** (the field project carries 163 markers): a worker was told to write HANDOVER,
   which §10.42 forbids. Markers are now tagged `@agent`, and a worker's marker is written and settled
   against its own `reports/team/<name>/board.md`. The compaction message no longer tells a worker to
   run a ritual. Agent names are matched literally, not as a regex.
-- **compact-check faulted on a project-owned `entry-budget.py`** (alice's has no `read_caps`). The
+- **compact-check faulted on a project-owned `entry-budget.py`** (the field project's has no `read_caps`). The
   script now parses the caps file itself. A missing citation gate reads "NOT measured"; one that
   crashes or `sys.exit`s on import is rc 2, never a silent rc 0. Long lines are info, not RED.
 - **Caps readers disagreed:** `KEY=10  # comment` read as 1020260925 in bash; one undecodable byte

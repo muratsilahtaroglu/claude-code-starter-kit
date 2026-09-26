@@ -5,7 +5,7 @@ GUARDS TWO FILES, one mechanism (rules §10.39 — fix the class, not the instan
   LESSONS.md  entry = a dated `- 20xx-xx-xx` line and its continuation  (LESSONS_ENTRY, default 8)
   TASKS.md    entry = a `- [ ]`/`- [x]` board item and its continuation (TASKS_ENTRY, default 4)
 
-WHY (measured on a live project, alice_v2 2026-08-25, backported with its blind spot FIXED):
+WHY (measured on a live project, 2026-08-25, backported with its blind spot FIXED):
 LESSONS was distilled to 450 lines and stood at 1039 five days later. Entry COUNT grew 1.5x but
 LINES grew 2.5x — the overflow came from entries GETTING LONGER (avg 6.3 -> 10.2 lines), not from
 new lessons. The owner's own words: "I keep raising the cap and it is never enough" — raising the

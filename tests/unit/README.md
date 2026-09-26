@@ -34,7 +34,7 @@ unregistered live session · per-identity aggregation so a stale dead row beside
 quiet · the two-machine axis: ATTACHED/DETACHED twins from the VS Code server's client signal, never
 guessed when the signal is missing · the SELF check that tells THIS window its address diverged).
 Origin: the 2026-08-19 "name unreachable ≠ session dead" incident and the 2026-09-03 two-VS-Code-
-builds twin case; resolver backported from alice_v2's `scripts/team_addresses.py`. KIT-OWNED.
+builds twin case; resolver backported from the field project's `scripts/team_addresses.py`. KIT-OWNED.
 
 `test_keel_launch_wrapper.py` — the resume-keeps-its-name launcher (12 cases: identity map names
 a resumed session · separate-arg `--resume` form · transcript `agent-name` record as fallback · map
@@ -45,7 +45,7 @@ Origin: measured 2026-09-03 — `/rename` lands in the transcript but a `--resum
 `nameSource=derived`, so the agent name vanished on every reopen; the fix was then confirmed
 through the real IDE (three reopened tabs came up `nameSource=user`). KIT-OWNED.
 
-`test_keel_citation_gate.py` — the provenance gate (11 cases: a committed citation is clean · a
+`test_keel_citation_gate.py` — the provenance gate (15 cases: a committed citation is clean · a
 note on disk but not in HEAD is a GHOST and the finding names who cites it · a report swept into
 `done/` still resolves · `..` is normalised before git is asked · a gitignored path is a THIRD class — never a ghost, silent alone, printed as context beside a real finding · a leading separator stops a foreign path's tail being read as a repo path (mutation-tested) · an unresolvable path is
 counted, never dropped · the allowlist silences a deliberate absence · a non-repo is a silent no-op).
