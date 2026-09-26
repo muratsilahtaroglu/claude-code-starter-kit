@@ -812,3 +812,78 @@ def test_stale_disk_debt_is_raised_until_handover_is_newer(tmp_path):
     (p / "HANDOVER.md").write_text("# HANDOVER\n\n### 2026-09-25 — settled\n")   # mtime = now
     _, out = run_hook("session-start-reground.sh", {"source": "compact"}, p)
     assert "STALE-DISK debt" not in out
+
+
+# Post-release review of v0.8.37 (2026-09-26), each pinned.
+
+def _team_mem_project(tmp_path):
+    p = _mem_project(tmp_path)
+    (p / ".claude" / "agents").mkdir()
+    (p / ".claude" / "agents" / "team-lead.md").write_text("Role: orchestrator\n")
+    (p / ".claude" / "agents" / "team-bob.md").write_text("Role: worker\n")
+    (p / ".claude" / "agent-team-sessions").write_text("sid-lead lead 2026-09-25\nsid-bob bob 2026-09-25\n")
+    old = datetime.datetime.now() - datetime.timedelta(hours=2)
+    os.utime(p / "HANDOVER.md", (old.timestamp(), old.timestamp()))
+    return p
+
+
+def test_a_worker_s_stale_disk_marker_is_settled_on_its_board_never_on_handover(tmp_path):
+    """A live team had 163 markers; a worker was told to write HANDOVER — which §10.42 forbids it."""
+    p = _team_mem_project(tmp_path)
+    stamp = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+    (p / ".claude" / "ritual-log").write_text(
+        stamp + " compact auto STALE-DISK @bob: tree dirty, reports/team/bob/board.md untouched\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "compact", "session_id": "sid-lead"}, p)
+    assert "STALE-DISK debt" not in out, "a worker's marker is not the orchestrator's debt"
+    _, out = run_hook("session-start-reground.sh", {"source": "compact", "session_id": "sid-bob"}, p)
+    assert "STALE-DISK debt" in out and "reports/team/bob/board.md" in out
+    assert "HANDOVER.md untouched" not in out
+    board = p / "reports" / "team" / "bob" / "board.md"
+    board.parent.mkdir(parents=True)
+    board.write_text("# bob\n")                                              # mtime = now
+    _, out = run_hook("session-start-reground.sh", {"source": "compact", "session_id": "sid-bob"}, p)
+    assert "STALE-DISK debt" not in out
+
+
+def test_pre_compact_tags_the_marker_and_uses_the_worker_s_board(tmp_path):
+    p = _team_mem_project(tmp_path)
+    git("init", "-q", cwd=p)
+    git("-c", "user.name=t", "-c", "user.email=t@e", "add", "HANDOVER.md", cwd=p)
+    git("-c", "user.name=t", "-c", "user.email=t@e", "commit", "-qm", "base", cwd=p)
+    (p / "work.py").write_text("x = 1\n")
+    run_hook("pre-compact-snapshot.sh", {"trigger": "auto", "session_id": "sid-bob"}, p)
+    run_hook("pre-compact-snapshot.sh", {"trigger": "auto", "session_id": "sid-lead"}, p)
+    log = (p / ".claude" / "ritual-log").read_text()
+    assert "STALE-DISK @bob: tree dirty, reports/team/bob/board.md untouched" in log
+    assert "STALE-DISK @lead: tree dirty, HANDOVER.md untouched" in log
+
+
+def test_an_inline_comment_in_keel_caps_is_not_read_as_digits(tmp_path):
+    """`HANDOVER_KB=64  # raised 2026-09-25` read as 6420260925 — every KB gate silently off."""
+    p = _mem_project(tmp_path)
+    (p / "HANDOVER.md").write_text("# HANDOVER\n- (a) " + "n" * 30000 + "\n")
+    (p / ".claude" / "keel-caps").write_text("HANDOVER_KB=20  # raised 2026-09-25\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "startup"}, p)
+    assert "(cap 20 KB" in out
+
+
+def test_a_worker_is_never_told_to_run_a_ritual_at_compaction(tmp_path):
+    p = _team_mem_project(tmp_path)
+    git("init", "-q", cwd=p)
+    git("-c", "user.name=t", "-c", "user.email=t@e", "add", "HANDOVER.md", cwd=p)
+    git("-c", "user.name=t", "-c", "user.email=t@e", "commit", "-qm", "base", cwd=p)
+    (p / "work.py").write_text("x = 1\n")
+    _, out = run_hook("pre-compact-snapshot.sh", {"trigger": "auto", "session_id": "sid-bob"}, p)
+    assert "reports/team/bob/board.md not updated" in out and "/keel-compact" not in out
+    _, out = run_hook("pre-compact-snapshot.sh", {"trigger": "auto", "session_id": "sid-lead"}, p)
+    assert "HANDOVER.md not updated" in out and "/keel-compact" in out
+
+
+def test_an_agent_name_is_matched_literally_not_as_a_regex(tmp_path):
+    p = _team_mem_project(tmp_path)
+    (p / ".claude" / "agents" / "team-w.1.md").write_text("Role: worker\n")
+    (p / ".claude" / "agent-team-sessions").write_text("sid-w w.1 2026-09-25\n")
+    stamp = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+    (p / ".claude" / "ritual-log").write_text(stamp + " compact auto STALE-DISK @wx1: tree dirty\n")
+    _, out = run_hook("session-start-reground.sh", {"source": "compact", "session_id": "sid-w"}, p)
+    assert "STALE-DISK debt" not in out

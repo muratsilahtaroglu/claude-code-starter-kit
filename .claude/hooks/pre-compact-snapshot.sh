@@ -26,18 +26,34 @@ else
   printf '{"systemMessage":"[keel] pre-compact snapshot FAILED: cannot create .claude/snapshots/ — memory files are NOT backed up for this compaction."}\n'
 fi
 
-# Stale-handover warning: tree changed but HANDOVER.md untouched → the summary may be the only record.
+# Stale-disk warning: tree changed but THIS session's durable surface is untouched → the summary may
+# be the only record. The surface depends on the ROLE (rules §10.42 single writer): a WORKER never
+# writes HANDOVER — its WHY belongs in its own board — so its debt is judged against, and settled on,
+# `reports/team/<agent>/board.md`. Orchestrator / solo / unidentified sessions: HANDOVER.md.
 # Ask git about the exact file (an unanchored grep would be fooled by e.g. backend/HANDOVER.md).
+sid=$(printf '%s' "$payload" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+ag=""
+[ -n "$sid" ] && [ -f "$DIR/.claude/agent-team-sessions" ] \
+  && ag=$(grep -m1 "^${sid} " "$DIR/.claude/agent-team-sessions" 2>/dev/null | awk '{print $2}')
+surface="HANDOVER.md"
+if [ -n "$ag" ] && grep -q '^Role: worker' "$DIR/.claude/agents/team-${ag}.md" 2>/dev/null; then
+  surface="reports/team/${ag}/board.md"
+fi
 if git -C "$DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   changed=$(git -C "$DIR" status --porcelain 2>/dev/null)
-  if [ -n "$changed" ] && [ -z "$(git -C "$DIR" status --porcelain -- HANDOVER.md 2>/dev/null)" ]; then
+  if [ -n "$changed" ] && [ -z "$(git -C "$DIR" status --porcelain -- "$surface" 2>/dev/null)" ]; then
     # DURABLE marker first: the systemMessage below dies with the context it warns, so an AUTO
     # compaction would otherwise leave NO record that this boundary was crossed without a handover
     # block (field case: a fix committed at 07:41, auto-compact at 07:43, its WHY reached disk at
     # 07:53 only because a ritual happened to run). The SessionStart hook reads this line back.
     trig=$(printf '%s' "$payload" | grep -o '"trigger"[[:space:]]*:[[:space:]]*"[a-z]*"' | grep -o '[a-z]*"$' | tr -d '"')
-    echo "$(date '+%F %T') compact ${trig:-?} STALE-DISK: tree dirty, HANDOVER.md untouched" >> "$DIR/.claude/ritual-log" 2>/dev/null || true
-    printf '{"systemMessage":"[keel] Compacting with a dirty tree but HANDOVER.md not updated — the WHY of this work may now exist only in the summary. A STALE-DISK line was written to .claude/ritual-log; the next session start asks you to settle it first. Next time run /keel-compact (snapshot saved to .claude/snapshots/)."}\n'
+    echo "$(date '+%F %T') compact ${trig:-?} STALE-DISK${ag:+ @$ag}: tree dirty, ${surface} untouched" >> "$DIR/.claude/ritual-log" 2>/dev/null || true
+    if [ "$surface" = "HANDOVER.md" ]; then
+      nxt="Next time run /keel-compact"
+    else
+      nxt="Next time write your board first — rituals are the orchestrator's (rules §10.42)"
+    fi
+    printf '{"systemMessage":"[keel] Compacting with a dirty tree but %s not updated — the WHY of this work may now exist only in the summary. A STALE-DISK line was written to .claude/ritual-log; the next session start asks you to settle it first. %s (snapshot saved to .claude/snapshots/)."}\n' "$surface" "$nxt"
   fi
 fi
 exit 0

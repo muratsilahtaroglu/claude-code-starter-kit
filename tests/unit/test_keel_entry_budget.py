@@ -313,6 +313,11 @@ def _load_hook():
 class _FakeEnc:
     """One token per character — lets the token axis be tested without tiktoken installed."""
     def encode(self, s):
+        if "<|endoftext|>" in s:
+            raise ValueError("special token")  # what tiktoken's encode() does
+        return list(s)
+
+    def encode_ordinary(self, s):
         return list(s)
 
 
@@ -342,3 +347,48 @@ def test_a_relative_file_path_is_resolved_against_the_project_root(handover, tmp
                           capture_output=True, text=True, cwd=str(elsewhere),
                           env=dict(os.environ, CLAUDE_PROJECT_DIR=str(handover)))
     assert proc.returncode == ALLOW, proc.stderr
+
+
+# Post-release review of v0.8.37 (2026-09-26), each pinned.
+
+def test_a_special_token_in_a_line_does_not_switch_the_gate_off():
+    """tiktoken's encode() RAISES on <|endoftext|>; the fail-open wrapper then allowed everything."""
+    eb = _load_hook()
+    after = "short\n" + "<|endoftext|>" + "x" * 200 + "\n"
+    assert eb.long_new_lines("short\n", after, 400, 100, _FakeEnc()) == [(2, 213, "tokens")]
+
+
+def test_the_offender_named_is_the_line_that_changed():
+    """Dominance is by rank: growing the SHORTER of two long lines used to name the untouched one."""
+    eb = _load_hook()
+    before = "a" * 900 + "\n" + "b" * 500 + "\n"
+    after = "a" * 900 + "\n" + "b" * 950 + "\n"
+    assert eb.long_new_lines(before, after, 400) == [(2, 950, "characters")]
+
+
+def test_a_near_miss_cap_key_is_named_and_a_project_key_stays_silent(handover):
+    (handover / ".claude").mkdir(exist_ok=True)
+    (handover / ".claude" / "keel-caps").write_text("LESSON_KB=90\nMY_TOOL_LIMIT=3\n")
+    eb = _load_hook()
+    notes = eb.caps_notes(str(handover))
+    assert len(notes) == 1 and "`LESSON_KB`" in notes[0] and "`LESSONS_KB`" in notes[0]
+
+
+def test_a_token_cap_without_tiktoken_is_said_out_loud(handover, monkeypatch):
+    (handover / ".claude").mkdir(exist_ok=True)
+    (handover / ".claude" / "keel-caps").write_text("HANDOVER_LINE_TOKENS=120\n")
+    eb = _load_hook()
+    monkeypatch.setattr(eb, "_tokenizer", lambda: None)
+    notes = eb.caps_notes(str(handover))
+    assert len(notes) == 1 and "token axis is OFF" in notes[0]
+    monkeypatch.setattr(eb, "_tokenizer", lambda: _FakeEnc())
+    assert eb.caps_notes(str(handover)) == []
+
+
+def test_an_undecodable_byte_in_keel_caps_does_not_silence_check(handover):
+    """UnicodeDecodeError is a ValueError the reader did not catch; --check then printed nothing."""
+    (handover / ".claude" / "keel-caps").write_bytes(b"LESSONS_ENTRY = 20  # r\xf6viewed\n")
+    eb = _load_hook()
+    assert eb.read_caps(str(handover)) == {"LESSONS_ENTRY": 20}
+    assert eb.max_lines(str(handover), {"cap_key": "LESSONS_ENTRY", "default": 8}) == 20, \
+        "one parser: spaces around '=' used to fall back to the default in the entry gate only"

@@ -50,7 +50,8 @@
    first) with (a) completed, (b) tried-and-failed (so they aren't retried), (c) latest updates,
    (d) next steps — in ENGLISH (machine-read memory, §9.31). **Hard cap: max 3 blocks / ~150 lines** (it is `@`-imported into every session — bloat
    is a per-session token tax and an adherence tax) — and in KB, ONE FACT PER LINE (a per-line cap is enforced: a line
-   cap alone stayed green while one line reached 135 KB). Refresh the block at each WORK BLOCK's end, not only at session end. On overflow run **`/keel-distill`** (§9.33): oldest
+   cap alone stayed green while one line reached 135 KB). Refresh the block at each WORK BLOCK's end, not only
+   at session end. On overflow run **`/keel-distill`** (§9.33): oldest
    block's critical facts → `LESSONS.md`, raw block → `docs/handover-archive.md` verbatim. Default is a
    **single root** handover. On large multi-area projects the AI may create **per-area handovers**
    (`<area>/HANDOVER.md`, e.g. backend/frontend/agent) when an area needs its own — the root then indexes
@@ -184,7 +185,7 @@
     tokens per always-imported line; write them in English on every project regardless of the
     project language (the user's verbatim words may stay quoted in their language; human surfaces —
     TASKS/PLAN/reports/docs — follow the project language; owner-facing questions are surfaced in
-    CHAT in the project language, the file line stays EN — and a LANGUAGE-SPECIFIC domain fact
+    CHAT in the project language (on teams: by the orchestrator only, §10.42), the file line stays EN — and a LANGUAGE-SPECIFIC domain fact
     (morphology, a locale's casing/collation trap) keeps its example in that language: translating
     the example destroys the lesson).
 32. **Task board (`TASKS.md`).** Cross-session tasks live in `TASKS.md` (built-in todos are session
@@ -242,18 +243,20 @@
     references dead (~54% false staleness). Exempt by PATH, resolve by BASENAME. Report the discrepancy
     only once the instrument
     is cleared — and say which side you checked. **The MECHANISM sentence is a separate claim:** a right verdict
-    can carry a wrong explanation nobody re-checks (field: six in one day) — falsify it too, or write "unmeasured". (Field: bit four times in one project; a probe's
+    can carry a wrong explanation nobody re-checks (field: six in one day) — falsify it too, or write
+    "unmeasured". (Field: bit four times in one project; a probe's
     exclusive `< end` against a tool's inclusive end manufactured a suspiciously clean ratio, and a
     raw `count()` reference read ~17% high on unmerged row versions — the TOOL was right both times.)
 38. **Rule budget.** Capped like the memory files: **~400 lines**, `.claude/keel-caps`-tunable (the
     SessionStart hook warns on overflow). A new rule must earn its slot — merge it into an existing
     rule, retire one, or promote the behavior to a hook/permission (enforced beats written); a
     constitution too long to hold in attention is decoration. **Measure, do not quote:** the stock
-    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~388 at v0.8.37), so your project's own
+    TEMPLATE is what `wc -l rules.md` says on a fresh clone (~391 at v0.8.38), so your project's own
     rules get the REMAINDER — check it before adding, and if the remainder is too thin the answer is
     to retire template text or raise `RULES` in `.claude/keel-caps`, not to squeeze. A hard-coded
     pair here rots: the previous "~290 / ~110" was written once and was 50 lines stale within a
-    fortnight, in the very rule that forbids a copied cap number (§9.33). (It was ~300 total until 2026-08-18, which measured out as ~6 lines for the project and
+    fortnight, in the very rule that forbids a copied cap number (§9.33). (It was ~300 total until
+    2026-08-18, which measured out as ~6 lines for the project and
     forced every real project to raise the cap on day one — the default was wrong, not the projects.)
     Template text that merely restates a skill is compressed to the invariant + the pointer.
 39. **Fix the class, not the instance.** When a fix targets one failing case (a query, a test, an input),

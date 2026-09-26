@@ -173,3 +173,60 @@ def test_an_unreadable_stale_disk_marker_is_not_settled(project):
     (project / ".claude" / "ritual-log").write_text("garbage-time compact auto STALE-DISK: x\n")
     rc, out = run_local(project)
     assert rc == 1 and "crossed a dirty tree" in out
+
+
+# Post-release review of v0.8.37 (2026-09-26), each pinned.
+
+def test_a_project_s_own_entry_budget_does_not_fault_the_script(project):
+    """A live project's entry-budget.py had no read_caps(); the script imported it and died rc=2."""
+    (project / ".claude" / "hooks" / "entry-budget.py").write_text("print('project-owned')\n")
+    rc, out = run_local(project)
+    assert rc == 0 and "INSTRUMENT FAULT" not in out, out
+
+
+def test_a_missing_or_foreign_citation_gate_is_not_measured_not_passed(project):
+    (project / ".claude" / "hooks" / "citation-gate.py").write_text("x = 1\n")
+    _, out = run_local(project)
+    assert "NOT measured" in out and "PASS  ghost" not in out
+    (project / ".claude" / "hooks" / "citation-gate.py").unlink()
+    _, out = run_local(project)
+    assert "NOT measured" in out
+
+
+def test_a_worker_s_stale_disk_marker_is_not_the_orchestrator_s_debt(project):
+    """Workers never write HANDOVER (single writer); their marker is settled on their board."""
+    (project / ".claude" / "agents").mkdir()
+    (project / ".claude" / "agents" / "team-bob.md").write_text("# bob\nRole: worker\n")
+    old = datetime.datetime.now() - datetime.timedelta(hours=1)
+    os.utime(project / "HANDOVER.md", (old.timestamp(), old.timestamp()))
+    stamp = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+    log = project / ".claude" / "ritual-log"
+    log.write_text(stamp + " compact auto STALE-DISK @bob: tree dirty, reports/team/bob/board.md untouched\n")
+    rc, out = run_local(project)
+    assert "crossed a dirty tree" not in out, out
+    log.write_text(stamp + " compact auto STALE-DISK @lead: tree dirty, HANDOVER.md untouched\n")
+    rc, out = run_local(project)
+    assert rc == 1 and "crossed a dirty tree" in out
+
+
+def test_line_char_default_equals_the_write_hook():
+    """The script no longer imports entry-budget.py (a project may own it) — so pin the parity."""
+    hook = (REPO / ".claude" / "hooks" / "entry-budget.py").read_text()
+    assert "LINE_CHARS_DEFAULT = 400" in hook and "LINE_CHARS_DEFAULT = 400" in SCRIPT.read_text()
+
+
+def test_a_script_style_citation_gate_cannot_set_the_verdict(project):
+    """`sys.exit(main())` at import is SystemExit, not Exception: the run ended rc 0, silently."""
+    (project / ".claude" / "hooks" / "citation-gate.py").write_text("import sys\nsys.exit(0)\n")
+    rc, out = run_local(project)
+    assert rc == 2 and "INSTRUMENT FAULT" in out
+
+
+def test_caps_values_parse_like_the_bash_reader(project):
+    (project / "LESSONS.md").write_text("# LESSONS\n" + ("- 2026-01-01 — %s\n" % ("w" * 90)) * 500)
+    (project / ".claude" / "keel-caps").write_text("LESSONS=500\nLESSONS_KB=50KB\n")
+    _, out = run_local(project)
+    assert "/50 KB" in out
+    (project / ".claude" / "keel-caps").write_text("LESSONS=500\nLESSONS_KB=abc\n")
+    _, out = run_local(project)
+    assert "/80 KB" in out, "a non-numeric value is ignored, so the scaled default applies"

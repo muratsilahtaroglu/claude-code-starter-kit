@@ -62,6 +62,13 @@ def parse_registry(lines):
     return out
 
 
+def name_matches(name, agent):
+    """A window name addresses `agent` when it IS the agent's name, or the agent's name plus the
+    optional date suffix `_<MM>_<DD>` (docs/steering.md) — `review_09_24` is @review, not a stray."""
+    import re
+    return name == agent or bool(name and re.fullmatch(re.escape(agent) + r"_\d\d_\d\d", name))
+
+
 def resolve(registry, records, is_alive, repo_cwd, attached=None, started=None):
     """Pure core. registry: [(session_id, agent)] · records: [dict] (sessions/*.json contents) ·
     is_alive: pid -> bool · repo_cwd: this repo's absolute path · attached: {pid: True|False|None} ·
@@ -99,7 +106,7 @@ def resolve(registry, records, is_alive, repo_cwd, attached=None, started=None):
         for rec in live:
             name = rec.get("name")
             cwd = rec.get("cwd")
-            if name != agent:
+            if not name_matches(name, agent):
                 status = "NAME_MISMATCH"
             elif cwd != repo_cwd:
                 status = "OTHER_REPO"
@@ -136,7 +143,7 @@ def self_line(own, registry):
     if not own:
         return []
     agent = dict(registry).get(own.get("sessionId"))
-    if not agent or own.get("name") == agent:
+    if not agent or name_matches(own.get("name"), agent):
         return []
     return ["[team] ⚠ THIS window is @%s but its address is '%s' — peers cannot reach @%s until the "
             "owner types `/rename %s` here (a resumed/reopened window loses its name; the launch "

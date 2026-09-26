@@ -148,7 +148,8 @@ merge layer, so every shared file gets exactly one writer.
 
 ### Owner review (four states)
 
-A developer does not delete their finished item — it moves to a `## Review` section and the line
+A developer does not delete their finished T2 item (T0/T1 close straight to the index, rules
+§10.41) — it moves to a `## Review` section and the line
 **names its evidence file**:
 
 ```

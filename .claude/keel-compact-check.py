@@ -87,7 +87,37 @@ def kb_default(caps, key):
     return base
 
 
-def caps_section(eb, caps):
+LINE_CHARS_DEFAULT = 400      # MUST equal entry-budget.py's (pinned by a test)
+
+
+def read_caps(root):
+    """{KEY: int} from `.claude/keel-caps`, parsed HERE — never imported from the hook module: a
+    project that kept its own `entry-budget.py` through `/keel-update` would otherwise make this
+    script an instrument fault on every run (found in review against a live project)."""
+    out = {}
+    try:
+        with open(os.path.join(root, ".claude", "keel-caps"), encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                line = line.split("#")[0].strip()
+                k, sep, v = line.partition("=")
+                # Leading digits, exactly like the bash reader (`50KB` -> 50, `abc` -> ignored).
+                m = re.match(r"\s*(\d+)", v)
+                if sep and m:
+                    out[k.strip()] = int(m.group(1))
+    except OSError:
+        pass
+    return out
+
+
+def line_char_cap(caps, name, key):
+    if key + "_LINE_CHARS" in caps:
+        return caps[key + "_LINE_CHARS"]
+    if name == "TASKS.md":      # the line cap never undercuts the board-item character budget
+        return max(LINE_CHARS_DEFAULT, caps.get("TASKS_ENTRY_CHARS", 400))
+    return LINE_CHARS_DEFAULT
+
+
+def caps_section(caps):
     say("SIZE (caps from .claude/keel-caps; defaults where a key is absent)")
     total = 0
     for name, key in FILES:
@@ -99,16 +129,20 @@ def caps_section(eb, caps):
         total += size
         line_cap = caps.get(key, LINE_DEFAULTS.get(key))
         kb_cap = kb_default(caps, key)
-        char_cap, _ = eb.line_caps_for(ROOT, name)
+        char_cap = line_char_cap(caps, name, key)
         long = [(i, len(l)) for i, l in enumerate(lines, 1) if char_cap and len(l) > char_cap]
         parts = ["%d lines%s" % (len(lines), "/%d" % line_cap if line_cap else ""),
                  "%.1f/%d KB" % (size / 1024, kb_cap)]
-        if long:
-            i, n = max(long, key=lambda x: x[1])
-            parts.append("%d line(s) over %d chars, longest line %d = %d chars" % (len(long), char_cap, i, n))
-        ok = (not line_cap or len(lines) <= line_cap) and size <= kb_cap * 1024 and not long
+        ok = (not line_cap or len(lines) <= line_cap) and size <= kb_cap * 1024
         gate(name, ok, " · ".join(parts))
-    cap_all = caps.get("CONTEXT_KB") or max(
+        if long:
+            # INFO, not RED: the write gate lets an EXISTING long line stay (it only blocks new or
+            # longer ones), so a RED here would be a permanently-red check on inherited text. A
+            # pathological line still turns the KB gate above RED.
+            i, n = max(long, key=lambda x: x[1])
+            info(name + " long lines", "%d over %d chars, longest line %d = %d chars — split into "
+                 "one fact each when you next touch them" % (len(long), char_cap, i, n))
+    cap_all = caps["CONTEXT_KB"] if "CONTEXT_KB" in caps else max(
         KB_DEFAULTS["CONTEXT_KB"], sum(kb_default(caps, k) for _, k in FILES) * 5 // 6)
     gate("always-loaded total", total <= cap_all * 1024, "%.1f/%d KB" % (total / 1024, cap_all))
 
@@ -136,7 +170,23 @@ def handover_section(caps, today):
          "modified in the tree" if dirty else ("committed <=30 min ago" if fresh_commit
                                                else "not modified, last commit older than 30 min"))
     log = read(".claude/ritual-log") or ""
-    sd = [l[:19] for l in log.splitlines() if " STALE-DISK" in l]
+    def worker(tag):
+        p = os.path.join(ROOT, ".claude", "agents", "team-%s.md" % tag)
+        try:
+            with open(p, encoding="utf-8") as fh:
+                return any(l.startswith("Role: worker") for l in fh)
+        except OSError:
+            return False
+    # /keel-compact is the orchestrator's / a solo session's ritual, so only markers that are
+    # settled in HANDOVER count here; a worker's tagged marker is settled in its own board.
+    sd = []
+    for l in log.splitlines():
+        if " STALE-DISK" not in l:
+            continue
+        m = re.search(r" STALE-DISK @([^:]+):", l)
+        if m and worker(m.group(1)):
+            continue
+        sd.append(l[:19])
     if sd:
         try:
             sd_s = datetime.datetime.strptime(sd[-1], "%Y-%m-%d %H:%M:%S").timestamp()
@@ -188,12 +238,24 @@ def citation_section():
     if git("rev-parse", "--is-inside-work-tree") != "true":
         info("ghost citations", "not a git repo — NOT measured (HEAD is the reference)")
         return
-    cg = load("citation_gate", os.path.join(HERE, "hooks", "citation-gate.py"))
+    path = os.path.join(HERE, "hooks", "citation-gate.py")
+    report = None
+    if os.path.isfile(path):
+        # A gate that is PRESENT but crashes on load propagates -> rc=2 (fail closed). Only an absent
+        # file, or a project's own gate without report(), is "not measured" — never a silent pass.
+        try:
+            report = getattr(load("citation_gate", path), "report", None)
+        except SystemExit as exc:   # a script-style gate exits at import: never let it set OUR rc
+            raise RuntimeError("citation-gate.py exited on import (%s) — not a library" % exc.code)
+    if report is None:
+        info("ghost citations", "NOT measured — no kit citation-gate.py with report() here "
+             "(a project may run its own gate; run it by hand)")
+        return
     import contextlib
     import io
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
-        rc = cg.report(ROOT)
+        rc = report(ROOT)
     if rc == 2:
         raise RuntimeError("citation-gate reports itself BROKEN: " + buf.getvalue().strip()[:200])
     first = next((l for l in buf.getvalue().splitlines() if l.strip()), "")
@@ -228,14 +290,13 @@ def plan_and_push_section(today):
 def main():
     today = datetime.date.today().isoformat()
     try:
-        eb = load("entry_budget", os.path.join(HERE, "hooks", "entry-budget.py"))
-        caps = eb.read_caps(ROOT)
-        caps_section(eb, caps)
+        caps = read_caps(ROOT)
+        caps_section(caps)
         handover_section(caps, today)
         board_section()
         citation_section()
         plan_and_push_section(today)
-    except Exception as exc:          # fail-CLOSED: a check that could not run is not a pass
+    except (Exception, SystemExit) as exc:   # fail-CLOSED: a check that could not run is not a pass
         print("\n".join(OUT))
         print("INSTRUMENT FAULT (rc=2): %s — fall back to the checklist in /keel-compact by hand." % exc)
         return 2

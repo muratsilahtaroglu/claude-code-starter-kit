@@ -36,12 +36,17 @@ counts LINES or ENTRIES, and none of them sees how LONG a line is. HANDOVER sat 
 green — while it had grown to 244 KB, because ONE line held 135 KB; auto-compact then fired three
 times in five minutes. So every ALWAYS-LOADED file (CLAUDE.md · rules.md · HANDOVER.md · LESSONS.md
 · TASKS.md, at the project root) also carries a per-LINE character cap (`<FILE>_LINE_CHARS`,
-default 400): a write that ADDS a line over the cap is blocked; a line already in the file verbatim
-never is (monotone descent again — cleanup must never be punished). Characters, not bytes, so a
+default 400): a write that ADDS a long line, or makes one LONGER, is blocked; existing long lines
+may stay, move or shrink (monotone descent by dominance — cleanup must never be punished; one
+consequence, stated honestly: splitting one long line into several still-long ones also blocks).
+Only root files are guarded — a per-area `<area>/HANDOVER.md` (rules §1.4) is not. Characters, not bytes, so a
 Turkish or emoji line is not penalised twice. Tokens are the real cost, but counting them needs a
 tokenizer: when `tiktoken` is importable, an optional `<FILE>_LINE_TOKENS` key adds a token axis
 (approximate — OpenAI's cl100k, not Claude's tokenizer); without it that axis is skipped, never
-guessed from a made-up ratio.
+guessed from a made-up ratio. When a `*_LINE_TOKENS` key is set but tiktoken cannot be
+imported by the interpreter that runs this hook, `--check` SAYS so once per session start — a
+configured gate that silently does nothing is worse than none. (tiktoken fetches its encoding file
+on first use unless cached — set TIKTOKEN_CACHE_DIR for offline machines.)
 
 Registrations: PreToolUse (Write|Edit; exit 2 = block, fail-open on anything unexpected) +
 SessionStart --check (advisory: prints only when the standing backlog GREW — a gate that is always
@@ -97,16 +102,14 @@ def read_caps(root):
     """{KEY: int} from `.claude/keel-caps`; comment lines and unparseable values are ignored."""
     out = {}
     try:
-        with open(os.path.join(root, ".claude", "keel-caps"), encoding="utf-8") as fh:
+        with open(os.path.join(root, ".claude", "keel-caps"), encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 line = line.split("#")[0].strip()
-                if "=" not in line:
-                    continue
-                k, _, v = line.partition("=")
-                try:
-                    out[k.strip()] = int(v.strip())
-                except ValueError:
-                    pass
+                k, sep, v = line.partition("=")
+                # Leading digits, exactly like the bash reader (`50KB` -> 50, `abc` -> ignored).
+                m = re.match(r"\s*(\d+)", v)
+                if sep and m:
+                    out[k.strip()] = int(m.group(1))
     except OSError:
         pass
     return out
@@ -134,18 +137,28 @@ def long_new_lines(before, after, char_cap, token_cap=None, enc=None):
             if char_cap and len(line) > char_cap:
                 out.append((len(line), i, "characters"))
             elif token_cap and enc is not None:
-                n = len(enc.encode(line))
+                # encode_ordinary: `encode` RAISES on special tokens such as <|endoftext|>, and the
+                # hook's fail-open wrapper would then switch off the WHOLE gate for that file.
+                n = len(enc.encode_ordinary(line))
                 if n > token_cap:
                     out.append((n, i, "tokens"))
         return sorted(out, reverse=True)
-    worse = []
+    worse, allnew = [], []
     # Each UNIT is compared on its own: in one sorted list a new over-TOKEN line could "replace" an
     # old over-CHARACTER line and pass (found by the pre-release review).
     for unit in ("characters", "tokens"):
         old = [m for m in measures(before) if m[2] == unit]
         new = [m for m in measures(after) if m[2] == unit]
         worse += [m for k, m in enumerate(new) if k >= len(old) or m[0] > old[k][0]]
-    return [(i, n, unit) for n, i, unit in sorted(worse, key=lambda m: m[1])]
+        allnew += new
+    # Name the lines that actually CHANGED: dominance is decided by rank, so an untouched long line
+    # can sit in a "worse" slot while the edited one is elsewhere (found in review).
+    old_lines = set(before.splitlines())
+    new_lines = after.splitlines()
+    if not worse:
+        return []
+    named = [m for m in allnew if new_lines[m[1] - 1] not in old_lines] or worse
+    return [(i, n, unit) for n, i, unit in sorted(named, key=lambda m: m[1])]
 
 
 def line_caps_for(root, name):
@@ -166,14 +179,9 @@ def max_lines(root, prof, cap_key="cap_key", default_key="default"):
     key = prof.get(cap_key)
     if key is None:
         return None
-    try:
-        with open(os.path.join(root, ".claude", "keel-caps"), encoding="utf-8") as fh:
-            for line in fh:
-                if line.strip().startswith(key + "="):
-                    return int(line.split("=", 1)[1].split("#")[0].strip())
-    except (OSError, ValueError):
-        pass
-    return prof.get(default_key)
+    # ONE parser for the file: a private `startswith(key + "=")` here read `LESSONS_ENTRY = 20` as the
+    # default while the line gate read 20 (found in review).
+    return read_caps(root).get(key, prof.get(default_key))
 
 
 def entries(text, prof):
@@ -230,9 +238,40 @@ def _msg(bad, cap, name, prof, char_cap=None):
     return "\n".join(parts)
 
 
+KNOWN_CAP_KEYS = {"HANDOVER", "LESSONS", "TASKS", "RULES", "HANDOVER_BLOCKS", "REVIEW_DAYS",
+                  "LESSONS_ENTRY", "TASKS_ENTRY", "TASKS_ENTRY_CHARS", "CONTEXT_KB"}
+for _k in LINE_CAPS.values():
+    KNOWN_CAP_KEYS |= {_k + "_KB", _k + "_LINE_CHARS", _k + "_LINE_TOKENS"}
+
+
+def caps_notes(root):
+    """Two SILENT failure modes of `.claude/keel-caps`, said out loud (never blocking):
+    a key one edit away from a known one (a typo like LESSON_KB is otherwise simply ignored), and a
+    token cap configured where no tokenizer can run it. Keys that are merely unknown are NOT flagged —
+    a project may keep its own keys there for its own tools."""
+    import difflib
+    caps = read_caps(root)
+    out = []
+    for k in sorted(caps):
+        if k in KNOWN_CAP_KEYS:
+            continue
+        close = difflib.get_close_matches(k, sorted(KNOWN_CAP_KEYS), n=1, cutoff=0.85)
+        if close:
+            out.append("[keel] .claude/keel-caps: `%s` is not a key Keel reads — did you mean `%s`? "
+                       "(an unknown key is ignored silently; see .claude/keel-caps.example)" % (k, close[0]))
+    tok = sorted(k for k in caps if k.endswith("_LINE_TOKENS") and k in KNOWN_CAP_KEYS)
+    if tok and _tokenizer() is None:
+        out.append("[keel] .claude/keel-caps sets %s but tiktoken is not importable by %s — the token "
+                   "axis is OFF (the character axis still runs). Install tiktoken for this interpreter, "
+                   "or let the hook command prefer the project venv." % (", ".join(tok), sys.executable))
+    return out
+
+
 def check(root):
     """SessionStart advisory, per guarded file: report only when the oversized-entry count GREW past
     the recorded baseline; auto-lower the baseline when it shrank. Never blocks, always exits 0."""
+    for line in caps_notes(root):
+        print(line)
     for name, prof in PROFILES.items():
         path = os.path.join(root, name)
         if not os.path.exists(path):

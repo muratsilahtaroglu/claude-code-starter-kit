@@ -199,3 +199,12 @@ def test_unmeasured_start_time_is_never_called_a_leftover():
     joined = "\n".join(lines)
     assert "WINDOWS" in joined and "UNMEASURED" in joined
     assert "leftovers" not in joined and not re.search(r"kill\s+\d", joined)
+
+
+def test_a_date_suffixed_name_is_not_a_mismatch():
+    """Optional `<agent>_<MM_DD>` window names (steering) must not read as a reverted address."""
+    rows, _ = ta.resolve([("s1", "frontend")], [rec("s1", "frontend_09_26", 11)], alive(11), CWD)
+    assert rows[0]["status"] == "OK"
+    assert ta.self_line({"sessionId": "s1", "name": "frontend_09_26"}, [("s1", "frontend")]) == []
+    rows, _ = ta.resolve([("s1", "frontend")], [rec("s1", "frontend_x", 11)], alive(11), CWD)
+    assert rows[0]["status"] == "NAME_MISMATCH", "only the exact date shape is accepted"

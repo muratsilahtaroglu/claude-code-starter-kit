@@ -3,7 +3,7 @@
 <!-- `test_<name>.py` — what it guards + origin (phase/bug). Example:
 `test_scoring.py` — scoring edge cases: 0-price, missing fields (phase 2; the silent-NaN bug). -->
 
-`test_keel_hooks.py` — the kit's own hook regression matrix (169 cases: block-dangerous ·
+`test_keel_hooks.py` — the kit's own hook regression matrix (174 cases: block-dangerous ·
 owner-guard · reground TASKS parsing + repo invariants · the workspace-trust check that names
 allow rules withheld until the trust dialog is accepted, silent when trusted, when there are no
 allow rules, or when the config is unreadable · the review-DECAY check: an old delivery is named
@@ -22,13 +22,13 @@ silent event kind as an INSTRUMENT gap). Origin: a false "hooks are double-firin
 ran at every session start for two days, caused by test runs writing into the live telemetry
 (`reports/2026-08-19-observability-audit.md`). KIT-OWNED — `/keel-update` replaces `test_keel_*.py`.
 
-`test_keel_star_topology.py` — the star wall for agent teams (12 cases: worker→worker blocked
+`test_keel_star_topology.py` — the star wall for agent teams (14 cases: worker→worker blocked
 incl. the `[ref]` disambiguator · worker→orchestrator and every off-roster target allowed · solo
 projects untouched · fails open · the block is logged with @attribution). Origin: the message-driven
 team design of 2026-08-19 — a permission rule cannot express "by target", so the topology had to
 become a hook (`reports/2026-08-19-agent-team-messaging.md`). KIT-OWNED.
 
-`test_keel_team_addresses.py` — the identity→address resolver (18 cases: healthy lane · closed
+`test_keel_team_addresses.py` — the identity→address resolver (20 cases: healthy lane · closed
 window · reverted display name flagged as NAME_MISMATCH not death · one session-id in two windows ·
 unregistered live session · per-identity aggregation so a stale dead row beside a live one stays
 quiet · the two-machine axis: ATTACHED/DETACHED twins from the VS Code server's client signal, never
@@ -53,8 +53,8 @@ Origin: `git commit -- <path>` skips an untracked file WITHOUT erroring, so a re
 reference the artefact never earned; measured on a live project where the class repeated three times
 in one day under a written rule, which is why §6.18 became a gate (§10.38). KIT-OWNED.
 
-`test_keel_compact_check.py` — the one-call freshness gate `/keel-compact` runs (13 cases: a fresh project passes and still prints the human step · one huge line is RED under the line cap · top-block date incl. a date-range heading · STALE-DISK debt · `## Now` counted per lane · Review line without a note · ghost citation · instrument fault fails CLOSED · defaults equal the SessionStart hook's · one existing path cannot vouch for a missing note · a raised line cap scales its KB default, in both readers · an unreadable STALE-DISK marker is not settled). Born from a ritual that cost up to 59 tool turns.
-`test_keel_entry_budget.py` — the per-entry budget for the always-imported boards plus the per-LINE cap on every always-loaded root file (29 cases; the line axis: a new over-token line cannot hide behind an old over-character one · fail-open on a malformed payload · relative paths resolve against the root · a new long HANDOVER line blocks · shortening passes and lengthening blocks (dominance) · a second long line beside a longer one blocks · tunable and root-only · rules/CLAUDE guarded; the entry axis: oversized new entry
+`test_keel_compact_check.py` — the one-call freshness gate `/keel-compact` runs (19 cases: a fresh project passes and still prints the human step · one huge line is RED under the line cap · top-block date incl. a date-range heading · STALE-DISK debt · `## Now` counted per lane · Review line without a note · ghost citation · instrument fault fails CLOSED · a project-owned entry-budget or script-style citation gate never faults or passes silently · a worker's STALE-DISK marker is not the orchestrator's debt · caps values parse like the bash reader · defaults equal the SessionStart hook's · one existing path cannot vouch for a missing note · a raised line cap scales its KB default, in both readers · an unreadable STALE-DISK marker is not settled). Born from a ritual that cost up to 59 tool turns.
+`test_keel_entry_budget.py` — the per-entry budget for the always-imported boards plus the per-LINE cap on every always-loaded root file (34 cases; the line axis: a new over-token line cannot hide behind an old over-character one · fail-open on a malformed payload · relative paths resolve against the root · a new long HANDOVER line blocks · shortening passes and lengthening blocks (dominance) · a second long line beside a longer one blocks · tunable and root-only · rules/CLAUDE guarded; the entry axis: oversized new entry
 blocked · the fold-in blind spot closed (an Edit with no dated line that grows an entry past budget)
 · shrinking always passes · pre-existing backlog never blocks unrelated edits · per-file caps tunable via
 keel-caps · --check baseline auto-lowers and never auto-raises · the same gate over TASKS.md board

@@ -41,10 +41,14 @@ git -C /tmp/keel-latest rev-parse --short HEAD   # record for the handover line
   PROTECTED tree** — `scratch/README.md`, `tests/README.md`, `tests/*/README.md`: the folder's
   CONTENTS are the project's, but the README states the kit's rule for that folder and projects
   tailor it, so it is diffed hunk-by-hunk rather than skipped with the tree (without this the
-  scratch-as-evidence rule of v0.8.25 could never reach an adopted project).
+  scratch-as-evidence rule of v0.8.25 could never reach an adopted project) · **`reports/team/README.md`**
+  (the index TEMPLATE inside the PROTECTED `reports/` tree: its header is kit doctrine — status
+  vocabulary, index scope — while its lines are the project's; diff the header, never the lines).
 - **TOOLING — template-owned; summarize changes, one approval for the batch:** `.claude/skills/**` ·
   `.claude/hooks/**` · `.claude/*.py` · `.claude/claude-launch-wrapper.sh` (kit-owned tools that sit at the `.claude/` root — team-addresses, ritual-report, the launch wrapper) · `.claude/agents/{researcher,verifier,auditor,observer,README}.md` · `.claude/rules/README.md`
   (+ example) · `tests/unit/test_keel_*.py` · `docs/security.md` · `docs/steering.md` ·
+  `docs/memory-files.md` · `.claude/keel-caps.example` (the key reference; the project's own
+  `.claude/keel-caps` stays PROTECTED) ·
   `docs/adr/0000-adr-template.md` · `docs/adr/README.md` · `docs/assets/` · `CONTRIBUTING.md`
   (kit-meta by its own first line) · folder `README.md`s.
 

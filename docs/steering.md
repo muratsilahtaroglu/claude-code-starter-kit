@@ -136,7 +136,8 @@ Roles from then on:
   message). Ritual surfaces stay shared — a session that cannot write HANDOVER/LESSONS/TASKS cannot
   run the discipline at all.
 - **Review loop (owner verifies developer work — file-first, four states, rules §10.40/41)** — a
-  developer's finished item is MOVED, not deleted, to a TASKS `## Review` section at their handover,
+  developer's finished T2 item (T0/T1 close straight to the index, §10.41) is MOVED, not deleted, to
+  a TASKS `## Review` section at their handover,
   and the line NAMES its evidence file (`- [x] ... (@dev) — evidence:
   reports/team/<@dev>/<task>_fix_<date>.md`). **A chat summary is not a delivery:** the re-ground hook
   flags pathless lines AND files missing on disk. Each delivery walks `wip → delivered → verified
@@ -180,8 +181,8 @@ Roles from then on:
   past-due dates at session start.
 - **Caps scale with the team:** the kit's memory caps are SOLO defaults — on a growing team the AI
   proposes larger ones (a starving `## Now`, a churning handover) and, with the owner's approval, pins
-  them in **`.claude/keel-caps`** (`KEY=NUMBER` per line: HANDOVER · LESSONS · TASKS · RULES ·
-  HANDOVER_BLOCKS). PROTECTED + owner-guarded: `/keel-update` never resets it, developers can't edit it.
+  them in **`.claude/keel-caps`** (`KEY=NUMBER` per line — every key the kit reads, with its default and meaning, is listed in
+  `.claude/keel-caps.example`; rules §10.40 names them). PROTECTED + owner-guarded: `/keel-update` never resets it, developers can't edit it.
 - **Spec + solution-note convention (the board stays lean):** `TASKS.md ## Now` carries only
   id + `@owner` + `due:` + done-when; the detailed SPEC of an assignment (requirements, manual test
   scripts, acceptance details) is an owner-approved `<task>_spec.md`, and every delivered fix ships a
@@ -234,7 +235,7 @@ Roles from then on:
   curation pass. Honest enforcement note: a co-agent runs under the owner's git identity, so
   owner-guard cannot wall it — the rule is discipline, backed by the ritual gates it cannot pass
   (its `/compact` stalls at the compact-gate because HANDOVER is not its surface; the main session's
-  handover clears it). Deliveries land in `## Review` like any teammate's (§10.41).
+  handover clears it). T2 deliveries land in `## Review` like any teammate's (§10.41).
 - **Agent teams (structured co-agents — `/keel-agent-team-create` + `/keel-agent-team-start`):** the
   owner names a roster (ONE **orchestrator** + specialized workers — `mechanic`, `frontend`, `test`,
   `provider`…; English single tokens preferred) and each agent gets an owner-approved charter in

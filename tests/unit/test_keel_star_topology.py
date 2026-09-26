@@ -143,3 +143,17 @@ def test_no_telemetry_from_a_probe_run(team):
     subprocess.run(["bash", str(HOOK)], input=json.dumps(payload),
                    capture_output=True, text=True, env=env, cwd=str(team))
     assert not (team / ".claude" / "ritual-log").exists()
+
+
+def test_a_date_suffixed_window_name_is_still_the_agent(team):
+    """Optional `<agent>_<MM_DD>` names (steering) read as OFF-roster and bypassed the block."""
+    rc, err = send(team, "provider_09_26")
+    assert rc == BLOCK and "@provider" in err
+    rc, _ = send(team, "orchestrator_09_26")
+    assert rc == ALLOW
+
+
+def test_a_roster_name_that_itself_ends_in_digits_is_not_stripped(team):
+    (team / ".claude" / "agents" / "team-etl_01_02.md").write_text("Role: worker\n")
+    rc, _ = send(team, "etl_01_02")
+    assert rc == BLOCK

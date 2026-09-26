@@ -42,6 +42,9 @@ cap_H=150; cap_L=250; cap_T=100; cap_R=400; cap_B=3; cap_RD=3
 kb_H=24; kb_L=40; kb_T=16; kb_R=48; kb_C=16; kb_ALL=120
 if [ -f "$DIR/.claude/keel-caps" ]; then
   while IFS='=' read -r k v; do
+    # Strip an inline "# comment" BEFORE keeping digits: `HANDOVER_KB=10  # lowered 2026-09-25` read
+    # as 1020260925 (found in review — the Python readers split on '#', this reader did not).
+    v="${v%%#*}"
     k="$(printf '%s' "$k" | tr -d '[:space:]\r')"; v="$(printf '%s' "$v" | tr -cd '0-9')"
     [ -n "$v" ] || continue
     case "$k" in
@@ -55,7 +58,7 @@ fi
 # A RAISED line cap scales its KB default in the same proportion (unless <FILE>_KB is set): an owner
 # who chose LESSONS=1000 must not meet a second, hidden 40 KB limit. Same rule as
 # .claude/keel-compact-check.py (pinned equal by a test).
-kbset() { [ -f "$DIR/.claude/keel-caps" ] && grep -qE "^[[:space:]]*$1[[:space:]]*=" "$DIR/.claude/keel-caps"; }
+kbset() { [ -f "$DIR/.claude/keel-caps" ] && grep -qE "^[[:space:]]*$1[[:space:]]*=[[:space:]]*[0-9]" "$DIR/.claude/keel-caps"; }
 kbscale() { # $1=kb_default $2=line_cap $3=line_default
   if [ "$2" -gt "$3" ]; then echo $(( ($1 * $2 + $3 - 1) / $3 )); else echo "$1"; fi
 }
@@ -98,16 +101,41 @@ if [ "$total_b" -gt $(( kb_ALL * 1024 )) ]; then
 fi
 
 # STALE-DISK debt (written by pre-compact-snapshot.sh): a compaction — usually AUTO — crossed a
-# dirty tree whose HANDOVER.md was untouched, so the WHY of that work may live only in the summary.
-# A systemMessage dies with the context it warns; this line is what survives. Settle it (write the
-# handover block) BEFORE new work. Cleared automatically once HANDOVER.md is newer than the marker.
-if [ -f "$DIR/.claude/ritual-log" ] && [ -f "$DIR/HANDOVER.md" ]; then
-  sd=$(grep ' STALE-DISK' "$DIR/.claude/ritual-log" 2>/dev/null | tail -1 | cut -c1-19)
+# dirty tree whose durable surface was untouched, so the WHY of that work may live only in the
+# summary. A systemMessage dies with the context it warns; this line is what survives.
+# ROLE-AWARE (rules §10.42 — found in review: the first version told EVERY session, workers included,
+# to run /keel-handover, a ritual workers may not run): a WORKER sees only its OWN tagged markers and
+# settles them in its board; the orchestrator / a solo session sees the rest and settles them in
+# HANDOVER. Cleared once that surface is newer than the marker. GNU date/stat; elsewhere this check is
+# skipped with one line saying so (never silently).
+if [ -f "$DIR/.claude/ritual-log" ]; then
+  sd_sid="$(printf '%s' "$payload" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  sd_me=""
+  [ -n "$sd_sid" ] && [ -f "$DIR/.claude/agent-team-sessions" ] \
+    && sd_me="$(grep -m1 "^${sd_sid} " "$DIR/.claude/agent-team-sessions" 2>/dev/null | awk '{print $2}')"
+  is_worker() { grep -q '^Role: worker' "$DIR/.claude/agents/team-$1.md" 2>/dev/null; }
+  if [ -n "$sd_me" ] && is_worker "$sd_me"; then
+    sd_surface="reports/team/${sd_me}/board.md"
+    sd=$(grep -F " STALE-DISK @${sd_me}:" "$DIR/.claude/ritual-log" 2>/dev/null | tail -1 | cut -c1-19)
+    sd_fix="write the WHY into your board's findings inbox (${sd_surface}) — never HANDOVER, the orchestrator syncs it —"
+  else
+    sd_surface="HANDOVER.md"
+    sd=""
+    while IFS= read -r l; do
+      tag=$(printf '%s' "$l" | sed -n 's/.* STALE-DISK @\([^:]*\):.*/\1/p')
+      if [ -z "$tag" ] || ! is_worker "$tag"; then sd=$(printf '%s' "$l" | cut -c1-19); fi
+    done <<EOF
+$(grep ' STALE-DISK' "$DIR/.claude/ritual-log" 2>/dev/null | tail -200)
+EOF
+    sd_fix="write/refresh this session's HANDOVER block (/keel-handover)"
+  fi
   if [ -n "$sd" ]; then
-    sd_s=$(date -d "$sd" +%s 2>/dev/null || echo 0)
-    h_s=$(stat -c %Y "$DIR/HANDOVER.md" 2>/dev/null || echo 0)
-    if [ "${sd_s:-0}" -gt "${h_s:-0}" ]; then
-      echo "[keel] STALE-DISK debt: at ${sd} a compaction crossed a dirty tree with HANDOVER.md untouched — the WHY of that work may exist only in the summary. Write/refresh this session's HANDOVER block (/keel-handover) BEFORE new work."
+    sd_s=$(date -d "$sd" +%s 2>/dev/null || echo "")
+    h_s=$(stat -c %Y "$DIR/$sd_surface" 2>/dev/null || echo 0)
+    if [ -z "$sd_s" ]; then
+      echo "[keel] STALE-DISK marker at ${sd} could not be timed here (GNU date needed) — check ${sd_surface} by hand."
+    elif [ "$sd_s" -gt "${h_s:-0}" ]; then
+      echo "[keel] STALE-DISK debt: at ${sd} a compaction crossed a dirty tree with ${sd_surface} untouched — the WHY of that work may exist only in the summary. ${sd_fix} BEFORE new work."
     fi
   fi
 fi

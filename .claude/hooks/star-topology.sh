@@ -50,6 +50,11 @@ grep -q '^Role: orchestrator' "$DIR/.claude/agents/team-${me}.md" 2>/dev/null &&
 # WHO AM I WRITING TO — strip the optional " [ref]" disambiguator SendMessage accepts.
 to="$(field '.get("tool_input", {}).get("to", "")')"
 to="$(printf '%s' "$to" | sed -E 's/[[:space:]]*\[[^]]*\][[:space:]]*$//; s/^[[:space:]]+//; s/[[:space:]]+$//')"
+# A date-suffixed window name (`review_09_24`, docs/steering.md option) is still that agent: without
+# this strip the roster lookup missed `team-review_09_24.md`, called it "off-roster" and ALLOWED the
+# worker-to-worker send (found in review — the documented option silently switched this hook off).
+# Only when the name as written is NOT itself a roster member (a worker may be called `etl_01_02`).
+[ -f "$DIR/.claude/agents/team-${to}.md" ] || to="$(printf '%s' "$to" | sed -E 's/_[0-9]{2}_[0-9]{2}$//')"
 [ -n "$to" ] || exit 0
 
 # Not a roster member → not a teammate → allowed (subagents, "main", unrelated sessions).

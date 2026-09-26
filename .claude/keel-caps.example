@@ -1,0 +1,35 @@
+# .claude/keel-caps.example — every cap key Keel reads, with its SOLO default (rules §9.33, §10.40).
+#
+# This file is REFERENCE ONLY and is never read. To tune a cap, create `.claude/keel-caps` (project
+# state: owner-only, PROTECTED from /keel-update) holding just the keys you change, one KEY=NUMBER per
+# line. An absent file or key means the default below. Inline `# comments` are fine.
+# Your own tools may keep extra keys there; Keel ignores them, and warns only on a key ONE typo away
+# from a key listed here (LESSON_KB → LESSONS_KB), since a misspelled cap is otherwise silently off.
+#
+# --- line caps of the always-loaded memory files (SessionStart warns on overflow) ---
+# HANDOVER=150            # lines in HANDOVER.md
+# HANDOVER_BLOCKS=3       # dated session blocks in HANDOVER.md
+# LESSONS=250             # lines in LESSONS.md
+# TASKS=100               # lines in TASKS.md
+# RULES=400               # lines in rules.md (the stock template uses most of it — measure: wc -l rules.md)
+# REVIEW_DAYS=3           # days a `## Review` line may wait before it is named
+#
+# --- size caps in KB (a line cap is blind to line length). A raised line cap scales its KB default
+# --- in proportion (LESSONS=500 → LESSONS_KB 80) unless the KB key is set explicitly ---
+# HANDOVER_KB=24
+# LESSONS_KB=40
+# TASKS_KB=16
+# RULES_KB=48
+# CLAUDE_KB=16
+# CONTEXT_KB=120          # all five together; default max(120, 5/6 of the sum of the five)
+#
+# --- per-entry write gate (entry-budget.py blocks a NEW or GROWN overflow; shrinking always passes) ---
+# LESSONS_ENTRY=8         # lines per dated LESSONS entry
+# TASKS_ENTRY=4           # lines per TASKS item
+# TASKS_ENTRY_CHARS=400   # characters per TASKS item
+#
+# --- per-LINE write gate, same monotone rule; <FILE> = HANDOVER · LESSONS · TASKS · RULES · CLAUDE ---
+# HANDOVER_LINE_CHARS=400 # characters per line (TASKS default: max(400, TASKS_ENTRY_CHARS))
+# HANDOVER_LINE_TOKENS=120  # OPTIONAL, NO default (off unless set): tokens per line, only where
+#                           # `tiktoken` imports for the hook's interpreter — SessionStart says so
+#                           # when it does not (the axis then stays off)

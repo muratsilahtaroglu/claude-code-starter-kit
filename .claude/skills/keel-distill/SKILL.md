@@ -6,14 +6,15 @@ description: Consolidate project memory — rotate old HANDOVER blocks to the ar
 # /keel-distill — the memory consolidation ritual ("sleep" for the project)
 
 Run when `HANDOVER.md` exceeds **3 session blocks / ~150 lines**, when `LESSONS.md` exceeds **~250** or
-`TASKS.md` **~100 lines** (the SessionStart hook warns on all of these), or every ~5 sessions as hygiene —
+`TASKS.md` **~100 lines**, or when any of them is over its **KB** cap (one long line can overflow a file
+that is green on lines — the SessionStart hook warns on all of these), or every ~5 sessions as hygiene —
 that cadence is yours to keep, the hook only detects cap overflows. Memory that is written but never
 reviewed degrades the project — consolidation is what keeps it useful (rules.md §9).
 
 Propose the full plan, get user approval, then apply. Never lossy-delete.
 (File-TREE clutter — stray scripts, logs, dead code — is not this ritual's job: that is `/keel-tidy`, §3.10.)
 
-## 1. Rotate HANDOVER blocks (oldest first, until ≤2 blocks AND under ~150 lines)
+## 1. Rotate HANDOVER blocks (oldest first, until ≤2 blocks AND under the line cap AND the KB cap)
 For each block being rotated, triage by criticality — **content-aware, not age-blind**:
 - **(b) Tried, didn't work** → PERMANENT: distill each to one `LESSONS.md [fail]` line
   (`<date> — <approach> → FAILED: <reason>. (full trace: docs/handover-archive.md, block <date>)`).
@@ -145,8 +146,9 @@ live work, and "what is @X still carrying?" becomes a directory listing again.
   authority; they drift in adopted projects because `/keel-update` never touches PROTECTED memory files.
 - Cap check (solo defaults — the project's `.claude/keel-caps` overrides them, rules §10.40):
   `HANDOVER.md` ≤ ~150 lines, `LESSONS.md` ≤ ~250, `TASKS.md` ≤ ~100, `CLAUDE.md` ≤ ~200,
-  `rules.md` ≤ ~400 — of which the stock template is ~290, so the project's own rules get ~110
-  (rule budget §10.38 — merge/retire/promote to a hook, don't just append).
+  `rules.md` ≤ ~400 — of which the stock template is what `wc -l rules.md` says on a fresh clone,
+  so the project's own rules get the REMAINDER (rule budget §10.38 — measure it, never copy a number;
+  merge/retire/promote to a hook, don't just append). Every file also has a KB cap (`<FILE>_KB`).
 
 ## 6. Report → approve → commit
 Summarize: N blocks archived, M lessons added/merged/superseded/promoted, lint findings. On approval,

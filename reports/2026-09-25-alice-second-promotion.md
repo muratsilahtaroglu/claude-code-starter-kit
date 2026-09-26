@@ -44,3 +44,25 @@ v0.8.36; nothing in alice was changed (kit-first — alice pulls via `/keel-upda
   were undocumented in §10.40.
 - Run read-only against alice_v2, `keel-compact-check.py` reports what the project must fix on pull:
   one rules.md line of 401 characters, 9 ghost citations, and (on the old defaults) nothing else.
+
+## Addendum 2026-09-26 — v0.8.38 (post-release audit of v0.8.37)
+An auditor pass and a second independent review found defects in v0.8.37 before alice_v2 pulled it.
+Every fix has a test that fails on the old code (checked by swapping the old files back in).
+- **STALE-DISK was role-blind** (alice_v2 carries 163 markers): a worker was told to write HANDOVER,
+  which §10.42 forbids. Markers are now tagged `@agent`, and a worker's marker is written and settled
+  against its own `reports/team/<name>/board.md`. The compaction message no longer tells a worker to
+  run a ritual. Agent names are matched literally, not as a regex.
+- **compact-check faulted on a project-owned `entry-budget.py`** (alice's has no `read_caps`). The
+  script now parses the caps file itself. A missing citation gate reads "NOT measured"; one that
+  crashes or `sys.exit`s on import is rc 2, never a silent rc 0. Long lines are info, not RED.
+- **Caps readers disagreed:** `KEY=10  # comment` read as 1020260925 in bash; one undecodable byte
+  silenced `--check`; `KEY = 20` gave the entry gate its default while the line gate read 20. There is
+  now one parser rule (leading digits, comments stripped, bytes replaced) in all three readers.
+- **The window-name date suffix bypassed star-topology.** `<agent>_MM_DD` now resolves to the agent,
+  but only when the name as written is not itself on the roster.
+- **Silent off-switches are now said out loud:** a special token in a line (`encode` raises) now
+  uses `encode_ordinary`; SessionStart names a `*_LINE_TOKENS` cap with no importable tiktoken, and a
+  caps key one typo away from a known one. `.claude/keel-caps.example` lists every key and default.
+- **Delivery gaps:** `/keel-update` ships `docs/memory-files.md`, `keel-caps.example` and the
+  `reports/team/README.md` header. The entry-budget hook prefers the project's working `.venv`
+  python. Doc wording is synced (T2-only Review, KB triggers in `/keel-distill`, steering cap keys).
